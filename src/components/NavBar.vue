@@ -51,7 +51,6 @@ const togglePopup = () => {
 };
 
 const changeFontSize = (fontSize: number) => {
-  console.log('fsdf')
   let root = document.querySelector(":root") as HTMLElement;
   root.style.setProperty("--over-all-font-size", fontSize + "px");
 };
