@@ -63,7 +63,7 @@
   font-weight: normal;
 }
 
-body {
+html {
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
@@ -76,3 +76,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+html.dark {
+  color: var(--vt-c-text-dark-2);
+  background: var(--vt-c-black);
+  transition: color 0.5s, background-color 0.5s;
+}
+
