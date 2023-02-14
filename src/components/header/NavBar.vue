@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { requireImage } from "@/utils/helper";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { RouterLink } from "vue-router";
-import { useStorage, useDark } from "@vueuse/core";
+
+import { t } from "@/locales";
+import LanguageSelection from "./LanguageSelection.vue";
+import Theme from "./Theme.vue";
+import FontSelection from "./FontSelection.vue";
 
 const showPopup = ref(false);
-const fontSize = useStorage("font-size", "18px");
-
-const isDark = useDark();
 
 const menuList = [
   { name: "home", label: "Me" },
@@ -43,8 +44,6 @@ const socialMedia = [
   },
 ];
 
-const fontSizeList = ["16px", "18px", "20px", "22px"];
-
 const togglePopup = () => {
   if (!showPopup.value) {
     showPopup.value = true;
@@ -56,17 +55,6 @@ const togglePopup = () => {
     }, 300);
   }
 };
-
-const changeFontSize = (size: string) => {
-  let root = document.querySelector(":root") as HTMLElement;
-  root.style.setProperty("--over-all-font-size", size);
-  fontSize.value = size;
-};
-
-onMounted(() => {
-  let root = document.querySelector(":root") as HTMLElement;
-  root.style.setProperty("--over-all-font-size", fontSize.value);
-});
 </script>
 
 <template>
@@ -76,7 +64,7 @@ onMounted(() => {
         <div
           class="fixed md:bg-white/80 md:dark:bg-transparent md:backdrop-blur-sm w-full md:shadow-md h-10 flex justify-between items-center px-2 top-0 z-50"
         >
-          Logo {{ showPopup }}
+          Logo {{ showPopup }} {{ t("hello") }}
 
           <div class="md:flex gap-3 items-center hidden">
             <template v-for="item in menuList" :key="item.name">
@@ -88,47 +76,9 @@ onMounted(() => {
               >
             </template>
 
-            <div>
-              <div
-                class="peer text-blue-400 hover:font-bold hover:text-blue-500"
-              >
-                {{ fontSize }}
-              </div>
-              <div class="hidden peer-hover:flex hover:flex absolute top-0">
-                <div
-                  class="flex-col items-start shadow-md dark:shadow-white/20 p-1 mt-10"
-                >
-                  <button
-                    v-for="item in fontSizeList"
-                    :key="item"
-                    type="button"
-                    class="text-blue-400 hover:text-blue-500 hover:font-bold"
-                    :class="{ 'text-active': item === fontSize }"
-                    :style="{ 'font-size': item }"
-                    @click="changeFontSize(item)"
-                  >
-                    {{ item }}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <van-switch
-              v-model="isDark"
-              size="14px"
-              class="border border-gray-400"
-              active-color="#555"
-              inactive-color="#eee"
-            >
-              <template #node>
-                <div class="icon-wrapper">
-                  <img
-                    :src="requireImage(isDark ? 'moon.svg' : 'sun.svg')"
-                    class="w-[14px] h-[14px] rounded-full dark:bg-black"
-                  />
-                </div>
-              </template>
-            </van-switch>
+            <Theme />
+            <LanguageSelection />
+            <FontSelection />
 
             <template v-for="item in socialMedia" :key="item.name">
               <a :href="item.link" target="_blank">
@@ -190,8 +140,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-nav a.router-link-exact-active,
-.text-active {
+nav a.router-link-exact-active {
   color: red;
   font-weight: bold;
 }

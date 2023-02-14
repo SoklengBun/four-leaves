@@ -1,14 +1,36 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.config.json"
-    },
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.vitest.json"
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "./node_modules"
+  ],
+  "files": [
+    "ts-custom.d.ts"
+  ],
+  "types": [
+    "node"
+  ],
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "Node",
+    "lib": ["es2022", "DOM"],
+    "esModuleInterop": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "sourceMap": true,
+    "pretty": true,
+    "removeComments": true,
+    "paths": {
+      "~/*": ["./src/*"],
+      "@/*": ["./src/*"]
     }
-  ]
+
+  }
 }
