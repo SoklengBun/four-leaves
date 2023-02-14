@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { requireImage } from "@/utils/helper";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { RouterLink } from "vue-router";
+import { useStorage, useDark } from "@vueuse/core";
 
 const showPopup = ref(false);
+const fontSize = useStorage("font-size", "18px");
+
+const isDark = useDark();
 
 const menuList = [
   { name: "home", label: "Me" },
@@ -29,7 +34,7 @@ const socialMedia = [
   {
     name: "Telegram",
     link: "https://t.me/soklengbun",
-    src: "facebook.svg",
+    src: "telegram.svg",
   },
   {
     name: "Github",
@@ -37,6 +42,8 @@ const socialMedia = [
     src: "github.svg",
   },
 ];
+
+const fontSizeList = ["16px", "18px", "20px", "22px"];
 
 const togglePopup = () => {
   if (!showPopup.value) {
@@ -50,10 +57,16 @@ const togglePopup = () => {
   }
 };
 
-const changeFontSize = (fontSize: number) => {
+const changeFontSize = (size: string) => {
   let root = document.querySelector(":root") as HTMLElement;
-  root.style.setProperty("--over-all-font-size", fontSize + "px");
+  root.style.setProperty("--over-all-font-size", size);
+  fontSize.value = size;
 };
+
+onMounted(() => {
+  let root = document.querySelector(":root") as HTMLElement;
+  root.style.setProperty("--over-all-font-size", fontSize.value);
+});
 </script>
 
 <template>
@@ -61,15 +74,11 @@ const changeFontSize = (fontSize: number) => {
     <nav>
       <div class="w-full md:h-10">
         <div
-          class="fixed md:bg-white/80 w-full md:shadow-md h-10 flex justify-between items-center px-2 top-0 z-50"
+          class="fixed md:bg-white/80 md:dark:bg-transparent md:backdrop-blur-sm w-full md:shadow-md h-10 flex justify-between items-center px-2 top-0 z-50"
         >
           Logo {{ showPopup }}
 
           <div class="md:flex gap-3 items-center hidden">
-            <button type="button" @click="changeFontSize(16)">16px</button>
-            <button type="button" @click="changeFontSize(18)">18px</button>
-            <button type="button" @click="changeFontSize(20)">20px</button>
-            <button type="button" @click="changeFontSize(22)">22px</button>
             <template v-for="item in menuList" :key="item.name">
               <RouterLink
                 :to="{ name: item.name }"
@@ -79,11 +88,53 @@ const changeFontSize = (fontSize: number) => {
               >
             </template>
 
+            <div>
+              <div
+                class="peer text-blue-400 hover:font-bold hover:text-blue-500"
+              >
+                {{ fontSize }}
+              </div>
+              <div class="hidden peer-hover:flex hover:flex absolute top-0">
+                <div
+                  class="flex-col items-start shadow-md dark:shadow-white/20 p-1 mt-10"
+                >
+                  <button
+                    v-for="item in fontSizeList"
+                    :key="item"
+                    type="button"
+                    class="text-blue-400 hover:text-blue-500 hover:font-bold"
+                    :class="{ 'text-active': item === fontSize }"
+                    :style="{ 'font-size': item }"
+                    @click="changeFontSize(item)"
+                  >
+                    {{ item }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <van-switch
+              v-model="isDark"
+              size="14px"
+              class="border border-gray-400"
+              active-color="#555"
+              inactive-color="#eee"
+            >
+              <template #node>
+                <div class="icon-wrapper">
+                  <img
+                    :src="requireImage(isDark ? 'moon.svg' : 'sun.svg')"
+                    class="w-[14px] h-[14px] rounded-full dark:bg-black"
+                  />
+                </div>
+              </template>
+            </van-switch>
+
             <template v-for="item in socialMedia" :key="item.name">
               <a :href="item.link" target="_blank">
                 <img
                   :src="requireImage(item.src)"
-                  class="w-6 h-6"
+                  class="w-6 h-6 hover:scale-125 duration-300"
                   :alt="item.name"
                 />
               </a>
@@ -139,7 +190,12 @@ const changeFontSize = (fontSize: number) => {
 </template>
 
 <style scoped>
-nav a.router-link-exact-active {
+nav a.router-link-exact-active,
+.text-active {
+  color: red;
+  font-weight: bold;
+}
+.text-active:hover {
   color: red;
   font-weight: bold;
 }
