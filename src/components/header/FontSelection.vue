@@ -18,27 +18,22 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="group">
-    <button
-      class="flex border border-gray-400 bg-[#eee] dark:bg-[#555] rounded-full w-12 group-hover:scale-125 duration-300 items-center px-[2px]"
-    >
+  <div class="group hover:cursor-pointer">
+    <button class="flex items-center duration-300 group-hover:scale-125">
       <img
         :src="requireImage('font-size.svg')"
-        class="w-4 h-4 rounded-full bg-white border-[0.5px]"
+        class="h-7 w-7 dark:contrast-0"
       />
-      <div class="w-full flex justify-center text-sm text-[16px]">
-        {{ fontSize }}
-      </div>
     </button>
-    <div class="hidden group-hover:flex absolute top-0 w-full">
+    <div class="absolute top-0 hidden w-12 group-hover:flex">
       <div
-        class="flex flex-col items-start shadow-md dark:shadow-white/20 py-1 mt-8 w-full bg-white dark:bg-dark"
+        class="mt-8 flex w-full flex-col items-start bg-white py-1 shadow-md dark:bg-dark dark:shadow-white/20"
       >
         <button
           v-for="item in fontSizeList"
           :key="item"
           type="button"
-          class="text-blue-400 hover:text-blue-500 hover:font-bold w-full hover:bg-white/20 flex items-start px-1"
+          class="flex w-full items-start px-1 text-blue-400 hover:bg-white/20 hover:font-bold hover:text-blue-500"
           :class="{ 'text-active': item === fontSize }"
           :style="{ 'font-size': item }"
           @click="changeFontSize(item)"

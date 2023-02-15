@@ -10,15 +10,13 @@
   "files": [
     "ts-custom.d.ts"
   ],
-  "types": [
-    "node"
-  ],
+  "types": ["node"],
   "compilerOptions": {
     "outDir": "./dist/",
-    "target": "es2022",
-    "module": "es2022",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "Node",
-    "lib": ["es2022", "DOM"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "esModuleInterop": true,
     "strict": true,
     "noImplicitReturns": true,
@@ -27,6 +25,7 @@
     "sourceMap": true,
     "pretty": true,
     "removeComments": true,
+    "types": ["vite/client"],
     "paths": {
       "~/*": ["./src/*"],
       "@/*": ["./src/*"]

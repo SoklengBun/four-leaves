@@ -16,7 +16,7 @@ const isDark = useDark();
       <div class="icon-wrapper">
         <img
           :src="requireImage(isDark ? 'moon.svg' : 'sun.svg')"
-          class="icon rounded-full dark:bg-black w-[20px] h-[20px]"
+          class="icon h-[20px] w-[20px] rounded-full dark:bg-black"
         />
       </div>
     </template>

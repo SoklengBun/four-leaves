@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { supportLanguage } from "@/locales";
-import { requireImage } from "@/utils/helper";
+import { requireImage } from "~/utils/helper";
 const i18n = useI18n();
 
 const changeLanguage = (newLang: string) => {
@@ -10,24 +10,19 @@ const changeLanguage = (newLang: string) => {
 </script>
 
 <template>
-  <div class="group">
-    <button
-      class="flex border border-gray-400 bg-[#eee] dark:bg-[#555] rounded-full w-10 group-hover:scale-125 duration-300"
-    >
-      <img :src="requireImage('earth.svg')" class="w-5 h-5" />
-      <div class="pr-1 text-sm">
-        {{ supportLanguage[i18n.locale.value].label }}
-      </div>
+  <div class="group hover:cursor-pointer">
+    <button class="flex duration-300 group-hover:scale-125">
+      <img :src="requireImage('earth.svg')" class="h-7 w-7" />
     </button>
-    <div class="hidden group-hover:flex absolute top-0 w-full">
+    <div class="absolute top-0 hidden w-8 group-hover:flex">
       <div
-        class="flex flex-col items-start shadow-md dark:shadow-white/20 py-1 mt-8 w-full bg-white dark:bg-dark"
+        class="mt-8 flex w-full flex-col items-start bg-white py-1 shadow-md dark:bg-dark dark:shadow-white/20"
       >
         <button
           v-for="item in i18n.availableLocales"
           :key="item"
           type="button"
-          class="text-blue-400 hover:text-blue-500 hover:font-bold w-full hover:bg-white/20 flex items-start px-1"
+          class="flex w-full items-start px-1 text-blue-400 hover:bg-white/20 hover:font-bold hover:text-blue-500"
           @click="changeLanguage(item)"
         >
           {{ supportLanguage[item].label }}

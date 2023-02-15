@@ -4,7 +4,7 @@ import NavBar from "./components/header/NavBar.vue";
 </script>
 
 <template>
-  <div class="body w-full min-h-screen flex flex-col">
+  <div class="body flex min-h-screen w-full flex-col">
     <NavBar />
     <main>
       <RouterView />
