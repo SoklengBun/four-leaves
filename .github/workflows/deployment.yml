@@ -1,0 +1,39 @@
+name: deploy-staging
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  first-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: action/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: yarn install
+      - name: Lint
+        run: yarn lint
+      - name: Job Done 1
+        run: echo "Hey job 1 done"
+  deploy:
+    needs: first-job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: action/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: yarn install
+      - name: Build Project
+        run: yarn build
+      - name: Deploy
+        run: echo "Deploying...."
+
