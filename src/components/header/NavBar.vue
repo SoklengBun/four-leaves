@@ -60,17 +60,17 @@ const togglePopup = () => {
 <template>
   <header>
     <nav>
-      <div class="w-full md:h-10 select-none">
+      <div class="w-full select-none md:h-10">
         <div
-          class="fixed md:bg-white/80 md:dark:bg-transparent md:backdrop-blur-sm w-full md:shadow-md h-10 flex justify-between items-center px-2 top-0 z-50"
+          class="fixed top-0 z-50 flex h-10 w-full items-center justify-between px-2 md:bg-white/80 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
         >
           Logo {{ t("hello") }}
 
-          <div class="md:flex gap-3 items-center hidden">
+          <div class="hidden items-center gap-3 md:flex">
             <template v-for="item in menuList" :key="item.name">
               <RouterLink
                 :to="{ name: item.name }"
-                class="text-blue-400 hover:text-blue-500 hover:font-bold"
+                class="text-blue-400 hover:font-bold hover:text-blue-500"
               >
                 {{ item.label }}</RouterLink
               >
@@ -84,7 +84,7 @@ const togglePopup = () => {
               <a :href="item.link" target="_blank">
                 <img
                   :src="requireImage(item.src)"
-                  class="w-6 h-6 hover:scale-125 duration-300"
+                  class="h-6 w-6 duration-300 hover:scale-125"
                   :alt="item.name"
                 />
               </a>
@@ -95,13 +95,13 @@ const togglePopup = () => {
           <div class="flex md:hidden">
             <button
               type="button"
-              class="w-7 h-7 flex items-center justify-center"
+              class="flex h-7 w-7 items-center justify-center"
               @click="togglePopup"
             >
               <img
                 :src="requireImage(!showPopup ? 'menu.svg' : 'close.svg')"
                 class="delay-300"
-                :class="!showPopup ? 'w-7 h-7' : 'w-5 h-5'"
+                :class="!showPopup ? 'h-7 w-7' : 'h-5 w-5'"
                 alt="Menu"
               />
             </button>
@@ -111,15 +111,15 @@ const togglePopup = () => {
         <!--Mobile Popup-->
         <div
           id="popup"
-          class="bg-white/70 h-full w-full fixed top-0 right-0 show z-40 backdrop-blur-sm"
+          class="show fixed top-0 right-0 z-40 h-full w-full bg-white/70 backdrop-blur-sm"
           :class="{ hidden: !showPopup }"
         >
-          <div class="pt-16 px-10 justify-start text-blue-500">
+          <div class="justify-start px-10 pt-16 text-blue-500">
             <ul>
               <li
                 v-for="item in menuList"
                 :key="item.name"
-                class="my-2 py-1 border-b"
+                class="my-2 border-b py-1"
               >
                 <RouterLink :to="{ name: item.name }" class="flex">
                   {{ item.label }}</RouterLink
@@ -129,16 +129,16 @@ const togglePopup = () => {
               <li
                 v-for="item in socialMedia"
                 :key="item.name"
-                class="my-2 py-1 border-b"
+                class="my-2 border-b py-1"
               >
                 <a
                   :href="item.link"
                   target="_blank"
-                  class="flex gap-1 items-start"
+                  class="flex items-start gap-1"
                 >
                   <img
                     :src="requireImage(item.src)"
-                    class="w-5 h-5"
+                    class="h-5 w-5"
                     :alt="item.name"
                   />
                   {{ item.name }}
