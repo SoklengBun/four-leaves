@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { supportLanguage } from "@/locales";
-import { requireImage } from "@/utils/helper";
+import { requireImage } from "~/utils/helper";
 const i18n = useI18n();
 
 const changeLanguage = (newLang: string) => {
@@ -10,16 +10,11 @@ const changeLanguage = (newLang: string) => {
 </script>
 
 <template>
-  <div class="group">
-    <button
-      class="flex border border-gray-400 bg-[#eee] dark:bg-[#555] rounded-full w-10 group-hover:scale-125 duration-300"
-    >
-      <img :src="requireImage('earth.svg')" class="w-5 h-5" />
-      <div class="pr-1 text-sm">
-        {{ supportLanguage[i18n.locale.value].label }}
-      </div>
+  <div class="group hover:cursor-pointer">
+    <button class="flex group-hover:scale-125 duration-300">
+      <img :src="requireImage('earth.svg')" class="w-7 h-7" />
     </button>
-    <div class="hidden group-hover:flex absolute top-0 w-full">
+    <div class="hidden group-hover:flex absolute top-0 w-8">
       <div
         class="flex flex-col items-start shadow-md dark:shadow-white/20 py-1 mt-8 w-full bg-white dark:bg-dark"
       >

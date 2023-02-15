@@ -10,10 +10,5 @@
         </div>
       </div>
     </div>
-    <div class="md:hidden relative h-12 z-50">
-      <div
-        class="fixed bottom-0 h-12 w-full shadow-inner rounded-t-xl bg-white"
-      ></div>
-    </div>
   </footer>
 </template>

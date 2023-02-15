@@ -18,19 +18,14 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="group">
-    <button
-      class="flex border border-gray-400 bg-[#eee] dark:bg-[#555] rounded-full w-12 group-hover:scale-125 duration-300 items-center px-[2px]"
-    >
+  <div class="group hover:cursor-pointer">
+    <button class="flex group-hover:scale-125 duration-300 items-center">
       <img
         :src="requireImage('font-size.svg')"
-        class="w-4 h-4 rounded-full bg-white border-[0.5px]"
+        class="w-7 h-7 dark:contrast-0"
       />
-      <div class="w-full flex justify-center text-sm text-[16px]">
-        {{ fontSize }}
-      </div>
     </button>
-    <div class="hidden group-hover:flex absolute top-0 w-full">
+    <div class="hidden group-hover:flex absolute top-0 w-12">
       <div
         class="flex flex-col items-start shadow-md dark:shadow-white/20 py-1 mt-8 w-full bg-white dark:bg-dark"
       >
