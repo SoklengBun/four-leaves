@@ -7,6 +7,10 @@ module.exports = {
       colors: {
         dark: "#181818",
       },
+      zIndex: {
+        55: "55",
+        100: "100",
+      },
     },
   },
   plugins: [],

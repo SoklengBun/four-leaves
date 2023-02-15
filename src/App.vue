@@ -12,3 +12,9 @@ import NavBar from "./components/header/NavBar.vue";
     <FooterBar />
   </div>
 </template>
+
+<style>
+body {
+  height: 100vh;
+}
+</style>
