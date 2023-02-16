@@ -3,5 +3,8 @@
     "hey": "ehhhh?",
     "more" : {
         "ahh": "ahh"
+    },
+    "button": {
+        "next": "Next"
     }
 }

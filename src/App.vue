@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import FooterBar from "./components/FooterBar.vue";
 import NavBar from "./components/header/NavBar.vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
 </script>
 
 <template>
@@ -9,7 +12,7 @@ import NavBar from "./components/header/NavBar.vue";
     <main>
       <RouterView />
     </main>
-    <FooterBar />
+    <FooterBar v-if="route.name !== 'home'" />
   </div>
 </template>
 
