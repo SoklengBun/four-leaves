@@ -100,8 +100,7 @@ const togglePopup = () => {
             >
               <img
                 :src="requireImage(!showPopup ? 'menu.svg' : 'close.svg')"
-                class="delay-300"
-                :class="!showPopup ? 'h-7 w-7' : 'h-5 w-5'"
+                class="delay-300 'h-7 w-7'"
                 alt="Menu"
               />
             </button>
@@ -121,9 +120,13 @@ const togglePopup = () => {
                 :key="item.name"
                 class="my-2 border-b py-1"
               >
-                <RouterLink :to="{ name: item.name }" class="flex">
-                  {{ item.label }}</RouterLink
+                <RouterLink
+                  :to="{ name: item.name }"
+                  class="flex"
+                  @click="togglePopup"
                 >
+                  {{ item.label }}
+                </RouterLink>
               </li>
 
               <li

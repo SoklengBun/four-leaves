@@ -6,7 +6,6 @@ const appSetting = useAppSetting();
 const loadingCharClass = ref("ready");
 
 onMounted(() => {
-  document.body.style.overflowY = "hidden";
   setTimeout(() => {
     loadingCharClass.value = "";
   }, 0);
@@ -14,16 +13,14 @@ onMounted(() => {
     loadingCharClass.value = "remove";
     setTimeout(() => {
       appSetting.isFirstLoadHomePage = false;
-      document.body.style.overflowY = "auto";
     }, 1000);
   }, 3000);
 });
 </script>
 <template>
   <div
-    v-if="appSetting.isFirstLoadHomePage"
     class="background"
-    :class="loadingCharClass"
+    :class="(loadingCharClass, { hidden: !appSetting.isFirstLoadHomePage })"
   >
     <div id="loading_character" :class="loadingCharClass">
       <div class="charcter-container char03"></div>
