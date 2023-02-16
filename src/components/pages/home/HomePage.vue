@@ -55,11 +55,11 @@ const handleScroll = () => {
         @scroll="handleScroll"
       >
         <FirstSlide id="section_0" />
-        <div id="section_1" class="item bg-green-100">b</div>
-        <div id="section_2" class="item bg-blue-100">c</div>
+        <div id="section_1" class="item bg-green-100 dark:bg-black/20">b</div>
+        <div id="section_2" class="item bg-blue-100 dark:bg-black/30">c</div>
         <div
           id="section_3"
-          class="item bg-yellow-100 flex items-end justify-end w-full"
+          class="item bg-yellow-100 dark:bg-black/40 flex items-end justify-end w-full"
         >
           <FooterBar class="w-full" />
         </div>
