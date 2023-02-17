@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core";
-import { onMounted } from "vue";
-import { requireImage } from "@/utils/helper";
-const fontSize = useStorage("font-size", "18px");
+import { useStorage } from '@vueuse/core';
+import { onMounted } from 'vue';
+import { requireImage } from '@/utils/helper';
+const fontSize = useStorage('font-size', '18px');
 
-const fontSizeList = ["16px", "18px", "20px", "22px"];
+const fontSizeList = ['16px', '18px', '20px', '22px'];
 
 const changeFontSize = (size: string) => {
-  let root = document.querySelector(":root") as HTMLElement;
-  root.style.setProperty("--over-all-font-size", size);
+  let root = document.querySelector(':root') as HTMLElement;
+  root.style.setProperty('--over-all-font-size', size);
   fontSize.value = size;
 };
 
 onMounted(() => {
-  let root = document.querySelector(":root") as HTMLElement;
-  root.style.setProperty("--over-all-font-size", fontSize.value);
+  let root = document.querySelector(':root') as HTMLElement;
+  root.style.setProperty('--over-all-font-size', fontSize.value);
 });
 </script>
 <template>

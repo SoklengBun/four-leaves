@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useDark } from "@vueuse/core";
-import { requireImage } from "@/utils/helper";
+import { useDark } from '@vueuse/core';
+import { requireImage } from '@/utils/helper';
 const isDark = useDark();
 </script>
 

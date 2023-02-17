@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useAppSetting } from "~/stores/app-setting";
+import { onMounted, ref } from 'vue';
+import { useAppSetting } from '~/stores/app-setting';
 
 const appSetting = useAppSetting();
-const loadingCharClass = ref("ready");
+const loadingCharClass = ref('ready');
 
 onMounted(() => {
   setTimeout(() => {
-    loadingCharClass.value = "";
+    loadingCharClass.value = '';
   }, 0);
   setTimeout(() => {
-    loadingCharClass.value = "remove";
+    loadingCharClass.value = 'remove';
     setTimeout(() => {
       appSetting.isFirstLoadHomePage = false;
     }, 1000);
@@ -34,7 +34,7 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   z-index: 100;
-  background: url("@/assets/images/background.gif") repeat center top;
+  background: url('@/assets/images/background.gif') repeat center top;
   top: 0;
   bottom: 0;
   left: 0;
@@ -71,11 +71,11 @@ onMounted(() => {
   width: 200px;
   height: 200px;
   overflow: hidden;
-  background: url("@/assets/images/kokkoro.png") no-repeat center;
+  background: url('@/assets/images/kokkoro.png') no-repeat center;
   background-size: 100%;
 }
 #loading_character .charcter-container.char03 {
-  background-image: url("@/assets/images/kokkoro.png");
+  background-image: url('@/assets/images/kokkoro.png');
   animation: spriteAnime03 700ms steps(19) infinite;
 }
 

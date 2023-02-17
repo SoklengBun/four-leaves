@@ -1,6 +1,6 @@
-import { createI18n } from "vue-i18n";
-import enUS from "./en-US.json";
-import jaJP from "./ja-JP.json";
+import { createI18n } from 'vue-i18n';
+import enUS from './en-US.json';
+import jaJP from './ja-JP.json';
 
 type MessageSchema = typeof enUS;
 
@@ -12,8 +12,8 @@ const supportLanguage: {
     label?: string;
   };
 } = {
-  "en-US": { name: "English", file: enUS, label: "En" },
-  "ja-JP": { name: "Japan", file: jaJP, label: "Ja" },
+  'en-US': { name: 'English', file: enUS, label: 'En' },
+  'ja-JP': { name: 'Japan', file: jaJP, label: 'Ja' },
 };
 
 const message: { [key: string]: MessageSchema } = {};
@@ -23,7 +23,7 @@ Object.keys(supportLanguage).forEach((key: string) => {
 
 const i18n = createI18n<{ message: MessageSchema }, string>({
   legacy: false,
-  locale: "en-US",
+  locale: 'en-US',
   allowComposition: true,
   globalInjection: true,
   messages: message,

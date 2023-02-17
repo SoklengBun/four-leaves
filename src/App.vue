@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import FooterBar from "./components/FooterBar.vue";
-import NavBar from "./components/header/NavBar.vue";
-import { useRoute } from "vue-router";
+import FooterBar from './components/FooterBar.vue';
+import NavBar from './components/header/NavBar.vue';
+import { useRoute } from 'vue-router';
 
 const route = useRoute();
 </script>

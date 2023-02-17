@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import { supportLanguage } from "@/locales";
-import { requireImage } from "~/utils/helper";
+import { useI18n } from 'vue-i18n';
+import { supportLanguage } from '@/locales';
+import { requireImage } from '~/utils/helper';
 const i18n = useI18n();
 
 const changeLanguage = (newLang: string) => {
