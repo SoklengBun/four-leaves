@@ -4,7 +4,7 @@ defineProps<{ fullscreen: boolean; horizontal: boolean }>();
 
 <template>
   <div
-    class="scroll-snap-container w-screen overflow-y-scroll overflow-hidden"
+    class="scroll-snap-container w-screen overflow-x-hidden overflow-y-scroll"
     :class="{ fullscreen: fullscreen, horizontal: horizontal }"
   >
     <slot> </slot>

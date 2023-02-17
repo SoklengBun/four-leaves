@@ -100,7 +100,7 @@ const togglePopup = () => {
             >
               <img
                 :src="requireImage(!showPopup ? 'menu.svg' : 'close.svg')"
-                class="delay-300 'h-7 w-7'"
+                class="h-7 w-7 delay-300"
                 alt="Menu"
               />
             </button>

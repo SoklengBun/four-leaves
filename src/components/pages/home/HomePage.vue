@@ -22,9 +22,8 @@ const handleScroll = () => {
   if (!(snap && last && nextBtn)) return;
 
   if (
-    // !nextBtn.classList.contains("hide") &&
-    snap.scrollTop - last.offsetHeight >=
-    snap.offsetHeight + 100
+    !nextBtn.classList.contains("hide") &&
+    snap.scrollTop - last.offsetHeight >= snap.offsetHeight + 100
   ) {
     nextBtn.classList.add("hide");
   } else if (
@@ -39,10 +38,10 @@ const handleScroll = () => {
 <template>
   <div>
     <FirstLoad />
-    <div class="fixed top-0 flex bg-green-400 h-screen w-full">
+    <div class="fixed top-0 flex h-screen w-full bg-green-400">
       <div
         id="next-button"
-        class="z-100 h-fit bottom-0 absolute w-full justify-center hidden md:flex"
+        class="absolute bottom-0 z-100 hidden h-fit w-full justify-center md:flex"
         :class="{ hidden: false }"
       >
         <button @click="scrollToRef(`section_${0}`)">
@@ -56,15 +55,15 @@ const handleScroll = () => {
         @scroll="handleScroll"
       >
         <FirstSlide id="section_0" />
-        <div id="section_1" class="item bg-green-100 dark:bg-black/20 h-screen">
+        <div id="section_1" class="item h-screen bg-green-100 dark:bg-black/20">
           b
         </div>
-        <div id="section_2" class="item bg-blue-100 dark:bg-black/30 h-screen">
+        <div id="section_2" class="item h-screen bg-blue-100 dark:bg-black/30">
           c
         </div>
         <div
           id="section_3"
-          class="item bg-yellow-100 dark:bg-black/40 flex items-end justify-end w-full h-screen"
+          class="item flex h-screen w-full items-end justify-end bg-yellow-100 dark:bg-black/40"
         >
           <FooterBar />
         </div>
