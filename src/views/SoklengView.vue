@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue';
 const state = ref(0);
 let count = 0;
 const setState = (value: any) => {
@@ -8,7 +8,7 @@ const setState = (value: any) => {
 
 const say = (msg: string) => {
   count += 1;
-  alert(msg + "" + count);
+  alert(msg + '' + count);
 };
 </script>
 

@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import { requireImage } from "@/utils/helper";
-import { ref } from "vue";
-import { RouterLink } from "vue-router";
+import { requireImage } from '@/utils/helper';
+import { ref } from 'vue';
+import { RouterLink } from 'vue-router';
 
-import { t } from "@/locales";
-import LanguageSelection from "./LanguageSelection.vue";
-import Theme from "./Theme.vue";
-import FontSelection from "./FontSelection.vue";
+import { t } from '@/locales';
+import LanguageSelection from './LanguageSelection.vue';
+import Theme from './Theme.vue';
+import FontSelection from './FontSelection.vue';
 
 const showPopup = ref(false);
 
 const menuList = [
-  { name: "home", label: "Me" },
-  { name: "sokleng", label: "Yahallo" },
-  { name: "about", label: "About me" },
+  { name: 'home', label: 'Me' },
+  { name: 'sokleng', label: 'Yahallo' },
+  { name: 'about', label: 'About me' },
 ];
 
 const socialMedia = [
   {
-    name: "Facebook",
-    link: "https://www.facebook.com/sokleng.bun.22/",
-    src: "facebook.svg",
+    name: 'Facebook',
+    link: 'https://www.facebook.com/sokleng.bun.22/',
+    src: 'facebook.svg',
   },
   {
-    name: "Youtube",
-    link: "https://www.youtube.com/@soklengbun",
-    src: "youtube.svg",
+    name: 'Youtube',
+    link: 'https://www.youtube.com/@soklengbun',
+    src: 'youtube.svg',
   },
   {
-    name: "Twitter",
-    link: "https://twitter.com/Sokleng28198854",
-    src: "twitter.svg",
+    name: 'Twitter',
+    link: 'https://twitter.com/Sokleng28198854',
+    src: 'twitter.svg',
   },
   {
-    name: "Telegram",
-    link: "https://t.me/soklengbun",
-    src: "telegram.svg",
+    name: 'Telegram',
+    link: 'https://t.me/soklengbun',
+    src: 'telegram.svg',
   },
   {
-    name: "Github",
-    link: "https://github.com/SoklengBun",
-    src: "github.svg",
+    name: 'Github',
+    link: 'https://github.com/SoklengBun',
+    src: 'github.svg',
   },
 ];
 
@@ -48,8 +48,8 @@ const togglePopup = () => {
   if (!showPopup.value) {
     showPopup.value = true;
   } else {
-    const element = document.getElementById("popup");
-    element?.classList.add("hide");
+    const element = document.getElementById('popup');
+    element?.classList.add('hide');
     setTimeout(() => {
       showPopup.value = false;
     }, 300);
@@ -64,7 +64,7 @@ const togglePopup = () => {
         <div
           class="fixed top-0 z-50 flex h-10 w-full items-center justify-between px-2 md:bg-white/80 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
         >
-          Logo {{ t("hello") }}
+          Logo {{ t('hello') }}
 
           <div class="hidden items-center gap-3 md:flex">
             <template v-for="item in menuList" :key="item.name">

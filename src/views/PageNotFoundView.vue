@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PageNotFoundPage from "~/components/pages/PageNotFoundPage.vue";
+import PageNotFoundPage from '~/components/pages/PageNotFoundPage.vue';
 </script>
 
 <template>

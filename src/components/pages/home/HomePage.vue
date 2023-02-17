@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import FooterBar from "~/components/FooterBar.vue";
-import SnapScroll from "~/components/shares/SnapScroll.vue";
-import { t } from "~/locales";
-import FirstLoad from "./components/FirstLoad.vue";
-import FirstSlide from "./components/slides/FirstSlide.vue";
+import FooterBar from '~/components/FooterBar.vue';
+import SnapScroll from '~/components/shares/SnapScroll.vue';
+import { t } from '~/locales';
+import FirstLoad from './components/FirstLoad.vue';
+import FirstSlide from './components/slides/FirstSlide.vue';
 
 const scrollToRef = (id: string) => {
-  const snap = document.getElementById("snap-scroll");
+  const snap = document.getElementById('snap-scroll');
   const one = document.getElementById(id);
   if (snap && one) {
     const current = snap.scrollTop + one.offsetHeight;
@@ -15,22 +15,22 @@ const scrollToRef = (id: string) => {
 };
 
 const handleScroll = () => {
-  const snap = document.getElementById("snap-scroll");
-  const last = document.getElementById("section_3"); //Last child id
-  const nextBtn = document.getElementById("next-button");
+  const snap = document.getElementById('snap-scroll');
+  const last = document.getElementById('section_3'); //Last child id
+  const nextBtn = document.getElementById('next-button');
 
   if (!(snap && last && nextBtn)) return;
 
   if (
-    !nextBtn.classList.contains("hide") &&
+    !nextBtn.classList.contains('hide') &&
     snap.scrollTop - last.offsetHeight >= snap.offsetHeight + 100
   ) {
-    nextBtn.classList.add("hide");
+    nextBtn.classList.add('hide');
   } else if (
-    nextBtn.classList.contains("hide") &&
+    nextBtn.classList.contains('hide') &&
     snap.scrollTop - last.offsetHeight <= snap.offsetHeight + 100
   ) {
-    nextBtn.classList.remove("hide");
+    nextBtn.classList.remove('hide');
   }
 };
 </script>
