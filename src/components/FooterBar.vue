@@ -1,6 +1,6 @@
 <template>
-  <footer class="mt-auto">
-    <div class="hidden md:flex">
+  <footer class="mt-auto w-full">
+    <div class="flex">
       <div
         class="justify-centers flex h-32 w-full flex-col items-center bg-gray-100"
       >
