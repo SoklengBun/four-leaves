@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import FooterBar from '~/components/FooterBar.vue';
+import { useWindowSize } from '@vant/use';
+import { onMounted } from 'vue';
 import SnapScroll from '~/components/shares/SnapScroll.vue';
-import { t } from '~/locales';
 import FirstLoad from './components/FirstLoad.vue';
 import FirstSlide from './components/slides/FirstSlide.vue';
+import LastSlide from './components/slides/LastSlide.vue';
+import SecondSlide from './components/slides/SecondSlide.vue';
+import ThirdSlide from './components/slides/ThirdSlide.vue';
+
+const { width } = useWindowSize();
 
 const scrollToRef = (id: string) => {
   const snap = document.getElementById('snap-scroll');
@@ -15,37 +20,63 @@ const scrollToRef = (id: string) => {
 };
 
 const handleScroll = () => {
+  if (width.value < 500) return;
+
   const snap = document.getElementById('snap-scroll');
-  const last = document.getElementById('section_3'); //Last child id
+  const last = snap?.children[snap.children.length - 1];
   const nextBtn = document.getElementById('next-button');
 
   if (!(snap && last && nextBtn)) return;
 
   if (
     !nextBtn.classList.contains('hide') &&
-    snap.scrollTop - last.offsetHeight >= snap.offsetHeight + 100
+    snap.scrollHeight - last.scrollHeight * 2 + 100 <= snap.scrollTop
   ) {
     nextBtn.classList.add('hide');
   } else if (
     nextBtn.classList.contains('hide') &&
-    snap.scrollTop - last.offsetHeight <= snap.offsetHeight + 100
+    snap.scrollHeight - last.scrollHeight * 2 + 100 > snap.scrollTop
   ) {
     nextBtn.classList.remove('hide');
   }
+
+  // for make background image look animated
+  const nodeList = document.querySelectorAll<HTMLElement>('.background-i');
+
+  if (nodeList) {
+    nodeList.forEach((node, index) => {
+      node.style.backgroundPosition = `50% ${
+        (node.scrollHeight - 800 * (2 - index) - snap.scrollTop) * 0.08
+      }px`;
+    });
+  }
 };
+
+onMounted(() => {
+  const snap = document.getElementById('snap-scroll');
+  const nodeList = document.querySelectorAll<HTMLElement>('.background-i');
+  if (nodeList && snap) {
+    nodeList.forEach((node, index) => {
+      node.style.backgroundPosition = `50% ${
+        (node.scrollHeight - 800 * (2 - index) - snap.scrollTop) * 0.08
+      }px`;
+    });
+  }
+});
 </script>
 
 <template>
   <div>
     <FirstLoad />
-    <div class="fixed top-0 flex h-screen w-full bg-green-400">
+    <div class="fixed top-0 flex h-screen w-full">
       <div
         id="next-button"
-        class="absolute bottom-0 z-100 hidden h-fit w-full justify-center md:flex"
-        :class="{ hidden: false }"
+        class="absolute bottom-0 z-100 hidden h-fit w-full justify-center p-2 md:flex"
       >
-        <button @click="scrollToRef(`section_${0}`)">
-          {{ t("button['next']") }}
+        <button @click="scrollToRef(`section_${1}`)">
+          <div
+            class="scroll-down duration-300 hover:scale-90 hover:opacity-70"
+          ></div>
         </button>
       </div>
       <SnapScroll
@@ -54,19 +85,10 @@ const handleScroll = () => {
         :horizontal="false"
         @scroll="handleScroll"
       >
-        <FirstSlide id="section_0" />
-        <div id="section_1" class="item h-screen bg-green-100 dark:bg-black/20">
-          b
-        </div>
-        <div id="section_2" class="item h-screen bg-blue-100 dark:bg-black/30">
-          c
-        </div>
-        <div
-          id="section_3"
-          class="item flex h-screen w-full items-end justify-end bg-yellow-100 dark:bg-black/40"
-        >
-          <FooterBar />
-        </div>
+        <FirstSlide id="section_1" />
+        <SecondSlide id="section_2" />
+        <ThirdSlide id="section_3" />
+        <LastSlide id="section_last" />
       </SnapScroll>
     </div>
   </div>
@@ -75,5 +97,14 @@ const handleScroll = () => {
 .hide {
   opacity: 0;
   pointer-events: none;
+}
+
+.scroll-down {
+  width: 80px;
+  height: 40px;
+  background-image: url('@/assets/images/scroll-down.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 80px 40px;
 }
 </style>

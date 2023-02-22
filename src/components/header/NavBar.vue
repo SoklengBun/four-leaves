@@ -62,7 +62,7 @@ const togglePopup = () => {
     <nav>
       <div class="w-full select-none md:h-10">
         <div
-          class="fixed top-0 z-50 flex h-10 w-full items-center justify-between px-2 md:bg-white/80 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
+          class="fixed top-0 z-50 flex h-10 w-full items-center justify-between px-2 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
         >
           Logo {{ t('hello') }}
 
@@ -70,10 +70,10 @@ const togglePopup = () => {
             <template v-for="item in menuList" :key="item.name">
               <RouterLink
                 :to="{ name: item.name }"
-                class="text-blue-400 hover:font-bold hover:text-blue-500"
+                class="text-blue-400 hover:scale-125 hover:font-bold hover:text-blue-500"
               >
-                {{ item.label }}</RouterLink
-              >
+                {{ item.label }}
+              </RouterLink>
             </template>
 
             <Theme />
