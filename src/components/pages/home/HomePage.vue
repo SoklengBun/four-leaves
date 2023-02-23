@@ -50,6 +50,23 @@ const handleScroll = () => {
       }px`;
     });
   }
+
+  // all child add show class
+  for (let i = 0; i <= snap.children.length; i++) {
+    if (snap.children[i]) {
+      if (
+        snap.scrollTop >= snap.children[i].scrollHeight * i &&
+        snap.scrollTop <
+          snap.children[i].scrollHeight * (i + 1) -
+            snap.children[i].scrollHeight / 3
+      ) {
+        snap.children[i].classList.add('show');
+      } else {
+        snap.children[i].classList.remove('show');
+      }
+    }
+    // snap.children[i].classList.add('show');
+  }
 };
 
 onMounted(() => {
