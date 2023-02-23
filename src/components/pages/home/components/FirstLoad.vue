@@ -11,6 +11,12 @@ onMounted(() => {
   }, 0);
   setTimeout(() => {
     loadingCharClass.value = 'remove';
+
+    setTimeout(() => {
+      const snap = document.getElementById('snap-scroll');
+      snap?.children[0].classList.add('show');
+    }, 500);
+
     setTimeout(() => {
       appSetting.isFirstLoadHomePage = false;
     }, 1000);
@@ -20,7 +26,7 @@ onMounted(() => {
 <template>
   <div
     class="background"
-    :class="(loadingCharClass, { hidden: !appSetting.isFirstLoadHomePage })"
+    :class="[loadingCharClass, { hidden: !appSetting.isFirstLoadHomePage }]"
   >
     <div id="loading_character" :class="loadingCharClass">
       <div class="charcter-container char03"></div>
@@ -46,8 +52,8 @@ onMounted(() => {
 
 .background.remove {
   transform: translate3d(100%, 0, 0);
-  transition-delay: 400ms;
-  transition-duration: 300ms;
+  transition-delay: 300ms;
+  transition-duration: 200ms;
 }
 
 #loading_character {
