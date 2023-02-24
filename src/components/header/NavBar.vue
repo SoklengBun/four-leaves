@@ -11,7 +11,7 @@ import FontSelection from './FontSelection.vue';
 const showPopup = ref(false);
 
 const menuList = [
-  { name: 'home', label: 'Me' },
+  { name: 'home', label: 'Home' },
   { name: 'sokleng', label: 'Yahallo' },
   { name: 'about', label: 'About me' },
 ];
@@ -163,6 +163,10 @@ nav a.router-link-exact-active {
 .text-active:hover {
   color: red;
   font-weight: bold;
+}
+
+.dark nav a.router-link-exact-active {
+  text-shadow: 1px -1px 5px white;
 }
 
 .show {

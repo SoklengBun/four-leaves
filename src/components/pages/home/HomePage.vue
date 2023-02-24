@@ -124,4 +124,11 @@ onMounted(() => {
   background-repeat: no-repeat;
   background-size: 80px 40px;
 }
+
+@media (max-width: 768px) {
+  .background-i {
+    background-position: center center !important;
+    background-size: auto 100vh !important;
+  }
+}
 </style>
