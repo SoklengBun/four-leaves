@@ -12,7 +12,7 @@ const route = useRoute();
     <main>
       <RouterView />
     </main>
-    <FooterBar v-if="route.name !== 'home'" />
+    <!-- <FooterBar v-if="route.name !== 'home'" /> -->
   </div>
 </template>
 

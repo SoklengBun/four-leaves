@@ -15,64 +15,13 @@ const say = (msg: string) => {
 <template>
   <div class="containers">
     <div class="container">
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <h1>Hello i'm sokleng</h1>
-      <var>
-        <h1>Hello i'm sokleng</h1>
-        <h1>Hello i'm sokleng</h1>
-        <h1>Hello i'm sokleng</h1>
-        <h1>Hello i'm sokleng</h1>
-        <h1>Hello i'm sokleng</h1>
-        v</var
-      >
       <h1>{{ count }}</h1>
       <h1>{{ state }}</h1>
       <button type="button" @click="say('bye')">Say bye</button>
       <button type="button" @click="setState(state + 1)">count+1</button>
+      <div v-for="item in 10000" :key="item">
+        <div>{{ item }}</div>
+      </div>
     </div>
   </div>
 </template>
