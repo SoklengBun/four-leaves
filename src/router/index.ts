@@ -25,6 +25,11 @@ const router = createRouter({
       component: SoklengView,
     },
     {
+      path: '/priconne',
+      name: 'priconne',
+      component: () => import('../views/PriconneHomeView.vue'),
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: NotFound,
