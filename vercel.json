@@ -1,5 +1,3 @@
 {
-  "rewrites": [
-    { "source": "'/:pathMatch(.*)*'", "destination": "'/:pathMatch(.*)*'" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
