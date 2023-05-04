@@ -16,6 +16,8 @@ const menuList = [
   { name: 'about', label: 'About me' },
 ];
 
+//icon source: https://www.iconfinder.com/iconsets/colorful-guache-social-media-logos-1
+
 const socialMedia = [
   {
     name: 'Facebook',
