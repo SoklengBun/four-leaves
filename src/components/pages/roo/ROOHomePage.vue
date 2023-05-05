@@ -105,7 +105,7 @@ const showSideBar = ref(true);
           v-else
           class="flex h-full w-full flex-1 items-center justify-center"
         >
-          Welcome to 「Princess Connect Re:Dive!」 whatever page.
+          Welcome to 「Ragnarok Origin!」 whatever page.
         </div>
       </div>
     </div>
