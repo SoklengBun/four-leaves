@@ -25,9 +25,24 @@ const router = createRouter({
       component: SoklengView,
     },
     {
-      path: '/priconne',
+      path: '/princess-connect',
       name: 'priconne',
       component: () => import('../views/PriconneHomeView.vue'),
+    },
+    {
+      path: '/priconne',
+      name: 'priconne-short',
+      redirect: { name: 'priconne' },
+    },
+    {
+      path: '/ragnarok-origin',
+      name: 'roo',
+      component: () => import('../views/ROOHomeView.vue'),
+    },
+    {
+      path: '/roo',
+      name: 'roo-short',
+      redirect: { name: 'roo' },
     },
     {
       path: '/:pathMatch(.*)*',

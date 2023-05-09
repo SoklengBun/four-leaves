@@ -4,26 +4,20 @@ import { useRoute } from 'vue-router';
 import IconArrowLeftRight from '~/components/icons/IconArrowLeftRight.vue';
 import HeaderSpace from '~/components/shares/HeaderSpace.vue';
 import { requireImage } from '~/utils/helper';
-import PriconneCharacterPage from './PriconneCharacterPage.vue';
-import PriconneItemPage from './PriconneItemPage.vue';
-import PriconneUniqueEquipmentPage from './PriconneUniqueEquipmentPage.vue';
+import ROOSkillSimulator from './ROOSkillSimulator.vue';
 
 const route = useRoute();
+
 const sideBarItems = [
   {
-    label: 'Character',
-    labelShort: 'Character',
-    category: 'character',
+    label: 'Job',
+    labelShort: 'Job',
+    category: 'Job',
   },
   {
-    label: 'Item',
-    labelShort: 'Item',
-    category: 'gear',
-  },
-  {
-    label: 'Unique Equipment',
-    labelShort: 'U.E',
-    category: 'unique-equipment',
+    label: 'Skill Simulator',
+    labelShort: 'S.S',
+    category: 'skill-simulator',
   },
 ];
 
@@ -48,7 +42,7 @@ const showSideBar = ref(true);
       >
         <div class="flex h-20 items-center justify-center">
           <img
-            :src="requireImage('images/priconne/logo.png')"
+            :src="requireImage('images/roo/logo.png')"
             class="contain h-full"
           />
         </div>
@@ -57,13 +51,13 @@ const showSideBar = ref(true);
           :key="item.category"
           :class="[
             'flex h-10 items-center justify-start',
-            'border-b border-light-pink px-5 last:border-0',
+            'border-b border-blue-400 px-5 last:border-0',
             {
-              'bg-pink-500 text-gray-100':
+              'bg-blue-600 text-gray-100':
                 route.query.category === item.category,
             },
           ]"
-          :to="{ name: 'priconne', query: { category: item.category } }"
+          :to="{ name: 'roo', query: { category: item.category } }"
         >
           {{ item.label }}
         </RouterLink>
@@ -73,7 +67,7 @@ const showSideBar = ref(true);
         @click="showSideBar = !showSideBar"
       >
         <IconArrowLeftRight
-          class="h-7 w-7 rotate-90 text-light-pink duration-300 hover:scale-125"
+          class="h-7 w-7 rotate-90 text-blue-400 duration-300 hover:scale-125"
         />
       </button>
     </div>
@@ -88,10 +82,10 @@ const showSideBar = ref(true);
         :class="[
           'flex h-full items-center justify-center text-center leading-none',
           {
-            'bg-pink-500 text-gray-100': route.query.category === item.category,
+            'bg-blue-600 text-gray-100': route.query.category === item.category,
           },
         ]"
-        :to="{ name: 'priconne', query: { category: item.category } }"
+        :to="{ name: 'roo', query: { category: item.category } }"
       >
         {{ item.labelShort }}
       </RouterLink>
@@ -106,16 +100,12 @@ const showSideBar = ref(true);
           { 'normal-size md:full-size': showSideBar },
         ]"
       >
-        <PriconneCharacterPage v-if="route.query.category === 'character'" />
-        <PriconneUniqueEquipmentPage
-          v-else-if="route.query.category === 'unique-equipment'"
-        />
-        <PriconneItemPage v-else-if="route.query.category === 'gear'" />
+        <ROOSkillSimulator v-if="route.query.category === 'skill-simulator'" />
         <div
           v-else
           class="flex h-full w-full flex-1 items-center justify-center"
         >
-          Welcome to 「Princess Connect Re:Dive!」 whatever page.
+          Welcome to 「Ragnarok Origin!」 whatever page.
         </div>
       </div>
     </div>
