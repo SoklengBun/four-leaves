@@ -2,18 +2,17 @@
 
 @import url('https://fonts.googleapis.com/css?family=Patrick+Hand');
 
-html, body {
+html,
+body {
   font-family: 'Patrick Hand', sans-serif;
+  overscroll-behavior-y: none;
 }
 
 #app {
   font-family: 'Patrick Hand', sans-serif;
-}
-
-
-#app {
   margin: 0 auto;
   font-weight: normal;
+  overscroll-behavior-y: none;
 }
 
 a,
@@ -21,5 +20,4 @@ a,
   text-decoration: none;
   color: hsla(160, 100%, 37%, 1);
   transition: 0.4s;
-
 }
