@@ -35,16 +35,6 @@ const router = createRouter({
       redirect: { name: 'priconne' },
     },
     {
-      path: '/ragnarok-origin',
-      name: 'roo',
-      component: () => import('../views/ROOHomeView.vue'),
-    },
-    {
-      path: '/roo',
-      name: 'roo-short',
-      redirect: { name: 'roo' },
-    },
-    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: NotFound,
