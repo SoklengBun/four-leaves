@@ -30,7 +30,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="body flex min-h-screen w-full flex-col">
+  <div class="body flex w-full flex-col">
     <NavBar />
     <main>
       <RouterView />
@@ -38,9 +38,3 @@ onMounted(() => {
     <!-- <FooterBar v-if="route.name !== 'home'" /> -->
   </div>
 </template>
-
-<style>
-body {
-  height: 100vh;
-}
-</style>
