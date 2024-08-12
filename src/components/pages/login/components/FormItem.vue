@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { InputHTMLAttributes, computed } from 'vue';
+import { computed } from 'vue';
+import type { InputHTMLAttributes } from 'vue';
 
 interface CustomInputAttributes extends InputHTMLAttributes {
   label: string;
