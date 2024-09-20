@@ -24,7 +24,6 @@ Object.keys(supportLanguage).forEach((key: string) => {
 const i18n = createI18n<{ message: MessageSchema }, string>({
   legacy: false,
   locale: 'en-US',
-  allowComposition: true,
   globalInjection: true,
   messages: message,
 });
