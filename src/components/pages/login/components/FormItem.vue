@@ -1,23 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import type { InputHTMLAttributes } from 'vue';
 
-interface CustomInputAttributes extends InputHTMLAttributes {
+interface CustomInputAttributes extends /* @vue-ignore */ InputHTMLAttributes {
   label: string;
-  modelValue: string;
 }
 
+const value = defineModel<string>();
 const props = defineProps<CustomInputAttributes>();
-
-const emit = defineEmits(['update:modelValue']);
-const value = computed<string>({
-  get() {
-    return props.modelValue;
-  },
-  set(value) {
-    emit('update:modelValue', value);
-  },
-});
 </script>
 
 <template>
