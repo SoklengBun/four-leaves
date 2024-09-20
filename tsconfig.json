@@ -1,15 +1,6 @@
 {
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.vue",
-    "test/**/*.ts"
-  ],
-  "exclude": [
-    "./node_modules"
-  ],
-  "files": [
-    "ts-custom.d.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.vue", "test/**/*.ts"],
+  "exclude": ["./node_modules"],
   "types": ["node"],
   "compilerOptions": {
     "outDir": "./dist/",
@@ -30,6 +21,5 @@
       "~/*": ["./src/*"],
       "@/*": ["./src/*"]
     }
-
   }
 }

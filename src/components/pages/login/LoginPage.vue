@@ -3,7 +3,6 @@ import { onMounted } from 'vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import FormItem from './components/FormItem.vue';
-import { showToast } from 'vant';
 
 const router = useRouter();
 const currentForm = ref('');
@@ -40,7 +39,8 @@ const onClick = () => {
   }
 };
 const onSubmit = () => {
-  form.value.login.password = '';
+  // form.value.login.password = '';
+  // console.log('asfas');
   console.log(form.value);
 };
 
@@ -53,15 +53,6 @@ onMounted(() => {
       currentForm.value = 'sign-up';
     }
   }, 100);
-
-  // window.addEventListener('devicemotion', (event) => {
-  //   if (
-  //     event?.acceleration?.x &&
-  //     (event?.acceleration?.x > 30 || event?.acceleration?.x < -30)
-  //   ) {
-  //     showToast(`shake ${event?.acceleration?.x}`);
-  //   }
-  // });
 });
 </script>
 
@@ -75,32 +66,36 @@ onMounted(() => {
       <div class="rotate-background z-20" :class="currentForm"></div>
 
       <!-- login -->
-      <div
+      <form
         class="login-left absolute z-10 flex h-full w-1/2 flex-col justify-center space-y-2 p-5"
         :class="currentForm"
       >
         <div class="text-3xl font-bold">Login</div>
         <FormItem
-          v-model:model-value="form.login.username"
+          v-model="form.login.username"
           label="Username/Email"
           placeholder="Username/Email"
           class="w-[200px]"
+          autocomplete="username"
         />
         <FormItem
-          v-model:model-value="form.login.password"
+          v-model="form.login.password"
           label="Password"
           placeholder="Password"
           type="password"
           class="w-[200px]"
+          autocomplete="current-password"
         />
-        <button class="button w-[200px]" @click="onSubmit">Login</button>
-      </div>
+        <button type="button" class="button w-[200px]" @click="onSubmit">
+          Login
+        </button>
+      </form>
       <div
         class="login-right absolute z-30 flex h-full w-1/2 flex-col items-end justify-center p-5 text-2xl font-bold text-white"
         :class="currentForm"
       >
         <div>Don't have account yet?</div>
-        <button class="" @click="onClick">Sign up here -></button>
+        <button type="button" class="" @click="onClick">Sign up here -></button>
       </div>
 
       <!-- sign up-->
@@ -113,33 +108,38 @@ onMounted(() => {
           {{ '<- Login Here' }}
         </button>
       </div>
-      <div
+      <form
         class="sign-up-right absolute z-10 flex h-full w-1/2 flex-col items-end justify-center space-y-2 p-5 text-end"
         :class="currentForm"
       >
         <div class="text-3xl font-bold">Sign Up</div>
         <FormItem
-          v-model:model-value="form.signUp.username"
+          v-model="form.signUp.username"
           label="Username/Email"
           placeholder="Username/Email"
           class="w-[200px] text-end"
+          autocomplete="username"
         />
         <FormItem
-          v-model:model-value="form.signUp.password"
+          v-model="form.signUp.password"
           label="Password"
           placeholder="Password"
           type="password"
           class="w-[200px] text-end"
+          autocomplete="current-password"
         />
         <FormItem
-          v-model:model-value="form.signUp.confirmPassword"
+          v-model="form.signUp.confirmPassword"
           label="Confirm Password"
           placeholder="Password"
           type="password"
           class="w-[200px] text-end"
+          autocomplete="current-password"
         />
-        <button class="button w-[200px]" @click="onSubmit">Sign Up</button>
-      </div>
+        <button type="button" class="button w-[200px]" @click="onSubmit">
+          Sign Up
+        </button>
+      </form>
     </div>
   </div>
 </template>
