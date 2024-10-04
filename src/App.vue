@@ -3,6 +3,7 @@ import FooterBar from './components/FooterBar.vue';
 import NavBar from './components/header/NavBar.vue';
 import { useRoute } from 'vue-router';
 import { onMounted, watch } from 'vue';
+import { useHead } from '@unhead/vue';
 
 const route = useRoute();
 
@@ -26,6 +27,14 @@ onMounted(() => {
 
     return;
   };
+});
+
+useHead({
+  title: 'αηєℓℓα',
+  meta: [
+    { name: 'description', content: 'This is a description for my Vue page' },
+    { property: 'og:title', content: 'αηєℓℓα' },
+  ],
 });
 </script>
 
