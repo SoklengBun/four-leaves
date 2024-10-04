@@ -20,4 +20,4 @@ app.use(i18n);
 app.use(Popup);
 app.use(Switch);
 
-app.mount('#app');
+router.isReady().then(() => app.mount('#app'));
