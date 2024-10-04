@@ -33,7 +33,17 @@ useHead({
   title: 'αηєℓℓα',
   meta: [
     { name: 'description', content: 'This is a description for my Vue page' },
+    { name: 'theme-color', content: '#ffffff' },
+    { name: 'author', content: 'αηєℓℓα' },
     { property: 'og:title', content: 'αηєℓℓα' },
+    {
+      property: 'og:description',
+      content: 'This is a description for my Vue pag',
+    },
+    {
+      property: 'og:image',
+      content: 'https://vueuse.org/og-useTitle.png',
+    },
   ],
 });
 </script>
