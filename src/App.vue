@@ -6,7 +6,6 @@ import { onMounted, watch } from 'vue';
 import { useHead } from '@unhead/vue';
 
 const route = useRoute();
-
 onMounted(() => {
   document.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -29,20 +28,22 @@ onMounted(() => {
   };
 });
 
+const description = route.query.name?.toString() ?? 'My Name';
+
 useHead({
   title: 'αηєℓℓα',
   meta: [
-    { name: 'description', content: 'This is a description for my Vue page' },
-    { name: 'theme-color', content: '#ffffff' },
-    { name: 'author', content: 'αηєℓℓα' },
+    { name: 'description', content: description },
     { property: 'og:title', content: 'αηєℓℓα' },
+    { property: 'og:description', content: 'Description for your page.' },
+    { property: 'og:image', content: 'https://anella.vercel.app/anella.jpg' },
+    { property: 'og:url', content: 'https://anella.vercel.app/' },
+    { property: 'twitter:card', content: 'summary_large_image' },
+    { property: 'twitter:title', content: 'Your Page Title' },
+    { property: 'twitter:description', content: description },
     {
-      property: 'og:description',
-      content: 'This is a description for my Vue pag',
-    },
-    {
-      property: 'og:image',
-      content: 'https://vueuse.org/og-useTitle.png',
+      property: 'twitter:image',
+      content: 'https://anella.vercel.app/anella.jpg',
     },
   ],
 });
