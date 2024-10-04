@@ -3,6 +3,7 @@ import FooterBar from './components/FooterBar.vue';
 import NavBar from './components/header/NavBar.vue';
 import { useRoute } from 'vue-router';
 import { onMounted, watch } from 'vue';
+import { useHead } from '@unhead/vue';
 
 const route = useRoute();
 
