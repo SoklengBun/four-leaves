@@ -8,10 +8,13 @@ import { Popup, Switch } from 'vant';
 import 'vant/lib/index.css';
 import './assets/main.css';
 import './styles/tailwind.css';
+import { createHead } from '@vueuse/head';
 
 const app = createApp(App);
+const head = createHead();
 
 app.use(createPinia());
+app.use(head);
 app.use(router);
 app.use(i18n);
 app.use(Popup);

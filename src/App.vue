@@ -27,6 +27,14 @@ onMounted(() => {
     return;
   };
 });
+
+useHead({
+  title: 'αηєℓℓα',
+  meta: [
+    { name: 'description', content: 'This is a description for my Vue page' },
+    { property: 'og:title', content: 'αηєℓℓα' },
+  ],
+});
 </script>
 
 <template>
