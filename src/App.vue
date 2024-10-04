@@ -36,7 +36,6 @@ useHead({
     { name: 'theme-color', content: '#ffffff' },
     { name: 'author', content: 'αηєℓℓα' },
     { property: 'og:title', content: 'αηєℓℓα' },
-
     {
       property: 'og:description',
       content: 'This is a description for my Vue pag',
