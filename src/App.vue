@@ -36,15 +36,15 @@ useHead({
     { name: 'description', content: description },
     { property: 'og:title', content: 'αηєℓℓα' },
     { property: 'og:description', content: 'Description for your page.' },
-    { property: 'og:image', content: 'https://anella.vercel.app/anella.jpg' },
+    // { property: 'og:image', content: 'https://anella.vercel.app/anella.jpg' },
     { property: 'og:url', content: 'https://anella.vercel.app/' },
     { property: 'twitter:card', content: 'summary_large_image' },
     { property: 'twitter:title', content: 'Your Page Title' },
     { property: 'twitter:description', content: description },
-    {
-      property: 'twitter:image',
-      content: 'https://anella.vercel.app/anella.jpg',
-    },
+    // {
+    //   property: 'twitter:image',
+    //   content: 'https://anella.vercel.app/anella.jpg',
+    // },
   ],
 });
 </script>
