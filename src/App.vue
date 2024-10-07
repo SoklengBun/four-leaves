@@ -6,6 +6,27 @@ import { onMounted, watch } from 'vue';
 import { useHead } from '@unhead/vue';
 
 const route = useRoute();
+
+const description = route.query.name?.toString() ?? 'My Name';
+
+useHead({
+  title: 'αηєℓℓα',
+  meta: [
+    { name: 'description', content: description },
+    { property: 'og:title', content: 'αηєℓℓα' },
+    { property: 'og:description', content: 'Description for your page.' },
+    // { property: 'og:image', content: 'https://anella.vercel.app/anella.jpg' },
+    { property: 'og:url', content: 'https://anella.vercel.app/' },
+    { property: 'twitter:card', content: 'summary_large_image' },
+    { property: 'twitter:title', content: 'Your Page Title' },
+    { property: 'twitter:description', content: description },
+    // {
+    //   property: 'twitter:image',
+    //   content: 'https://anella.vercel.app/anella.jpg',
+    // },
+  ],
+});
+
 onMounted(() => {
   document.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -26,26 +47,6 @@ onMounted(() => {
 
     return;
   };
-});
-
-const description = route.query.name?.toString() ?? 'My Name';
-
-useHead({
-  title: 'αηєℓℓα',
-  meta: [
-    { name: 'description', content: description },
-    { property: 'og:title', content: 'αηєℓℓα' },
-    { property: 'og:description', content: 'Description for your page.' },
-    // { property: 'og:image', content: 'https://anella.vercel.app/anella.jpg' },
-    { property: 'og:url', content: 'https://anella.vercel.app/' },
-    { property: 'twitter:card', content: 'summary_large_image' },
-    { property: 'twitter:title', content: 'Your Page Title' },
-    { property: 'twitter:description', content: description },
-    // {
-    //   property: 'twitter:image',
-    //   content: 'https://anella.vercel.app/anella.jpg',
-    // },
-  ],
 });
 </script>
 
