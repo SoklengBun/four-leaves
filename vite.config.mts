@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import vueJsxPlugin from '@vitejs/plugin-vue-jsx';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,11 +12,41 @@ export default defineConfig({
     open: true,
     proxy: {},
   },
-  define: {
-    // enable hydration mismatch details in production build
-    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
-  },
-  plugins: [vue(), vueJsxPlugin()],
+  plugins: [
+    vue(),
+    vueJsxPlugin(),
+    VitePWA({
+      registerType: 'prompt',
+      includeAssets: ['favicon.ico', 'robots.txt'],
+      manifest: {
+        name: 'Anella',
+        short_name: 'Anella',
+        description: 'Anella',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: '192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: '512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+          {
+            src: '1024x1024.png',
+            sizes: '1024x1024',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{css,js,html}'],
+      },
+    }),
+  ],
   resolve: {
     alias: {
       '~/': `${path.resolve(__dirname, 'src')}/`,

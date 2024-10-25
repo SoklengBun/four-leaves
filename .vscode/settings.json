@@ -1,0 +1,7 @@
+{
+  "i18n-ally.localesPaths": ["src/locales"],
+  "i18n-ally.enabledParsers": ["json", "ts", "js", "yaml"],
+  "i18n-ally.sourceLanguage": "en-US",
+  "i18n-ally.displayLanguage": "en-US",
+  "i18n-ally.enabledFrameworks": ["vue"]
+}

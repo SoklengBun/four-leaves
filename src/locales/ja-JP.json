@@ -1,10 +1,15 @@
 {
-    "hello": "こんにちは！",
-    "hey": "はははは?",
-    "more" : {
-        "ahh": "ににに"
-    },
-    "button": {
-        "next": "次"
-    }
+  "hello": "こんにちは！",
+  "hey": "はははは?",
+  "more": {
+    "ahh": "ににに"
+  },
+  "button": {
+    "next": "次"
+  },
+  "pwa": {
+    "update_available_message": "新しいアップデートが利用可能です!!",
+    "update": "更新",
+    "close": "閉じる"
+  }
 }

@@ -4,6 +4,7 @@ import jaJP from './ja-JP.json';
 
 type MessageSchema = typeof enUS;
 
+//Doc: https://vue-i18n.intlify.dev/
 const supportLanguage: {
   [key: string]: {
     name: string;
@@ -28,33 +29,4 @@ const i18n = createI18n<{ message: MessageSchema }, string>({
   messages: message,
 });
 
-type RecursiveKeyOf<TObj extends object> = {
-  [TKey in keyof TObj & (string | number)]: RecursiveKeyOfHandleValue<
-    TObj[TKey],
-    `${TKey}`
-  >;
-}[keyof TObj & (string | number)];
-
-type RecursiveKeyOfInner<TObj extends object> = {
-  [TKey in keyof TObj & (string | number)]: RecursiveKeyOfHandleValue<
-    TObj[TKey],
-    `['${TKey}']` | `.${TKey}`
-  >;
-}[keyof TObj & (string | number)];
-
-type RecursiveKeyOfHandleValue<
-  TValue,
-  Text extends string
-> = TValue extends any[]
-  ? Text
-  : TValue extends object
-  ? Text | `${Text}${RecursiveKeyOfInner<TValue>}`
-  : Text;
-
-type TxKeyPath = RecursiveKeyOf<MessageSchema>;
-
-// You may change name base on what you wnat
-function t(key: TxKeyPath) {
-  return i18n.global.t(key);
-}
-export { i18n, t, supportLanguage };
+export { i18n, supportLanguage };
