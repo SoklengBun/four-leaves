@@ -1,10 +1,15 @@
 {
-    "hello": "Hello",
-    "hey": "ehhhh?",
-    "more" : {
-        "ahh": "ahh"
-    },
-    "button": {
-        "next": "Next"
-    }
+  "hello": "Hello",
+  "hey": "ehhhh?",
+  "more": {
+    "ahh": "ahh"
+  },
+  "button": {
+    "next": "Next"
+  },
+  "pwa": {
+    "update_available_message": "New update available!!",
+    "update": "Update",
+    "close": "Close"
+  }
 }

@@ -12,13 +12,11 @@
   },
   "dependencies": {
     "@vueuse/core": "^11.1.0",
-    "@vueuse/head": "^2.0.0",
-    "pinia": "^2.0.23",
-    "vant": "^4.0.10",
-    "vue": "^3.2.41",
-    "vue-i18n": "10.0.1",
-    "vue-router": "^4.1.5",
-    "yarn": "^1.22.19"
+    "pinia": "^2.2.4",
+    "vant": "^4.9.8",
+    "vue": "^3.5.12",
+    "vue-i18n": "10.0.4",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
@@ -26,8 +24,8 @@
     "@types/node": "^22.5.5",
     "@vitejs/plugin-vue": "^5.1.4",
     "@vitejs/plugin-vue-jsx": "^4.0.1",
-    "@vue/eslint-config-prettier": "^9.0.0",
-    "@vue/eslint-config-typescript": "^13.0.0",
+    "@vue/eslint-config-prettier": "^10.1.0",
+    "@vue/eslint-config-typescript": "^14.1.3",
     "@vue/test-utils": "^2.1.0",
     "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.13",
@@ -35,15 +33,16 @@
     "eslint-plugin-vue": "^9.3.0",
     "jsdom": "^25.0.0",
     "npm-run-all": "^4.1.5",
-    "postcss": "^8.4.21",
+    "postcss": "^8.4.47",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",
-    "sass": "^1.76.0",
-    "sass-loader": "^16.0.1",
-    "tailwindcss": "^3.2.6",
-    "typescript": "~5.6.2",
-    "vite": "^5.4.6",
-    "vitest": "^2.1.1",
+    "sass": "^1.80.4",
+    "sass-loader": "^16.0.2",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vite-plugin-pwa": "^0.20.5",
+    "vitest": "^2.1.3",
     "vue-tsc": "^2.1.6"
   }
 }

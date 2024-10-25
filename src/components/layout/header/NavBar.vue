@@ -3,7 +3,6 @@ import { requireImage } from '@/utils/helper';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
-import { t } from '@/locales';
 import LanguageSelection from './LanguageSelection.vue';
 import Theme from './Theme.vue';
 import FontSelection from './FontSelection.vue';
@@ -69,7 +68,6 @@ const togglePopup = () => {
           <RouterLink :to="{ name: 'home' }" class="h-full">
             <img :src="requireImage('logo.png')" class="contain h-full" />
           </RouterLink>
-
           <div class="hidden items-center gap-3 md:flex">
             <template v-for="item in menuList" :key="item.name">
               <RouterLink
@@ -114,7 +112,7 @@ const togglePopup = () => {
         <!--Mobile Popup-->
         <div
           id="popup"
-          class="show fixed top-0 right-0 z-40 h-full w-full bg-white/70 backdrop-blur-sm"
+          class="show fixed right-0 top-0 z-40 h-full w-full bg-white/70 backdrop-blur-sm"
           :class="{ hidden: !showPopup }"
         >
           <div class="justify-start px-10 pt-16 text-blue-500">
