@@ -66,8 +66,11 @@ const togglePopup = () => {
           class="fixed top-0 z-50 flex h-10 w-full items-center justify-between px-2 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
         >
           <RouterLink :to="{ name: 'home' }" class="h-full">
-            <img :src="requireImage('logo.png')" class="contain h-full" />
-          </RouterLink>
+            <img
+              :src="requireImage('logo.png')"
+              class="contain h-full"
+            /> </RouterLink
+          >TEst
           <div class="hidden items-center gap-3 md:flex">
             <template v-for="item in menuList" :key="item.name">
               <RouterLink
