@@ -9,7 +9,10 @@ const close = () => {
 </script>
 
 <template>
-  <div class="pwa-toast" :class="needRefresh ? 'opacity-100' : 'opacity-0'">
+  <div
+    class="pwa-toast"
+    :class="needRefresh ? 'opacity-100' : '-translate-y-44 opacity-0'"
+  >
     <div>
       {{ $t('pwa.update_available_message') }}
     </div>

@@ -11,6 +11,7 @@ const showPopup = ref(false);
 
 const menuList = [
   { name: 'home', label: 'Home' },
+  { name: 'lyrics', label: 'Lyrics' },
   { name: 'sokleng', label: 'Yahallo' },
   { name: 'about', label: 'About me' },
 ];
@@ -61,16 +62,13 @@ const togglePopup = () => {
 <template>
   <header>
     <nav>
-      <div class="w-full select-none md:h-10">
+      <div class="h-nav w-full select-none">
         <div
-          class="fixed top-0 z-50 flex h-10 w-full items-center justify-between px-2 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
+          class="h-nav fixed top-0 z-50 flex w-full items-center justify-between px-2 py-1 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
         >
           <RouterLink :to="{ name: 'home' }" class="h-full">
-            <img
-              :src="requireImage('logo.png')"
-              class="contain h-full"
-            /> </RouterLink
-          >TEst
+            <img :src="requireImage('logo.png')" class="contain h-full" />
+          </RouterLink>
           <div class="hidden items-center gap-3 md:flex">
             <template v-for="item in menuList" :key="item.name">
               <RouterLink

@@ -36,7 +36,7 @@ onUnmounted(() => {
 
 <template>
   <div class="containers">
-    <div class="container">
+    <div class="container-1">
       <div class="flex gap-2 p-2">
         <Dice v-for="num in 6" :key="num" :number="num" />
       </div>
@@ -61,7 +61,7 @@ onUnmounted(() => {
 </template>
 
 <style>
-.container {
+.container-1 {
   background-color: black;
   padding-top: 4rem;
   width: 80%;
