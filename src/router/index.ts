@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import SoklengView from '../views/SoklengView.vue';
+import LyricsView from '../views/LyricsView.vue';
+import LyricsDetailView from '../views/LyricsDetailView.vue';
 import NotFound from '../views/PageNotFoundView.vue';
 
 const router = createRouter({
@@ -23,6 +25,21 @@ const router = createRouter({
       path: '/sokleng',
       name: 'sokleng',
       component: SoklengView,
+    },
+    {
+      path: '/lyrics',
+      children: [
+        {
+          path: '',
+          name: 'lyrics',
+          component: LyricsView,
+        },
+        {
+          path: '/lyrics/:id',
+          name: 'lyrics-detail',
+          component: LyricsDetailView,
+        },
+      ],
     },
     {
       path: '/princess-connect',
