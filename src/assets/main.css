@@ -26,3 +26,17 @@ a,
   color: hsla(160, 100%, 37%, 1);
   transition: 0.4s;
 }
+
+span,
+div,
+p,
+a {
+  text-decoration: none;
+
+  a[href^='tel'] {
+    text-decoration: none;
+    color: inherit;
+    pointer-events: none;
+    cursor: default;
+  }
+}

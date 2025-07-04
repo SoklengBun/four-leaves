@@ -13,6 +13,7 @@ const menuList = [
   { name: 'home', label: 'Home' },
   { name: 'lyrics', label: 'Lyrics' },
   { name: 'sokleng', label: 'Yahallo' },
+  { name: 'slot-machine', label: 'Slot' },
   { name: 'about', label: 'About me' },
 ];
 
@@ -64,7 +65,7 @@ const togglePopup = () => {
     <nav>
       <div class="h-nav w-full select-none">
         <div
-          class="h-nav fixed top-0 z-50 flex w-full items-center justify-between px-2 py-1 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
+          class="fixed top-0 z-50 flex h-nav w-full items-center justify-between px-2 py-1 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
         >
           <RouterLink :to="{ name: 'home' }" class="h-full">
             <img :src="requireImage('logo.png')" class="contain h-full" />

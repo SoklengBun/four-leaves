@@ -67,6 +67,11 @@ const router = createRouter({
       component: () => import('../views/ShakeView.vue'),
     },
     {
+      path: '/slot-machine',
+      name: 'slot-machine',
+      component: () => import('../views/SlotMachineView.vue'),
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: NotFound,
