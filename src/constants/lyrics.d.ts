@@ -5,4 +5,5 @@ type Lyrics = {
   romaji?: string;
   jp?: string;
   en?: string;
+  url?: string;
 };

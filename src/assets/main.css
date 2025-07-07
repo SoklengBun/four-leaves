@@ -9,6 +9,8 @@
 html,
 body {
   font-family: 'Patrick Hand', sans-serif;
+  height: 100vh;
+  height: 100svh;
 }
 
 #app {

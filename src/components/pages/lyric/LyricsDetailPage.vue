@@ -7,6 +7,7 @@ const router = useRouter();
 
 const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
 const lyrics = ref<Lyrics>();
+const isExpand = ref(false);
 
 onMounted(() => {
   if (!lyricsList.value.length) {
@@ -21,13 +22,45 @@ onMounted(() => {
     }
   }
 });
+
+const onPlay = () => {
+  isExpand.value = !isExpand.value;
+  console.log('lyrice', lyrics.value);
+};
 </script>
 
 <template>
-  <div class="flex flex-col items-center py-5">
-    <p class="text-base">{{ lyrics?.title }}</p>
-    <p class="mb-5 mt-2 text-sm">{{ lyrics?.artist }}</p>
+  <div
+    class="flex h-[calc(100svh-50px)] flex-col items-center overflow-hidden py-2"
+  >
+    <p class="text-xl">{{ lyrics?.title }}</p>
+    <p class="my-2 text-base">{{ lyrics?.artist }}</p>
+    <div class="flex w-full flex-1 flex-col overflow-hidden">
+      <div class="flex flex-1 overflow-hidden">
+        <div class="flex flex-1 justify-center overflow-scroll py-5">
+          <p class="h-fit whitespace-pre-line text-center text-sm">
+            {{ lyrics?.romaji }}
+          </p>
+        </div>
+      </div>
+      <div
+        class="mt-auto flex h-5 w-full flex-col items-center justify-start overflow-hidden border-t transition-all duration-300"
+        :class="{ '!h-[300px]': isExpand }"
+      >
+        <button @click="onPlay" class="mx-auto mb-2 w-fit">play music</button>
 
-    <p class="whitespace-pre-line text-center text-xs">{{ lyrics?.romaji }}</p>
+        <iframe
+          v-if="lyrics?.url"
+          width="460"
+          height="250"
+          :src="`https://www.youtube.com/embed/${lyrics?.url}?si=0IWQ9Kbz7n-ixbBR`"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
   </div>
 </template>

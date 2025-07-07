@@ -38,6 +38,7 @@ const fetchLyrics = async () => {
         artist: e[1],
         jp: e[2],
         romaji: e[3],
+        url: e[4],
       });
     }
   });
@@ -59,15 +60,24 @@ onMounted(async () => {
 const onClick = (id: number) => {
   router.push({ name: 'lyrics-detail', params: { id: id } });
 };
+
+const onClear = async () => {
+  searchText.value = '';
+  await fetchLyrics();
+};
 </script>
 
 <template>
   <div class="container flex flex-col items-center py-4">
-    <div>Search:</div>
-    <input
-      v-model="searchText"
-      class="w-full max-w-[300px] rounded-md border px-2 py-1"
-    />
+    <span>Search:</span>
+
+    <div class="flex items-center justify-center gap-2">
+      <input
+        v-model="searchText"
+        class="w-full max-w-[300px] rounded-md border px-2 py-1"
+      />
+      <button @click="onClear">Clear</button>
+    </div>
     <div class="flex flex-col">
       <div v-for="lyrics in searchResult" @click="() => onClick(lyrics.id)">
         {{ lyrics.title }}
