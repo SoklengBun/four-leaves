@@ -1,10 +1,10 @@
 <script setup lang="ts">
-defineProps<{ fullscreen: boolean; horizontal: boolean }>();
+defineProps<{ fullscreen?: boolean; horizontal?: boolean }>();
 </script>
 
 <template>
   <div
-    class="scroll-snap-container w-screen overflow-x-hidden overflow-y-scroll"
+    class="scroll-snap-container w-screen"
     :class="{ fullscreen: fullscreen, horizontal: horizontal }"
   >
     <slot> </slot>
@@ -12,6 +12,10 @@ defineProps<{ fullscreen: boolean; horizontal: boolean }>();
 </template>
 
 <style>
+.scroll-snap-container {
+  overflow: auto;
+}
+
 @media (min-width: 768px) {
   .scroll-snap-container {
     display: block;

@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import SoklengView from '../views/SoklengView.vue';
-import LyricsView from '../views/LyricsView.vue';
-import LyricsDetailView from '../views/LyricsDetailView.vue';
+
+import LyricsLayoutView from '../views/lyrics/LayoutView.vue';
+import LyricsListView from '../views/lyrics/ListView.vue';
+import LyricsDetailView from '../views/lyrics/DetailView.vue';
+
 import NotFound from '../views/PageNotFoundView.vue';
 
 const router = createRouter({
@@ -21,18 +24,19 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
-    {
-      path: '/sokleng',
-      name: 'sokleng',
-      component: SoklengView,
-    },
+    // {
+    //   path: '/sokleng',
+    //   name: 'sokleng',
+    //   component: SoklengView,
+    // },
     {
       path: '/lyrics',
+      component: LyricsLayoutView,
       children: [
         {
           path: '',
           name: 'lyrics',
-          component: LyricsView,
+          component: LyricsListView,
         },
         {
           path: '/lyrics/:id',
@@ -66,11 +70,11 @@ const router = createRouter({
       name: 'shake',
       component: () => import('../views/ShakeView.vue'),
     },
-    {
-      path: '/slot-machine',
-      name: 'slot-machine',
-      component: () => import('../views/SlotMachineView.vue'),
-    },
+    // {
+    //   path: '/slot-machine',
+    //   name: 'slot-machine',
+    //   component: () => import('../views/SlotMachineView.vue'),
+    // },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
