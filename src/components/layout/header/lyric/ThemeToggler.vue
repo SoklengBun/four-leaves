@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useDark } from '@vueuse/core';
 import { ref, onMounted } from 'vue';
 
@@ -10,7 +10,7 @@ const offsetY = ref(0);
 
 const maxPull = 40;
 
-let animationFrame;
+let animationFrame: any;
 let velocityY = 0;
 let positionY = 0;
 let angle = 0;
@@ -19,13 +19,13 @@ let velocityAngle = 0;
 const knobTransform = ref('translateY(0)');
 const ropeTransform = ref('scaleY(1)');
 
-const onPointerDown = (e) => {
+const onPointerDown = (e: any) => {
   pulling.value = true;
   startY.value = e.clientY || e.touches?.[0].clientY;
   cancelAnimationFrame(animationFrame);
 };
 
-const onPointerMove = (e) => {
+const onPointerMove = (e: any) => {
   if (!pulling.value) return;
   const currentY = e.clientY || e.touches?.[0].clientY;
   let dy = currentY - startY.value;
