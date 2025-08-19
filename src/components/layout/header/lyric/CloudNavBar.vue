@@ -9,7 +9,7 @@ const cloudTwo = ref(-800);
 const cloudOneDuration = ref(150);
 const cloudTwoDuration = ref(150);
 
-let interval: number;
+let interval: any;
 
 onMounted(() => {
   interval = setInterval(() => {
