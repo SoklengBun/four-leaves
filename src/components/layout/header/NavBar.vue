@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { requireImage } from '@/utils/helper';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
 import LanguageSelection from './LanguageSelection.vue';
@@ -12,8 +12,8 @@ const showPopup = ref(false);
 const menuList = [
   { name: 'home', label: 'Home' },
   { name: 'lyrics', label: 'Lyrics' },
-  { name: 'sokleng', label: 'Yahallo' },
-  { name: 'slot-machine', label: 'Slot' },
+  // { name: 'sokleng', label: 'Yahallo' },
+  // { name: 'slot-machine', label: 'Slot' },
   { name: 'about', label: 'About me' },
 ];
 
@@ -58,101 +58,107 @@ const togglePopup = () => {
     }, 300);
   }
 };
+
+watch(showPopup, () => {
+  if (showPopup.value) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+});
 </script>
 
 <template>
   <header>
     <nav>
-      <div class="h-nav w-full select-none">
-        <div
-          class="fixed top-0 z-50 flex h-nav w-full items-center justify-between px-2 py-1 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
-        >
-          <RouterLink :to="{ name: 'home' }" class="h-full">
-            <img :src="requireImage('logo.png')" class="contain h-full" />
-          </RouterLink>
-          <div class="hidden items-center gap-3 md:flex">
-            <template v-for="item in menuList" :key="item.name">
+      <div
+        class="fixed top-0 z-50 flex h-nav w-full select-none items-center justify-between px-2 py-1 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
+      >
+        <RouterLink :to="{ name: 'home' }" class="h-full">
+          <img :src="requireImage('logo.png')" class="contain h-full" />
+        </RouterLink>
+        <div class="hidden items-center gap-3 md:flex">
+          <template v-for="item in menuList" :key="item.name">
+            <RouterLink
+              :to="{ name: item.name }"
+              class="text-blue-400 transition-all duration-300 hover:scale-125 hover:font-bold hover:text-blue-500"
+            >
+              {{ item.label }}
+            </RouterLink>
+          </template>
+
+          <Theme />
+          <LanguageSelection />
+          <FontSelection />
+
+          <template v-for="item in socialMedia" :key="item.name">
+            <a :href="item.link" target="_blank">
+              <img
+                :src="requireImage(item.src)"
+                class="h-6 w-6 duration-300 hover:scale-125"
+                :alt="item.name"
+              />
+            </a>
+          </template>
+        </div>
+
+        <!---Mobile Screen-->
+        <div class="flex md:hidden">
+          <button
+            type="button"
+            class="flex h-7 w-7 items-center justify-center"
+            @click="togglePopup"
+          >
+            <img
+              :src="requireImage(!showPopup ? 'menu.svg' : 'close.svg')"
+              class="h-7 w-7 delay-300"
+              alt="Menu"
+            />
+          </button>
+        </div>
+      </div>
+
+      <!--Mobile Popup-->
+      <div
+        id="popup"
+        class="show fixed right-0 top-0 z-40 h-body w-full bg-white/70 backdrop-blur-sm"
+        :class="{ hidden: !showPopup }"
+      >
+        <div class="justify-start px-10 pt-16 text-blue-500">
+          <ul>
+            <li
+              v-for="item in menuList"
+              :key="item.name"
+              class="my-2 border-b py-1"
+            >
               <RouterLink
                 :to="{ name: item.name }"
-                class="text-blue-400 hover:scale-125 hover:font-bold hover:text-blue-500"
+                class="flex"
+                @click="togglePopup"
               >
                 {{ item.label }}
               </RouterLink>
-            </template>
+            </li>
 
-            <Theme />
-            <LanguageSelection />
-            <FontSelection />
-
-            <template v-for="item in socialMedia" :key="item.name">
-              <a :href="item.link" target="_blank">
+            <li
+              v-for="item in socialMedia"
+              :key="item.name"
+              class="my-2 border-b py-1"
+            >
+              <a
+                :href="item.link"
+                target="_blank"
+                class="flex items-start gap-1"
+              >
                 <img
                   :src="requireImage(item.src)"
-                  class="h-6 w-6 duration-300 hover:scale-125"
+                  class="h-5 w-5"
                   :alt="item.name"
                 />
+                {{ item.name }}
               </a>
-            </template>
-          </div>
-
-          <!---Mobile Screen-->
-          <div class="flex md:hidden">
-            <button
-              type="button"
-              class="flex h-7 w-7 items-center justify-center"
-              @click="togglePopup"
-            >
-              <img
-                :src="requireImage(!showPopup ? 'menu.svg' : 'close.svg')"
-                class="h-7 w-7 delay-300"
-                alt="Menu"
-              />
-            </button>
-          </div>
-        </div>
-
-        <!--Mobile Popup-->
-        <div
-          id="popup"
-          class="show fixed right-0 top-0 z-40 h-full w-full bg-white/70 backdrop-blur-sm"
-          :class="{ hidden: !showPopup }"
-        >
-          <div class="justify-start px-10 pt-16 text-blue-500">
-            <ul>
-              <li
-                v-for="item in menuList"
-                :key="item.name"
-                class="my-2 border-b py-1"
-              >
-                <RouterLink
-                  :to="{ name: item.name }"
-                  class="flex"
-                  @click="togglePopup"
-                >
-                  {{ item.label }}
-                </RouterLink>
-              </li>
-
-              <li
-                v-for="item in socialMedia"
-                :key="item.name"
-                class="my-2 border-b py-1"
-              >
-                <a
-                  :href="item.link"
-                  target="_blank"
-                  class="flex items-start gap-1"
-                >
-                  <img
-                    :src="requireImage(item.src)"
-                    class="h-5 w-5"
-                    :alt="item.name"
-                  />
-                  {{ item.name }}
-                </a>
-              </li>
-            </ul>
-          </div>
+            </li>
+          </ul>
         </div>
       </div>
     </nav>

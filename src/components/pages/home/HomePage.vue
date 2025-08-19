@@ -68,40 +68,21 @@ const handleScroll = () => {
     // snap.children[i].classList.add('show');
   }
 };
-
-onMounted(() => {
-  const snap = document.getElementById('snap-scroll');
-  const nodeList = document.querySelectorAll<HTMLElement>('.background-i');
-  if (nodeList && snap) {
-    nodeList.forEach((node, index) => {
-      node.style.backgroundPosition = `50% ${
-        (node.scrollHeight - 800 * (2 - index) - snap.scrollTop) * 0.08
-      }px`;
-    });
-  }
-});
 </script>
 
 <template>
   <div>
     <FirstLoad />
-    <div class="fixed top-0 flex h-screen w-full">
-      <div
+    <div class="fixed left-0 top-0 flex h-body w-full border border-red-500">
+      <button
         id="next-button"
-        class="absolute bottom-0 z-100 hidden h-fit w-full justify-center p-2 md:flex"
+        class="absolute bottom-0 z-[100] hidden h-fit w-full justify-center p-2 md:flex"
+        @click="scrollToRef(`section_${1}`)"
       >
-        <button @click="scrollToRef(`section_${1}`)">
-          <div
-            class="scroll-down duration-300 hover:scale-90 hover:opacity-70"
-          ></div>
-        </button>
-      </div>
-      <SnapScroll
-        id="snap-scroll"
-        :fullscreen="true"
-        :horizontal="false"
-        @scroll="handleScroll"
-      >
+        <div class="scroll-down duration-300 hover:scale-90 hover:opacity-70" />
+      </button>
+
+      <SnapScroll id="snap-scroll" fullscreen @scroll="handleScroll">
         <FirstSlide id="section_1" />
         <SecondSlide id="section_2" />
         <ThirdSlide id="section_3" />
@@ -125,10 +106,14 @@ onMounted(() => {
   background-size: 80px 40px;
 }
 
+.background-i {
+  background-position-x: center;
+}
+
 @media (max-width: 768px) {
   .background-i {
     background-position: center center !important;
-    background-size: auto 100vh !important;
+    background-size: auto var(--body-height, 100vh) !important;
   }
 }
 </style>

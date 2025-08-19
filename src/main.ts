@@ -6,7 +6,7 @@ import router from './router';
 import { Popup, Switch } from 'vant';
 
 import 'vant/lib/index.css';
-import './assets/main.css';
+import './assets/styles/main.css';
 import './styles/tailwind.css';
 
 const app = createApp(App);

@@ -4,9 +4,9 @@ import NavBar from './header/NavBar.vue';
 </script>
 
 <template>
-  <NavBar />
+  <!-- <NavBar /> -->
   <main>
-    <slot></slot>
+    <slot />
   </main>
   <!-- <FooterBar /> -->
 </template>

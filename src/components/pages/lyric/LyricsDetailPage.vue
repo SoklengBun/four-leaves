@@ -27,18 +27,24 @@ const onPlay = () => {
   isExpand.value = !isExpand.value;
   console.log('lyrice', lyrics.value);
 };
+
+const back = () => {
+  router.back();
+};
 </script>
 
 <template>
   <div
-    class="flex h-[calc(100svh-50px)] flex-col items-center overflow-hidden py-2"
+    class="flex h-[calc(var(--body-height))] flex-col items-center overflow-hidden pb-2 pt-nav"
   >
-    <p class="text-xl">{{ lyrics?.title }}</p>
-    <p class="my-2 text-base">{{ lyrics?.artist }}</p>
+    <div class="container flex h-10 w-full items-center">
+      <div class="" @click="back">{{ '< Back' }}</div>
+    </div>
+    <p class="pb-2 text-xl">{{ lyrics?.title }}</p>
     <div class="flex w-full flex-1 flex-col overflow-hidden">
       <div class="flex flex-1 overflow-hidden">
         <div class="flex flex-1 justify-center overflow-scroll py-5">
-          <p class="h-fit whitespace-pre-line text-center text-sm">
+          <p class="h-fit whitespace-pre-line text-center text-base">
             {{ lyrics?.romaji }}
           </p>
         </div>

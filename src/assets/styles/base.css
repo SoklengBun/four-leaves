@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css?family=Patrick+Hand');
+
+:root {
+  --anella-primary: blue;
+  --anella-primary-dark: blue;
+
+  --anella-secondary: pink;
+  --anella-secondary-dark: pink;
+
+  --anella-foreground: #333333;
+  --anella-foreground-dark: #d0d0d0;
+
+  --anella-background: rgb(255, 255, 255);
+  --anella-background-dark: rgb(85, 85, 85);
+
+  --over-all-font-size: 16px;
+
+  --color-primary: var(--anella-primary);
+  --color-secondary: var(--anella-secondary);
+  --color-foreground: var(--anella-foreground);
+  --color-background: var(--anella-background);
+
+  --color-border: var(--anella-foreground);
+}
+
+.dark:root {
+  --color-primary: var(--anella-primary-dark);
+  --color-secondary: var(--anella-secondary-dark);
+  --color-foreground: var(--anella-foreground-dark);
+  --color-background: var(--anella-background-dark);
+
+  --color-border: var(--anella-foreground);
+}
+
+html {
+  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+
+  min-height: 100svh;
+  height: 100svh;
+  max-height: 100svh;
+
+  /* text style */
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-size: var(--over-all-font-size);
+  line-height: 24px;
+
+  transition:
+    color 0.5s ease,
+    background-color 0.5s ease !important;
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: auto;
+}
+
+html,
+body,
+#app {
+  font-family: 'Patrick Hand', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+  border-color: var(--color-border);
+}

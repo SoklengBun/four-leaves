@@ -1,0 +1,16 @@
+@import './base.css';
+
+:root {
+  --nav-height: 50px;
+  --body-height: 100vh;
+}
+
+@supports (height: 100svh) {
+  :root {
+    --body-height: 100svh;
+  }
+}
+
+body {
+  height: var(--body-height);
+}

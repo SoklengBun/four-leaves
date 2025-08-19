@@ -68,20 +68,42 @@ const onClear = async () => {
 </script>
 
 <template>
-  <div class="container flex flex-col items-center py-4">
-    <span>Search:</span>
-
-    <div class="flex items-center justify-center gap-2">
+  <div
+    class="container flex h-[calc(var(--body-height))] flex-col items-center pt-nav"
+  >
+    <div class="h-12 w-full">
+      <div class="fetch size-12" @click="fetchLyrics"></div>
+    </div>
+    <div class="flex w-full items-center gap-2">
       <input
         v-model="searchText"
-        class="w-full max-w-[300px] rounded-md border px-2 py-1"
+        class="h-[34px] w-full max-w-[300px] rounded-md border bg-white px-2 py-1 transition-colors duration-500 dark:bg-[#484848]"
       />
-      <button @click="onClear">Clear</button>
+
+      <button
+        @click="onClear"
+        class="h-[34px] rounded-md border border-black/10 bg-gray-200 px-4 dark:bg-gray-700"
+      >
+        Clear
+      </button>
     </div>
-    <div class="flex flex-col">
-      <div v-for="lyrics in searchResult" @click="() => onClick(lyrics.id)">
+    <div class="flex w-full flex-1 flex-col overflow-auto py-2">
+      <div
+        v-for="lyrics in searchResult"
+        @click="() => onClick(lyrics.id)"
+        class="line-clamp-1 min-h-6 break-all"
+      >
         {{ lyrics.title }}
       </div>
     </div>
   </div>
 </template>
+
+<style>
+.fetch {
+  background-image: url('@/assets/images/yunli.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 48px 48px;
+}
+</style>

@@ -13,15 +13,14 @@ module.exports = {
         },
       },
       colors: {
-        dark: '#181818',
-        'light-pink': '#ff92c1',
-      },
-      zIndex: {
-        55: '55',
-        100: '100',
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        background: 'var(--color-background)',
+        foreground: 'var(--color-foreground)',
       },
       spacing: {
         nav: 'var(--nav-height)',
+        body: 'var(--body-height)',
       },
     },
   },
