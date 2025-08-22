@@ -12,7 +12,9 @@ const setAppHeight = () => {
 
   if (!doc) return;
 
-  doc.style.setProperty('--body-height', `${window.innerHeight}px`);
+  setTimeout(() => {
+    doc.style.setProperty('--body-height', `${window.innerHeight}px`);
+  }, 1000);
 };
 
 onMounted(() => {

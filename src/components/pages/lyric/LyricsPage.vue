@@ -91,7 +91,7 @@ const onClear = async () => {
       <div
         v-for="lyrics in searchResult"
         @click="() => onClick(lyrics.id)"
-        class="line-clamp-1 min-h-6 break-all"
+        class="line-clamp-1 flex h-[34px] min-h-6 items-center break-all"
       >
         {{ lyrics.title }}
       </div>
