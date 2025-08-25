@@ -32,13 +32,17 @@ const fetchLyrics = async () => {
   let temp: Lyrics[] = [];
   (jsonData.values as string[][]).forEach((e, i) => {
     if (i !== 0) {
+      let links = e[4];
+
+      if (links.includes('[')) links = JSON.parse(e[4]);
+
       temp.push({
         id: i,
         title: e[0],
         artist: e[1],
         jp: e[2],
         romaji: e[3],
-        url: e[4],
+        url: links,
       });
     }
   });
@@ -50,8 +54,6 @@ onMounted(async () => {
   if (!lyricsList.value?.length) {
     await fetchLyrics();
   }
-
-  console.log(lyricsList.value[0]);
 
   const query = route.query.search?.toString();
   if (query) searchText.value = query;
@@ -91,7 +93,7 @@ const onClear = async () => {
       <div
         v-for="lyrics in searchResult"
         @click="() => onClick(lyrics.id)"
-        class="line-clamp-1 flex h-[34px] min-h-6 items-center break-all"
+        class="line-clamp-1 flex h-[34px] min-h-[34px] items-center break-all"
       >
         {{ lyrics.title }}
       </div>
