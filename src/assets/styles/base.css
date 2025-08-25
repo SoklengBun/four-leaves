@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Patrick+Hand');
 
 :root {
-  --anella-primary: blue;
-  --anella-primary-dark: blue;
+  --anella-primary: rgb(89, 166, 255);
+  --anella-primary-dark: rgb(89, 166, 255);
 
   --anella-secondary: pink;
   --anella-secondary-dark: pink;
@@ -34,22 +34,14 @@
 
 html {
   min-height: 100vh;
-  height: 100vh;
+  height: var(--body-height, 100vh);
   max-height: 100vh;
 
   min-height: 100svh;
-  height: 100svh;
+  height: var(--body-height, 100svh);
   max-height: 100svh;
 
   /* text style */
-  color: var(--color-foreground);
-  background: var(--color-background);
-  font-size: var(--over-all-font-size);
-  line-height: 24px;
-
-  transition:
-    color 0.5s ease,
-    background-color 0.5s ease !important;
 
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -60,7 +52,14 @@ html {
 html,
 body,
 #app {
+  @apply text-base;
+
   font-family: 'Patrick Hand', sans-serif;
+  color: var(--color-foreground);
+  background: var(--color-background);
+  transition:
+    color 0.5s ease,
+    background-color 0.5s ease !important;
 }
 
 *,

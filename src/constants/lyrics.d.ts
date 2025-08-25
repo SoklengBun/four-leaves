@@ -5,5 +5,5 @@ type Lyrics = {
   romaji?: string;
   jp?: string;
   en?: string;
-  url?: string;
+  url?: string | { a: string; l: string }[];
 };
