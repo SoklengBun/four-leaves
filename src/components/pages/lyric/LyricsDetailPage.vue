@@ -9,6 +9,9 @@ const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
 const lyrics = ref<Lyrics>();
 const isExpand = ref(false);
 const selectedLink = ref('');
+const availableLang = ref<LyricsKeys[]>(['romaji']);
+const languages = ['en', 'jp', 'romaji', 'kh', 'cn', 'pinyin'];
+const currentLang = ref<LyricsKeys>('romaji');
 
 onMounted(() => {
   if (!lyricsList.value.length) {
@@ -28,6 +31,21 @@ onMounted(() => {
       if (typeof lyrics.value.url === 'object') {
         selectedLink.value = lyrics.value.url[0].l;
       }
+
+      // Available Language
+      let tempLang: LyricsKeys[] = [];
+      Object.keys(temp).forEach((key) => {
+        if (languages.includes(key)) tempLang.push(key as LyricsKeys);
+      });
+      availableLang.value = tempLang;
+
+      if (tempLang.includes('romaji')) {
+        currentLang.value = 'romaji';
+      }
+
+      if (tempLang.includes('pinyin')) {
+        currentLang.value = 'pinyin';
+      }
     }
   }
 });
@@ -44,6 +62,10 @@ const onChangeLink = (link: string) => {
   if (selectedLink.value === link) return;
 
   selectedLink.value = link;
+};
+
+const switchLang = (lang: keyof Lyrics) => {
+  currentLang.value = lang;
 };
 </script>
 
@@ -72,12 +94,12 @@ const onChangeLink = (link: string) => {
       <div class="flex flex-1 overflow-hidden">
         <div class="flex flex-1 justify-center overflow-scroll py-2">
           <p class="h-fit whitespace-pre-line pb-5 text-center text-base">
-            {{ lyrics?.romaji }}
+            {{ lyrics?.[currentLang] }}
           </p>
         </div>
       </div>
       <div
-        class="relative mt-auto flex h-0 w-full flex-col items-center justify-start border-t-[1.5px] border-primary transition-all duration-300"
+        class="relative z-10 mt-auto flex h-0 w-full flex-col items-center justify-start border-t-[1.5px] border-primary transition-all duration-300"
         :class="{ '!h-[300px]': isExpand }"
       >
         <button
@@ -86,6 +108,22 @@ const onChangeLink = (link: string) => {
         >
           Music
         </button>
+
+        <!-- Available Language  -->
+        <div
+          class="absolute left-0 top-[-30px] z-[5] flex h-[30px] space-x-0.5 px-1"
+        >
+          <div
+            v-for="lang in availableLang"
+            :key="lang"
+            class="flex h-full items-center rounded-t-md bg-primary px-4 capitalize"
+            @click="switchLang(lang)"
+          >
+            <span :class="{ 'scale-125 text-white': currentLang === lang }">
+              {{ lang }}
+            </span>
+          </div>
+        </div>
 
         <iframe
           v-if="selectedLink"
