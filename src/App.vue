@@ -4,6 +4,7 @@ import { onMounted } from 'vue';
 import Layout from './components/layout/Layout.vue';
 import ReloadPrompt from './components/pwa/ReloadPrompt.vue';
 import { disableContextMenu, disableDevToolWithKeyboard } from './utils/lock';
+import Firework from './components/animation/Firework.vue';
 
 const route = useRoute();
 
@@ -30,5 +31,6 @@ onMounted(() => {
   <Layout>
     <ReloadPrompt />
     <RouterView />
+    <Firework />
   </Layout>
 </template>
