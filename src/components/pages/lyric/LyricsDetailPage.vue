@@ -83,7 +83,7 @@ const switchLang = (lang: keyof Lyrics) => {
     </div>
     <div class="px-2 py-2">
       <div
-        class="p rounded-lg border-2 border-primary px-5 py-1 text-xl text-primary"
+        class="rounded-lg border-2 border-primary px-5 py-1 text-xl text-primary"
       >
         <p class="text-center">
           {{ lyrics?.title }}
@@ -93,15 +93,28 @@ const switchLang = (lang: keyof Lyrics) => {
     <div class="flex w-full flex-1 flex-col overflow-hidden">
       <div class="flex flex-1 overflow-hidden">
         <div class="flex flex-1 justify-center overflow-scroll py-2">
-          <p class="h-fit whitespace-pre-line pb-5 text-center text-base">
+          <p
+            class="h-fit whitespace-pre-line pb-10 text-center text-base lowercase"
+          >
             {{ lyrics?.[currentLang] }}
           </p>
         </div>
       </div>
+
       <div
         class="relative z-10 mt-auto flex h-0 w-full flex-col items-center justify-start border-t-[1.5px] border-primary transition-all duration-300"
         :class="{ '!h-[300px]': isExpand }"
       >
+        <div
+          class="absolute left-0 top-[-2px] z-10 h-3 w-full border-t-2 border-red-400 bg-white"
+        ></div>
+
+        <button
+          @click="back"
+          class="absolute right-[76px] top-[-30px] z-[5] h-[30px] w-[70px] rounded-t-md bg-primary text-white"
+        >
+          Back
+        </button>
         <button
           @click="onPlay"
           class="absolute right-1 top-[-30px] z-[5] h-[30px] w-[70px] rounded-t-md bg-primary text-black"
@@ -111,15 +124,18 @@ const switchLang = (lang: keyof Lyrics) => {
 
         <!-- Available Language  -->
         <div
-          class="absolute left-0 top-[-30px] z-[5] flex h-[30px] space-x-0.5 px-1"
+          class="absolute left-0 top-[-30px] z-[5] flex h-[30px] space-x-1 px-1"
         >
           <div
             v-for="lang in availableLang"
             :key="lang"
             class="flex h-full items-center rounded-t-md bg-primary px-4 capitalize"
+            :class="{
+              'active-lang bg-red-400 text-white': currentLang === lang,
+            }"
             @click="switchLang(lang)"
           >
-            <span :class="{ 'scale-125 text-white': currentLang === lang }">
+            <span>
               {{ lang }}
             </span>
           </div>
@@ -131,7 +147,7 @@ const switchLang = (lang: keyof Lyrics) => {
           :key="selectedLink"
           title="YouTube video player"
           frameborder="0"
-          class="my-auto aspect-[375/240] h-[250px]"
+          class="my-auto mt-3 aspect-[375/240] h-[230px]"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen
@@ -153,3 +169,11 @@ const switchLang = (lang: keyof Lyrics) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.active-lang {
+  box-shadow:
+    0px 2px 4px 4px #ff8b8b inset,
+    0px 2px 4px 4px #ff3636;
+}
+</style>

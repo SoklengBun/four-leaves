@@ -8,8 +8,8 @@ onMounted(() => {
     circleRadius: { min: 5, max: 25 },
     diffuseRadius: { min: 10, max: 50 },
     orbitRadius: { min: 20, max: 30 },
-    colors: ['#C00000', '#FF8C00', '#FFCC00', '#00C957', '#0047FF'],
-    orbitColor: '#0047FF',
+    colors: ['#5ec7ff', '#fabee2', '#b561fa', '#76ff5e', '#fa6161'],
+    orbitColor: '#5802ba',
     numberOfParticles: 10,
     animeDuration: { min: 500, max: 1000 },
   });

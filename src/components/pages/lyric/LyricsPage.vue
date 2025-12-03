@@ -70,30 +70,31 @@ const onClear = async () => {
 </script>
 
 <template>
-  <div
-    class="container flex h-[calc(var(--body-height))] flex-col items-center pt-nav"
-  >
-    <div class="h-12 w-full">
+  <div class="flex h-[calc(var(--body-height))] flex-col items-center pt-nav">
+    <div class="container h-12 w-full">
       <div class="fetch size-12" @click="fetchLyrics"></div>
     </div>
-    <div class="flex w-full items-center gap-2">
+    <div class="container flex w-full items-center gap-2">
       <input
         v-model="searchText"
-        class="h-[34px] w-full max-w-[300px] rounded-md border bg-white px-2 py-1 transition-colors duration-500 dark:bg-[#484848]"
+        class="h-[34px] w-full max-w-[300px] rounded-md border bg-white px-2 py-1 transition-colors duration-500 dark:border-gray-500 dark:bg-[#484848]"
       />
 
       <button
         @click="onClear"
-        class="h-[34px] rounded-md border border-black/10 bg-gray-200 px-4 dark:bg-gray-700"
+        class="h-[34px] rounded-md border border-black/10 bg-gray-200 px-4 active:opacity-50 dark:border-gray-500 dark:bg-gray-700"
       >
         Clear
       </button>
     </div>
-    <div class="flex w-full flex-1 flex-col overflow-auto py-2">
+
+    <div
+      class="container mt-1 flex w-full flex-1 flex-col space-y-2 overflow-y-auto overflow-x-visible pb-5 pt-1"
+    >
       <div
         v-for="lyrics in searchResult"
         @click="() => onClick(lyrics.id)"
-        class="line-clamp-1 flex h-[34px] min-h-[34px] items-center break-all"
+        class="lyric-item line-clamp-1 flex h-[34px] min-h-[34px] items-center break-all rounded-md px-2 active:opacity-50"
       >
         {{ lyrics.title }}
       </div>
@@ -101,11 +102,24 @@ const onClear = async () => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .fetch {
   background-image: url('@/assets/images/yunli.png');
   background-position: center;
   background-repeat: no-repeat;
   background-size: 48px 48px;
+}
+
+.lyric-item {
+  box-shadow:
+    2px 2px 4px 0px #649dff4b,
+    2px 2px 8px 2px #ceeffff3 inset;
+}
+.dark {
+  .lyric-item {
+    box-shadow:
+      2px 2px 4px 0px #649dff20,
+      2px 2px 8px 2px #ceefff2e inset;
+  }
 }
 </style>

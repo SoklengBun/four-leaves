@@ -62,7 +62,7 @@ body,
 #app {
   @apply text-base;
 
-  font-family: 'Fafo', 'Patrick Hand', sans-serif;
+  font-family: 'Patrick Hand', sans-serif;
   color: var(--color-foreground);
   background: var(--color-background);
   transition:
