@@ -23,6 +23,7 @@ export default defineConfig({
         short_name: 'Anella',
         description: 'Anella',
         theme_color: '#ffffff',
+        display: 'fullscreen',
         icons: [
           {
             src: '192.png',
