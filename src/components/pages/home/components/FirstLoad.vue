@@ -1,26 +1,20 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useAppSetting } from '~/stores/app-setting';
+import { sleep } from '~/utils/helper';
+const props = defineProps<{ onEnd?: () => void }>();
 
 const appSetting = useAppSetting();
 const loadingCharClass = ref('ready');
 
-onMounted(() => {
-  setTimeout(() => {
-    loadingCharClass.value = '';
-  }, 0);
-  setTimeout(() => {
-    loadingCharClass.value = 'remove';
+onMounted(async () => {
+  loadingCharClass.value = '';
 
-    setTimeout(() => {
-      const snap = document.getElementById('snap-scroll');
-      snap?.children[0].classList.add('show');
-    }, 500);
+  await sleep(3000);
 
-    setTimeout(() => {
-      appSetting.isFirstLoadHomePage = false;
-    }, 1000);
-  }, 3000);
+  loadingCharClass.value = 'remove';
+  await sleep(1000);
+  appSetting.isFirstLoadHomePage = false;
 });
 </script>
 <template>
@@ -29,7 +23,7 @@ onMounted(() => {
     :class="[loadingCharClass, { hidden: !appSetting.isFirstLoadHomePage }]"
   >
     <div id="loading_character" :class="loadingCharClass">
-      <div class="charcter-container char03"></div>
+      <div class="character-container char03"></div>
     </div>
   </div>
 </template>
@@ -73,14 +67,14 @@ onMounted(() => {
   left: 200%;
 }
 
-#loading_character .charcter-container {
+#loading_character .character-container {
   width: 200px;
   height: 200px;
   overflow: hidden;
   background: url('@/assets/images/kokkoro.png') no-repeat center;
   background-size: 100%;
 }
-#loading_character .charcter-container.char03 {
+#loading_character .character-container.char03 {
   background-image: url('@/assets/images/kokkoro.png');
   animation: spriteAnime03 700ms steps(19) infinite;
 }

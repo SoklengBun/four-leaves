@@ -1,7 +1,6 @@
 {
-    "singleQuote": true,
-    "plugins": [
-        "prettier-plugin-tailwindcss"
-        ],
-        "pluginSearchDirs": false
+  "singleQuote": true,
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "pluginSearchDirs": false,
+  "printWidth": 150
 }
