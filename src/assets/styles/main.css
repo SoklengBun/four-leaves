@@ -7,7 +7,7 @@
 
 @supports (height: 100svh) {
   :root {
-    /* --body-height: 100svh; */
+    --body-height: 100svh;
   }
 }
 
