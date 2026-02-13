@@ -2,13 +2,13 @@
 
 :root {
   --nav-height: 50px;
-  --body-height: 100%;
+  --body-height: 100vh;
 }
 
 @supports (height: 100svh) {
-  /* :root {
+  :root {
     --body-height: 100svh;
-  } */
+  }
 }
 
 body {

@@ -65,10 +65,8 @@ const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home
 
 <style scoped>
 .mobile-front-container {
-  @apply relative h-body w-full px-3 md:hidden;
+  @apply relative h-body w-full p-3 md:hidden;
 
-  padding-top: 12px;
-  padding-top: env(safe-area-inset-top, 12px);
   background-color: rgb(3, 9, 35);
 }
 
