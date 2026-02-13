@@ -70,21 +70,9 @@ const switchLang = (lang: keyof Lyrics) => {
 </script>
 
 <template>
-  <div
-    class="flex h-[calc(var(--body-height))] flex-col items-center overflow-hidden pt-nav"
-  >
-    <div class="container flex h-10 w-full items-center">
-      <button
-        class="rounded-md border-[1.5px] border-primary px-2.5 py-0.5 text-primary"
-        @click="back"
-      >
-        {{ '< Back' }}
-      </button>
-    </div>
+  <div class="flex h-[calc(var(--body-height))] flex-col items-center overflow-hidden pt-nav">
     <div class="px-2 py-2">
-      <div
-        class="rounded-lg border-2 border-primary px-5 py-1 text-xl text-primary"
-      >
+      <div class="rounded-lg border-2 border-primary px-5 py-1 text-xl text-primary">
         <p class="text-center">
           {{ lyrics?.title }}
         </p>
@@ -93,9 +81,7 @@ const switchLang = (lang: keyof Lyrics) => {
     <div class="flex w-full flex-1 flex-col overflow-hidden">
       <div class="flex flex-1 overflow-hidden">
         <div class="flex flex-1 justify-center overflow-scroll py-2">
-          <p
-            class="h-fit whitespace-pre-line pb-10 text-center text-base lowercase"
-          >
+          <p class="h-fit whitespace-pre-line pb-10 text-center text-base lowercase">
             {{ lyrics?.[currentLang] }}
           </p>
         </div>
@@ -105,27 +91,13 @@ const switchLang = (lang: keyof Lyrics) => {
         class="relative z-10 mt-auto flex h-0 w-full flex-col items-center justify-start border-t-[1.5px] border-primary transition-all duration-300"
         :class="{ '!h-[300px]': isExpand }"
       >
-        <div
-          class="absolute left-0 top-[-2px] z-10 h-3 w-full border-t-2 border-red-400 bg-white"
-        ></div>
+        <div class="absolute left-0 top-[-2px] z-[7] h-3 w-full border-t-2 border-red-400 bg-white"></div>
 
-        <button
-          @click="back"
-          class="absolute right-[76px] top-[-30px] z-[5] h-[30px] w-[70px] rounded-t-md bg-primary text-white"
-        >
-          Back
-        </button>
-        <button
-          @click="onPlay"
-          class="absolute right-1 top-[-30px] z-[5] h-[30px] w-[70px] rounded-t-md bg-primary text-black"
-        >
-          Music
-        </button>
+        <button @click="back" class="absolute right-[76px] top-[-30px] z-[5] h-[30px] w-[70px] rounded-t-md bg-primary text-white">Back</button>
+        <button @click="onPlay" class="absolute right-1 top-[-30px] z-[5] h-[30px] w-[70px] rounded-t-md bg-primary text-white">Music</button>
 
         <!-- Available Language  -->
-        <div
-          class="absolute left-0 top-[-30px] z-[5] flex h-[30px] space-x-1 px-1"
-        >
+        <div class="absolute left-0 top-[-30px] z-[5] flex h-[30px] space-x-1 px-1">
           <div
             v-for="lang in availableLang"
             :key="lang"
@@ -147,22 +119,25 @@ const switchLang = (lang: keyof Lyrics) => {
           :key="selectedLink"
           title="YouTube video player"
           frameborder="0"
-          class="my-auto mt-3 aspect-[375/240] h-[230px]"
+          class="relative z-10 my-auto aspect-[375/240] w-full rounded-b-lg bg-black text-[10px]"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen
-        ></iframe>
-        <div
-          v-if="typeof lyrics?.url === 'object'"
-          class="flex w-screen flex-1 items-center justify-center gap-2 overflow-x-auto py-2"
-        >
-          <div
-            v-for="url in lyrics.url"
-            :key="url.l"
-            class="rounded-md border-[1.5px] border-primary px-3 py-0.5 text-primary"
-            @click="onChangeLink(url.l)"
-          >
-            {{ url.a }}
+        />
+        <div class="flex w-screen flex-1 items-center space-x-2 overflow-x-auto overflow-y-hidden p-2">
+          <template v-if="typeof lyrics?.url === 'object'">
+            <div
+              v-for="url in lyrics.url"
+              :key="url.l"
+              class="whitespace-nowrap rounded-md border-[1.5px] border-primary px-3 py-0.5 text-primary first:ml-auto last:!mr-auto"
+              @click="onChangeLink(url.l)"
+            >
+              {{ url.a }}
+            </div>
+          </template>
+
+          <div v-else class="mx-auto whitespace-nowrap rounded-md border-[1.5px] border-primary px-3 py-0.5 text-primary">
+            {{ lyrics?.artist }}
           </div>
         </div>
       </div>
