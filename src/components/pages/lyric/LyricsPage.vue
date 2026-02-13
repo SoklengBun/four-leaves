@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { debouncedRef, useFetch, useStorage } from '@vueuse/core';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useAppSetting } from '~/stores/app-setting';
 
 const route = useRoute();
 const router = useRouter();
 const searchText = ref('');
 const searchDebounce = debouncedRef(searchText);
 const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
+const containerRef = ref<HTMLDivElement>();
+const appSetting = useAppSetting();
+
 const isFetching = ref(false);
 
 const searchResult = computed(() => {
@@ -57,6 +61,19 @@ onMounted(async () => {
 
   const query = route.query.search?.toString();
   if (query) searchText.value = query;
+
+  if (!containerRef.value) return;
+  const position = appSetting.getScrollPosition('lyric');
+
+  containerRef.value.scrollTo({
+    top: position,
+    behavior: 'instant',
+  });
+});
+
+onBeforeUnmount(() => {
+  if (!containerRef.value) return;
+  appSetting.setScrollPosition('lyric', containerRef.value.scrollTop);
 });
 
 const onClick = (id: number) => {
@@ -88,7 +105,7 @@ const onClear = async () => {
       </button>
     </div>
 
-    <div class="container mt-1 flex w-full flex-1 flex-col space-y-2 overflow-y-auto overflow-x-visible pb-5 pt-1">
+    <div ref="containerRef" class="container mt-1 flex w-full flex-1 flex-col space-y-2 overflow-y-auto overflow-x-visible pb-5 pt-1">
       <div
         v-for="lyrics in searchResult"
         @click="() => onClick(lyrics.id)"
