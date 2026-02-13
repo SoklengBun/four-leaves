@@ -2,7 +2,7 @@
 
 :root {
   --nav-height: 50px;
-  --body-height: 100lvh;
+  --body-height: 100%;
 }
 
 @supports (height: 100svh) {
