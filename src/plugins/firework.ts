@@ -9,7 +9,6 @@
 import type { JSAnimation } from 'animejs';
 import { animate, createTimeline, utils } from 'animejs';
 import { TinyColor } from '@ctrl/tinycolor';
-import Yunli from '@/assets/images/yunli.png';
 
 export interface MinMax {
   min: number;
@@ -25,6 +24,7 @@ export interface FireworksConfig {
   circleRadius: MinMax;
   diffuseRadius: MinMax;
   animeDuration: MinMax;
+  scale: number;
 }
 
 export interface Point {
@@ -69,11 +69,12 @@ export function getCoordsFromEvent(e: MouseEvent | TouchEvent): Point {
  */
 export function setCanvasSize(
   canvasEl: HTMLCanvasElement,
+  scale = 1,
   width = window.innerWidth,
   height = window.innerHeight,
 ) {
-  canvasEl.width = width;
-  canvasEl.height = height;
+  canvasEl.width = width * scale;
+  canvasEl.height = height * scale;
   canvasEl.style.width = `${width}px`;
   canvasEl.style.height = `${height}px`;
 }
@@ -104,6 +105,7 @@ export function createFireworks(config: Partial<FireworksConfig>) {
       max: 1500,
     },
     orbitColor = '#000',
+    scale = 1,
   } = config;
 
   const colors =
@@ -118,7 +120,10 @@ export function createFireworks(config: Partial<FireworksConfig>) {
 
   function setParticleDirection(p: Point) {
     const angle = (utils.random(0, 360) * Math.PI) / 180;
-    const value = utils.random(diffuseRadius.min, diffuseRadius.max);
+    const value = utils.random(
+      diffuseRadius.min * scale,
+      diffuseRadius.max * scale,
+    );
     const radius = value * (utils.randomPick([-1, 1]) as number);
     return {
       x: p.x + radius * Math.cos(angle),
@@ -139,7 +144,7 @@ export function createFireworks(config: Partial<FireworksConfig>) {
       x,
       y,
       color: tinyColor.toRgbString(),
-      radius: utils.random(circleRadius.min, circleRadius.max),
+      radius: utils.random(circleRadius.min * scale, circleRadius.max * scale),
       endPos: setParticleDirection({ x, y }),
       draw: () => {},
     };
@@ -217,7 +222,10 @@ export function createFireworks(config: Partial<FireworksConfig>) {
       .add(
         circle,
         {
-          radius: utils.random(orbitRadius.min, orbitRadius.max),
+          radius: utils.random(
+            orbitRadius.min * scale,
+            orbitRadius.max * scale,
+          ),
           lineWidth: 0,
           alpha: {
             to: 0,
@@ -233,7 +241,6 @@ export function createFireworks(config: Partial<FireworksConfig>) {
         0,
       );
   }
-  console.log('inti', 324123);
 
   document.addEventListener(
     'mousedown',
@@ -253,18 +260,18 @@ export function createFireworks(config: Partial<FireworksConfig>) {
       // for ios relative
       const rect = canvasEl.getBoundingClientRect();
       animateParticles({
-        x: pos.x - rect.left,
-        y: pos.y - rect.top,
+        x: (pos.x - rect.left) * scale,
+        y: (pos.y - rect.top) * scale,
       });
     },
     false,
   );
 
-  setCanvasSize(canvasEl);
+  setCanvasSize(canvasEl, scale);
   window.addEventListener(
     'resize',
     () => {
-      setCanvasSize(canvasEl);
+      setCanvasSize(canvasEl, scale);
     },
     false,
   );

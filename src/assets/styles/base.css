@@ -50,17 +50,29 @@ html {
   max-height: 100svh;
 
   /* text style */
-
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
   overflow: auto;
+
+  touch-action: none;
+  user-select: none;
+
+  /* font-size: 16px;  for 375px screen*/
+  font-size: 4.267vw;
 }
 
-html,
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+    touch-action: auto;
+  }
+}
+
 body,
 #app {
-  @apply text-base;
+  @apply text-base md:text-base;
 
   font-family: 'Patrick Hand', sans-serif;
   color: var(--color-foreground);

@@ -88,9 +88,7 @@ const onClear = async () => {
       </button>
     </div>
 
-    <div
-      class="container mt-1 flex w-full flex-1 flex-col space-y-2 overflow-y-auto overflow-x-visible pb-5 pt-1"
-    >
+    <div class="container mt-1 flex w-full flex-1 flex-col space-y-2 overflow-y-auto overflow-x-visible pb-5 pt-1">
       <div
         v-for="lyrics in searchResult"
         @click="() => onClick(lyrics.id)"
@@ -111,15 +109,17 @@ const onClear = async () => {
 }
 
 .lyric-item {
+  background: rgb(255, 253, 241);
   box-shadow:
-    2px 2px 4px 0px #649dff4b,
-    2px 2px 8px 2px #ceeffff3 inset;
+    2px 2px 4px 0px #ffee3895,
+    2px 2px 8px 2px #ffd81737 inset;
 }
 .dark {
   .lyric-item {
+    background: rgb(2, 23, 56);
     box-shadow:
-      2px 2px 4px 0px #649dff20,
-      2px 2px 8px 2px #ceefff2e inset;
+      2px 2px 4px 0px #9dc1ff9b,
+      2px 2px 8px 2px #ceefff93 inset;
   }
 }
 </style>

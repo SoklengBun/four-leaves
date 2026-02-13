@@ -11,7 +11,8 @@ onMounted(() => {
     colors: ['#5ec7ff', '#fabee2', '#b561fa', '#76ff5e', '#fa6161'],
     orbitColor: '#5802ba',
     numberOfParticles: 10,
-    animeDuration: { min: 500, max: 1000 },
+    animeDuration: { min: 1000, max: 1500 },
+    scale: 3,
   });
 });
 </script>

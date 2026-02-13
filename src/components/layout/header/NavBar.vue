@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { requireImage } from '@/utils/helper';
-import { ref, watch } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 
 import LanguageSelection from './LanguageSelection.vue';
@@ -10,11 +10,11 @@ import FontSelection from './FontSelection.vue';
 const showPopup = ref(false);
 
 const menuList = [
-  { name: 'home', label: 'Home' },
-  { name: 'lyrics', label: 'Lyrics' },
+  { name: 'home', label: 'Home', icon: 'images/nav/home.png' },
+  { name: 'lyrics', label: 'Lyrics', icon: 'images/nav/lyrics.png' },
   // { name: 'sokleng', label: 'Yahallo' },
   // { name: 'slot-machine', label: 'Slot' },
-  { name: 'about', label: 'About me' },
+  // { name: 'about', label: 'About me' },
 ];
 
 //icon source: https://www.iconfinder.com/iconsets/colorful-guache-social-media-logos-1
@@ -37,7 +37,7 @@ const socialMedia = [
   },
   {
     name: 'Telegram',
-    link: 'https://t.me/soklengbun',
+    link: 'https://t.me/bunsokleng',
     src: 'telegram.svg',
   },
   {
@@ -48,6 +48,7 @@ const socialMedia = [
 ];
 
 const togglePopup = () => {
+  console.log('toggle');
   if (!showPopup.value) {
     showPopup.value = true;
   } else {
@@ -55,7 +56,7 @@ const togglePopup = () => {
     element?.classList.add('hide');
     setTimeout(() => {
       showPopup.value = false;
-    }, 300);
+    }, 350);
   }
 };
 
@@ -66,17 +67,22 @@ watch(showPopup, () => {
     document.body.style.overflow = '';
   }
 });
+
+onBeforeUnmount(() => {
+  document.body.style.overflow = '';
+});
 </script>
 
 <template>
   <header>
     <nav>
       <div
-        class="fixed top-0 z-50 flex h-nav w-full select-none items-center justify-between px-2 py-1 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
+        class="fixed top-0 z-50 flex h-nav w-full select-none items-center justify-between px-1 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
       >
-        <RouterLink :to="{ name: 'home' }" class="h-full">
+        <!-- <RouterLink :to="{ name: 'home' }" class="h-full">
           <img :src="requireImage('logo.png')" class="contain h-full" />
-        </RouterLink>
+        </RouterLink> -->
+
         <div class="hidden items-center gap-3 md:flex">
           <template v-for="item in menuList" :key="item.name">
             <RouterLink
@@ -93,72 +99,60 @@ watch(showPopup, () => {
 
           <template v-for="item in socialMedia" :key="item.name">
             <a :href="item.link" target="_blank">
-              <img
-                :src="requireImage(item.src)"
-                class="h-6 w-6 duration-300 hover:scale-125"
-                :alt="item.name"
-              />
+              <img :src="requireImage(item.src)" class="h-6 w-6 duration-300 hover:scale-125" :alt="item.name" />
             </a>
           </template>
         </div>
-
-        <!---Mobile Screen-->
-        <div class="flex md:hidden">
-          <button
-            type="button"
-            class="flex h-7 w-7 items-center justify-center"
-            @click="togglePopup"
-          >
-            <img
-              :src="requireImage(!showPopup ? 'menu.svg' : 'close.svg')"
-              class="h-7 w-7 delay-300"
-              alt="Menu"
-            />
-          </button>
-        </div>
       </div>
 
-      <!--Mobile Popup-->
-      <div
-        id="popup"
-        class="show fixed right-0 top-0 z-40 h-body w-full bg-white/70 backdrop-blur-sm"
-        :class="{ hidden: !showPopup }"
+      <!---Mobile Screen-->
+
+      <button
+        type="button"
+        class="menu-circle fixed right-1 top-1 z-[53] size-11 bg-white/70 md:hidden"
+        @click="togglePopup"
+        :class="{ active: showPopup }"
       >
-        <div class="justify-start px-10 pt-16 text-blue-500">
-          <ul>
-            <li
+        <div class="menu-circle size-9">
+          <div class="menu-circle size-8 flex-col text-[10px]">
+            <div class="h-3 w-5 -translate-y-0.5">
+              <div class="menu-line top" :style="{ height: '1px' }" />
+              <div class="menu-line bottom mt-1" :style="{ height: '1px' }" />
+            </div>
+            <div class="relative flex items-center justify-center text-[#333]">
+              <transition name="fade">
+                <span v-if="!showPopup" class="absolute z-10">MENU</span>
+                <span v-else class="absolute z-10 text-red-400">CLOSE</span>
+              </transition>
+            </div>
+          </div>
+        </div>
+      </button>
+
+      <!--Mobile Popup-->
+      <div id="popup" class="show fixed right-0 top-0 z-[52] h-body w-full" :class="{ hidden: !showPopup }">
+        <div class="flex flex-col px-5 pt-16 text-blue-500">
+          <div class="darkL grid grid-cols-4 border-t border-[#999] pt-5">
+            <RouterLink
               v-for="item in menuList"
               :key="item.name"
-              class="my-2 border-b py-1"
+              :to="{ name: item.name }"
+              class="flex flex-col items-center justify-center"
+              @click="togglePopup"
             >
-              <RouterLink
-                :to="{ name: item.name }"
-                class="flex"
-                @click="togglePopup"
-              >
-                {{ item.label }}
-              </RouterLink>
-            </li>
+              <div class="size-10">
+                <img v-if="item.icon" :src="requireImage(item.icon)" class="size-full" />
+              </div>
+              <span>{{ item.label }}</span>
+            </RouterLink>
+          </div>
 
-            <li
-              v-for="item in socialMedia"
-              :key="item.name"
-              class="my-2 border-b py-1"
-            >
-              <a
-                :href="item.link"
-                target="_blank"
-                class="flex items-start gap-1"
-              >
-                <img
-                  :src="requireImage(item.src)"
-                  class="h-5 w-5"
-                  :alt="item.name"
-                />
-                {{ item.name }}
-              </a>
-            </li>
-          </ul>
+          <p class="mt-10 w-full border-b border-[#999]">Me?</p>
+          <div class="mt-2 flex space-x-2">
+            <a v-for="item in socialMedia" :key="item.name" :href="item.link" target="_blank">
+              <img :src="requireImage(item.src)" class="h-5 w-5" :alt="item.name" />
+            </a>
+          </div>
         </div>
       </div>
     </nav>
@@ -166,13 +160,34 @@ watch(showPopup, () => {
 </template>
 
 <style scoped>
-nav a.router-link-exact-active {
-  color: red;
-  font-weight: bold;
-}
+nav a.router-link-exact-active,
 .text-active:hover {
   color: red;
   font-weight: bold;
+}
+
+.menu-circle {
+  @apply flex items-center justify-center rounded-full border border-white md:hidden;
+}
+
+.menu-line {
+  @apply w-5 bg-[#333] transition-all duration-300 ease-linear;
+  transform-origin: 0px 0px;
+  transform: rotate(0deg);
+}
+
+.active {
+  .menu-line {
+    @apply bg-red-400;
+
+    &.top {
+      transform: rotate(13.5deg);
+    }
+
+    &.bottom {
+      transform: rotate(-13.5deg);
+    }
+  }
 }
 
 .dark nav a.router-link-exact-active {
@@ -182,24 +197,21 @@ nav a.router-link-exact-active {
 .show {
   opacity: 1;
   animation: fade-in 0.5s ease-in-out;
+  background-image: url('@/assets/images/bg_cross.png'), linear-gradient(#ff232330, #000eac30);
+
+  background-color: white;
+  background-size: 35px auto;
+  background-repeat: repeat;
 }
 
 .hide {
   opacity: 0;
   animation: fade-out 0.5s ease-in-out;
 }
+
 @keyframes fade-in {
   0% {
     opacity: 0;
-  }
-  25% {
-    opacity: 0.25;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  75% {
-    opacity: 0.75;
   }
   100% {
     opacity: 1;
@@ -210,17 +222,18 @@ nav a.router-link-exact-active {
   0% {
     opacity: 1;
   }
-  25% {
-    opacity: 0.75;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  75% {
-    opacity: 0.25;
-  }
   100% {
     opacity: 0;
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

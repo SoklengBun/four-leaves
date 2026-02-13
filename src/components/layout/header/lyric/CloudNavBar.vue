@@ -48,7 +48,7 @@ onUnmounted(() => {
 <template>
   <div class="fixed top-0 z-50 flex h-nav w-full md:hidden">
     <!-- <div class="fixed z-[300]">{{ cloudOne }} || {{ cloudTwo }}</div> -->
-    <div class="z-20 w-screen overflow-hidden">
+    <div class="pointer-events-none z-20 w-screen overflow-hidden">
       <div
         class="fixed left-0 top-0 flex min-w-[720px] overflow-hidden transition-all"
         :style="{
@@ -86,13 +86,42 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div
-      class="fixed right-10 top-3 size-14 rounded-full bg-yellow-300 transition-all duration-300 dark:bg-[#c0d7e5]"
-    ></div>
-    <div
-      class="fixed -top-[20px] right-[10px] z-30 size-[120px] rounded-full bg-yellow-200/20 blur-sm transition-all duration-300 dark:bg-[#38daff]/10"
-    ></div>
+    <RouterLink to="/" class="sun-moon"></RouterLink>
 
     <ThemeToggler />
   </div>
 </template>
+
+<style scoped>
+.sun-moon {
+  @apply fixed right-10 top-3 size-[60px] rounded-full;
+
+  background-color: #fff;
+
+  --one: #ffa217;
+  --two: #ffd900;
+  --three: #ffd445;
+  --four: #f5ff88;
+
+  box-shadow:
+    inset 0 0 10px var(--three),
+    inset 4px 0 16px var(--two),
+    inset -4px 0 16px var(--one),
+    inset 4px 0 60px var(--two),
+    inset -4px 0 60px var(--one),
+    0 0 10px var(--three),
+    -2px 0 16px var(--two),
+    0px 0 150px var(--two),
+    0px 0 300px var(--four),
+    2px 0 16px var(--one);
+}
+
+.dark {
+  .sun-moon {
+    --one: #4f5499;
+    --two: #84e6ff;
+    --three: #d0f9ff;
+    --four: #aee8ff;
+  }
+}
+</style>
