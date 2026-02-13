@@ -22,7 +22,7 @@ export default defineConfig({
         name: 'Anella',
         short_name: 'Anella',
         description: 'Anella',
-        display: 'fullscreen',
+        display: 'standalone',
         orientation: 'portrait',
         theme_color: '#fffff',
         icons: [
@@ -46,9 +46,6 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{css,js,html}'],
-      },
-      devOptions: {
-        enabled: true,
       },
     }),
   ],
