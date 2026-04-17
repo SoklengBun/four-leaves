@@ -11,4 +11,3 @@ const onFirstLoadEnd = () => {};
   <FirstLoad @end="onFirstLoadEnd" />
   <MobileFrontPage />
 </template>
-<style scoped></style>

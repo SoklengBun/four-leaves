@@ -1,14 +1,32 @@
 <script setup lang="ts">
 import { useNow } from '@vueuse/core';
+import { onMounted, ref } from 'vue';
 
 const now = useNow();
-const days = ['Monday...', 'Tuesday...', 'Wednesday...', 'Thursday~', 'Friday~~!', 'Saturday!', 'Sunday.'];
+const days = ['Sunday.', 'Monday...', 'Tuesday...', 'Wednesday...', 'Thursday~', 'Friday~~!', 'Saturday!'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home the trophy!', 'Go make it happen.', 'You were made for this!'];
+
+const batteryPercentage = ref(100);
+const getBatteryPercentage = () => {
+  if ('getBattery' in navigator) {
+    (navigator as any).getBattery().then((battery: any) => {
+      const percentage = Math.round(battery.level * 100);
+      console.log(`Battery level: ${percentage}%`);
+      batteryPercentage.value = percentage;
+    });
+  } else {
+    console.log('Battery Status API is not supported in this browser.');
+  }
+};
+
+onMounted(() => {
+  getBatteryPercentage();
+});
 </script>
 
 <template>
-  <div class="mobile-front-container">
+  <div class="mobile-front-container flex flex-col">
     <div class="background-image" />
     <div class="relative z-[2] flex flex-col">
       <img src="https://redive.estertion.win/card/full/124131.webp" class="box-cover h-[200px] w-full rounded-lg" />
@@ -16,8 +34,10 @@ const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home
       <div class="mt-3 flex space-x-3">
         <div class="box-cover flex flex-1 flex-col rounded-lg bg-green-50 px-2.5 py-2 text-[40px] leading-none">
           <div class="flex justify-between text-green-500">
-            <span>{{ now.getDate().toString().padStart(2, '0') }}</span
-            >•<span>{{ months[now.getMonth()] }}.</span>•
+            <span>{{ now.getDate().toString().padStart(2, '0') }}</span>
+            •
+            <span>{{ months[now.getMonth()] }}.</span>
+            •
             <span>{{ now.getFullYear() }}</span>
           </div>
           <div class="mt-auto flex translate-y-0.5 items-center text-base leading-none text-gray-500">
@@ -59,13 +79,27 @@ const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home
           </div>
         </div>
       </div>
+
+      <div class="mt-3 flex items-center space-x-3">
+        <div
+          class="box-cover h-5 w-full overflow-hidden rounded-full border border-[#ff97f6] bg-black/30"
+          :style="`--battery-percent:${batteryPercentage}%`"
+        >
+          <div
+            class="flex h-full w-[var(--battery-percent)] items-center rounded-full bg-gradient-to-tr from-green-300 via-cyan-400 to-yellow-300 px-2"
+          >
+            <span class="whitespace-nowrap text-sm text-[#666]">おはよう！</span>
+          </div>
+        </div>
+        <span class="font-bold text-[#ff97f6]">{{ batteryPercentage }}%</span>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .mobile-front-container {
-  @apply relative h-body w-full p-3 md:hidden;
+  @apply relative h-body w-full px-3 pt-3 md:hidden;
 
   background-color: rgb(3, 9, 35);
 }
