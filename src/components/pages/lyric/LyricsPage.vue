@@ -18,7 +18,8 @@ const searchResult = computed(() => {
   if (!searchDebounce.value) return lyricsList.value;
 
   return lyricsList.value.filter((e) => {
-    const titleAndArtist = `${e.title.toLocaleLowerCase()} | ${e.artist.toLocaleLowerCase()}`;
+    const artistStr = e.artists ? (e.artists.map((a) => a.name).join(', ')) : (e.artist || '');
+    const titleAndArtist = `${e.title.toLocaleLowerCase()} | ${artistStr.toLocaleLowerCase()}`;
     return titleAndArtist.includes(searchDebounce.value.toLocaleLowerCase());
   });
 });

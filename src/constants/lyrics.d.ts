@@ -1,7 +1,9 @@
 type Lyrics = {
   id: number;
   title: string;
-  artist: string;
+  // legacy single-artist string (spreadsheet) or structured artists array returned by API
+  artist?: string;
+  artists?: Array<{ id: number; name: string }>;
   romaji?: string;
   jp?: string;
   en?: string;

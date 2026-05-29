@@ -3,8 +3,11 @@ import { onMounted } from 'vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import FormItem from './components/FormItem.vue';
+import { useAuth } from '~/stores/auth.js';
+import showToast from '~/utils/toast.js';
 
 const router = useRouter();
+const auth = useAuth();
 const currentForm = ref('');
 const defaultForm = {
   login: {
@@ -15,8 +18,10 @@ const defaultForm = {
     username: '',
     password: '',
     confirmPassword: '',
+    displayName: '',
   },
 };
+
 const form = ref(defaultForm);
 
 const onClick = () => {
@@ -28,20 +33,44 @@ const onClick = () => {
     username: '',
     password: '',
     confirmPassword: '',
+    displayName: '',
   };
+
   if (currentForm.value == 'login') {
     currentForm.value = 'sign-up';
 
-    router.replace({ name: 'sign-up' });
+    router.replace({ name: 'sign-up', query: { redirect: router.currentRoute.value.query.redirect } });
   } else {
     currentForm.value = 'login';
-    router.replace({ name: 'login' });
+    router.replace({ name: 'login', query: { redirect: router.currentRoute.value.query.redirect } });
   }
 };
-const onSubmit = () => {
-  // form.value.login.password = '';
-  // console.log('asfas');
-  console.log(form.value);
+const onSubmit = async () => {
+  if (currentForm.value == 'login') {
+    const res = await auth.login(form.value.login);
+
+    if (res) {
+      router.replace((router.currentRoute.value.query.redirect as string) || '/');
+    }
+  } else {
+    if (form.value.signUp.password !== form.value.signUp.confirmPassword) {
+      showToast({
+        message: 'Password and Confirm Password do not match',
+        type: 'error',
+      });
+      return;
+    }
+
+    const res = await auth.signUp({
+      username: form.value.signUp.username,
+      password: form.value.signUp.password,
+      name: form.value.signUp.displayName,
+    });
+
+    if (res) {
+      router.replace((router.currentRoute.value.query.redirect as string) || '/');
+    }
+  }
 };
 
 onMounted(() => {
@@ -57,27 +86,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    class="fixed flex h-screen w-screen select-none flex-col items-center justify-center pb-40"
-  >
-    <div
-      class="login-container relative flex h-[500px] w-[700px] overflow-hidden rounded"
-    >
+  <div class="fixed flex h-screen w-screen select-none flex-col items-center justify-center pb-40">
+    <div class="login-container relative flex h-[500px] w-[700px] overflow-hidden rounded">
       <div class="rotate-background z-20" :class="currentForm"></div>
 
       <!-- login -->
-      <form
-        class="login-left absolute z-10 flex h-full w-1/2 flex-col justify-center space-y-2 p-5"
-        :class="currentForm"
-      >
+      <form class="login-left absolute z-10 flex h-full w-1/2 flex-col justify-center space-y-2 p-5" :class="currentForm">
         <div class="text-3xl font-bold">Login</div>
-        <FormItem
-          v-model="form.login.username"
-          label="Username/Email"
-          placeholder="Username/Email"
-          class="w-[200px]"
-          autocomplete="username"
-        />
+        <FormItem v-model="form.login.username" label="Username" placeholder="Username" class="w-[200px]" autocomplete="username" />
         <FormItem
           v-model="form.login.password"
           label="Password"
@@ -86,9 +102,7 @@ onMounted(() => {
           class="w-[200px]"
           autocomplete="current-password"
         />
-        <button type="button" class="button w-[200px]" @click="onSubmit">
-          Login
-        </button>
+        <button type="button" class="button w-[200px]" @click="onSubmit">Login</button>
       </form>
       <div
         class="login-right absolute z-30 flex h-full w-1/2 flex-col items-end justify-center p-5 text-2xl font-bold text-white"
@@ -108,18 +122,9 @@ onMounted(() => {
           {{ '<- Login Here' }}
         </button>
       </div>
-      <form
-        class="sign-up-right absolute z-10 flex h-full w-1/2 flex-col items-end justify-center space-y-2 p-5 text-end"
-        :class="currentForm"
-      >
+      <form class="sign-up-right absolute z-10 flex h-full w-1/2 flex-col items-end justify-center space-y-2 p-5 text-end" :class="currentForm">
         <div class="text-3xl font-bold">Sign Up</div>
-        <FormItem
-          v-model="form.signUp.username"
-          label="Username/Email"
-          placeholder="Username/Email"
-          class="w-[200px] text-end"
-          autocomplete="username"
-        />
+        <FormItem v-model="form.signUp.username" label="Username" placeholder="Username" class="w-[200px] text-end" autocomplete="username" />
         <FormItem
           v-model="form.signUp.password"
           label="Password"
@@ -131,14 +136,13 @@ onMounted(() => {
         <FormItem
           v-model="form.signUp.confirmPassword"
           label="Confirm Password"
-          placeholder="Password"
+          placeholder="Confirm Password"
           type="password"
           class="w-[200px] text-end"
           autocomplete="current-password"
         />
-        <button type="button" class="button w-[200px]" @click="onSubmit">
-          Sign Up
-        </button>
+        <FormItem v-model="form.signUp.displayName" label="Display Name" placeholder="Display Name" class="w-[200px] text-end" autocomplete="name" />
+        <button type="button" class="button w-[200px]" @click="onSubmit">Sign Up</button>
       </form>
     </div>
   </div>
@@ -163,12 +167,7 @@ onMounted(() => {
     width: 250%;
     left: -20%;
     background-color: var(--shadow-login);
-    background-image: linear-gradient(
-      35deg,
-      rgba(0, 0, 0, 1),
-      var(--shadow-login),
-      var(--shadow-login)
-    );
+    background-image: linear-gradient(35deg, rgba(0, 0, 0, 1), var(--shadow-login), var(--shadow-login));
     border: 1px solid var(--shadow-login);
     transition: all 1300ms ease-in-out;
 
