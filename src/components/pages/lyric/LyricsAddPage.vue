@@ -27,7 +27,34 @@ const addArtistSubmitting = ref(false);
 const addTitle = () => titles.value.push('');
 const removeTitle = (i: number) => titles.value.splice(i, 1);
 
-const addContent = () => contents.value.push({ kind: '', lang: '', content: '' });
+const allKinds = ['romaji', 'japanese', 'english', 'translation'];
+
+const addContent = () => {
+  // find first unused kind
+  const used = new Set(contents.value.map((c) => c.kind).filter(Boolean));
+  const unused = allKinds.find((k) => !used.has(k));
+  if (!unused) {
+    showToast({ message: 'All content kinds have been added', type: 'error' });
+    return;
+  }
+  contents.value.push({ kind: unused, lang: '', content: '' });
+};
+
+const setContentLang = (idx: number) => {
+  const kind = contents.value[idx]?.kind || '';
+  const map: Record<string, string> = {
+    romaji: 'romaji',
+    japanese: 'ja',
+    english: 'en',
+    translation: '',
+  };
+  contents.value[idx].lang = map[kind] ?? '';
+};
+
+const availableKindsFor = (idx: number) => {
+  const used = new Set(contents.value.map((c, i) => (i === idx ? null : c.kind)).filter(Boolean));
+  return allKinds.filter((k) => !used.has(k) || contents.value[idx]?.kind === k);
+};
 const removeContent = (i: number) => contents.value.splice(i, 1);
 
 const addReference = () => references.value.push({ link: '', name: '' });
@@ -135,6 +162,14 @@ const validate = () => {
       error.value = 'Each content entry requires a kind and content';
       return false;
     }
+  }
+
+  // ensure kinds are unique
+  const kinds = contents.value.map((c) => c.kind).filter(Boolean);
+  if (new Set(kinds).size !== kinds.length) {
+    showToast({ message: 'Duplicate content kinds are not allowed', type: 'error' });
+    error.value = 'Duplicate content kinds are not allowed';
+    return false;
   }
 
   error.value = null;
@@ -264,14 +299,11 @@ const onSubmit = async () => {
             <div class="mt-3 space-y-3">
               <div v-for="(c, idx) in contents" :key="idx" class="rounded border bg-gray-50 p-3 dark:bg-slate-900">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:gap-3">
-                  <select v-model="c.kind" class="w-full rounded border px-2 py-1 sm:w-48">
+                  <select v-model="c.kind" @change="setContentLang(idx)" class="w-full rounded border px-2 py-1 sm:w-48">
                     <option disabled value="">Select kind</option>
-                    <option value="romaji">romaji</option>
-                    <option value="japanese">japanese</option>
-                    <option value="english">english</option>
-                    <option value="translation">translation</option>
+                    <option v-for="k in availableKindsFor(idx)" :key="k" :value="k">{{ k }}</option>
                   </select>
-                  <input v-model="c.lang" placeholder="lang (en, ja)" class="w-full rounded border px-2 py-1 sm:w-32" />
+                    <!-- language is auto-selected based on kind; no UI shown -->
                   <button
                     type="button"
                     @click="removeContent(idx)"
@@ -295,13 +327,13 @@ const onSubmit = async () => {
           <section class="rounded bg-white p-3 shadow-sm dark:bg-slate-800 sm:p-4">
             <label class="block text-sm font-medium">References</label>
             <div class="mt-3 space-y-2">
-              <div v-for="(r, i) in references" :key="i" class="flex gap-2">
+              <div v-for="(r, i) in references" :key="i" class="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input v-model="r.link" placeholder="Link (optional)" class="flex-1 rounded border px-3 py-2" />
-                <input v-model="r.name" placeholder="Name (optional)" class="w-48 rounded border px-3 py-2" />
+                <input v-model="r.name" placeholder="Name (optional)" class="w-full rounded border px-3 py-2 sm:w-48" />
                 <button
                   type="button"
                   @click="removeReference(i)"
-                  class="inline-flex items-center rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
+                  class="mt-2 inline-flex items-center rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700 sm:mt-0"
                 >
                   Remove
                 </button>
@@ -309,7 +341,7 @@ const onSubmit = async () => {
               <button
                 type="button"
                 @click="addReference"
-                class="inline-flex items-center rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700"
+                class="inline-flex w-full items-center justify-center rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700 sm:w-auto"
               >
                 Add reference
               </button>
