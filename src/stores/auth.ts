@@ -1,7 +1,8 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { useLocalStorage } from '@vueuse/core';
-import { LoginForm, SignUpForm, userLogin, userQuickLogin, userSignUp } from '~/services/user';
+import { userLogin, userQuickLogin, userSignUp } from '~/services/user';
+import type { LoginForm, SignUpForm } from '~/services/user';
 import showToast from '~/utils/toast';
 
 type User = {
