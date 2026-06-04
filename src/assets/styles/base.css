@@ -1,19 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Patrick+Hand');
 
-@font-face {
-  font-family: 'Fafo';
-  src: url('~/assets/fonts/Fafo.ttf');
-  font-weight: 400;
-  font-style: normal;
-  font-display: auto;
-}
-
 :root {
-  --anella-primary: rgb(89, 166, 255);
-  --anella-primary-dark: rgb(89, 166, 255);
+  --anella-primary: #f99ab8;
+  --anella-primary-dark: #f99ab8;
 
-  --anella-secondary: pink;
-  --anella-secondary-dark: pink;
+  --anella-secondary: #ffb6cc;
+  --anella-secondary-dark: #ffb6cc;
 
   --anella-foreground: #333333;
   --anella-foreground-dark: #d0d0d0;
@@ -21,12 +14,15 @@
   --anella-background: rgb(255, 255, 255);
   --anella-background-dark: rgb(85, 85, 85);
 
+  --anella-card-background: #fff1f7;
+
   --over-all-font-size: 16px;
 
   --color-primary: var(--anella-primary);
   --color-secondary: var(--anella-secondary);
   --color-foreground: var(--anella-foreground);
   --color-background: var(--anella-background);
+  --color-card: var(--anella-card-background);
 
   --color-border: var(--anella-foreground);
 }
@@ -36,6 +32,7 @@
   --color-secondary: var(--anella-secondary-dark);
   --color-foreground: var(--anella-foreground-dark);
   --color-background: var(--anella-background-dark);
+  --color-card: var(--anella-card-background);
 
   --color-border: var(--anella-foreground);
 }
@@ -70,11 +67,22 @@ html {
   }
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: inherit;
+  border-color: var(--color-border);
+}
+
 body,
 #app {
-  @apply text-base md:text-base;
+  @apply text-sm md:text-base;
 
-  font-family: 'Patrick Hand', sans-serif;
+  font-family: 'Patrick Hand', 'Zen Maru Gothic', sans-serif;
+  font-weight: 400;
+  font-style: normal;
   color: var(--color-foreground);
   background: var(--color-background);
   transition:
@@ -82,11 +90,12 @@ body,
     background-color 0.5s ease !important;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
-  border-color: var(--color-border);
-}
+/* Primary CTA	#F99AB8
+Active Tab	#F8A0BC
+Hover Pink	#FFB6CC
+Soft Pink	#FFDCE8
+Background Pink	#FFF1F7
+Hero Background	#C8C2FF
+Light Lavender	#DDD8FF
+Cloud Purple	#B9B0F5
+Dark Lavender	#9A8DE8 */

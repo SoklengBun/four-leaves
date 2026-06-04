@@ -1,10 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuth } from '~/stores/auth';
 import HomeView from '../views/HomeView.vue';
 import SoklengView from '../views/SoklengView.vue';
 
 import LyricsLayoutView from '../views/lyrics/LayoutView.vue';
 import LyricsListView from '../views/lyrics/ListView.vue';
 import LyricsDetailView from '../views/lyrics/DetailView.vue';
+import LyricsAddView from '../views/lyrics/AddView.vue';
+import MyLyricsView from '../views/lyrics/MineView.vue';
 
 import NotFound from '../views/PageNotFoundView.vue';
 
@@ -39,6 +42,24 @@ const router = createRouter({
           component: LyricsListView,
         },
         {
+          path: 'mine',
+          name: 'lyrics-mine',
+          component: MyLyricsView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'edit/:id',
+          name: 'lyrics-edit',
+          component: LyricsAddView,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'add',
+          name: 'lyrics-add',
+          component: LyricsAddView,
+          meta: { requiresAuth: true },
+        },
+        {
           path: '/lyrics/:id',
           name: 'lyrics-detail',
           component: LyricsDetailView,
@@ -70,6 +91,7 @@ const router = createRouter({
       name: 'shake',
       component: () => import('../views/ShakeView.vue'),
     },
+
     // {
     //   path: '/slot-machine',
     //   name: 'slot-machine',
@@ -81,6 +103,29 @@ const router = createRouter({
       component: NotFound,
     },
   ],
+});
+
+// global guard: prevent accessing auth pages when already logged in
+router.beforeEach(async (to, from, next) => {
+  const auth = useAuth();
+
+  console.log('beforeEach', { to, auth: { isLoggedIn: auth.isLoggedIn, token: auth.token } });
+  // if we have a token but not logged in, try quick login
+  if (!auth.isLoggedIn && auth.token) {
+    await auth.quickLogin();
+  }
+
+  // redirect to login if route requires auth but user is not logged in
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    return next({ name: 'login', query: { redirect: to.fullPath } });
+  }
+
+  const authPages = ['login', 'sign-up'];
+  if (auth.isLoggedIn && authPages.includes(to.name as string)) {
+    return next({ name: 'home' });
+  }
+
+  next();
 });
 
 export default router;

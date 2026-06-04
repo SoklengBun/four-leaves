@@ -137,7 +137,7 @@ const switchLang = (lang: keyof Lyrics) => {
           </template>
 
           <div v-else class="mx-auto whitespace-nowrap rounded-md border-[1.5px] border-primary px-3 py-0.5 text-primary">
-            {{ lyrics?.artist }}
+            {{ (lyrics?.artists || (lyrics?.artist ? [{ id: 0, name: lyrics.artist }] : [])).map((a) => a.name).join(', ') }}
           </div>
         </div>
       </div>

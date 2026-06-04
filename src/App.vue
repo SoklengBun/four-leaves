@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router';
 import { onMounted } from 'vue';
 import Layout from './components/layout/Layout.vue';
 import ReloadPrompt from './components/pwa/ReloadPrompt.vue';
+import ToastContainer from './components/toast/ToastContainer.vue';
 import { disableContextMenu, disableDevToolWithKeyboard } from './utils/lock';
 import Firework from './components/animation/Firework.vue';
 
@@ -32,5 +33,6 @@ onMounted(() => {
     <ReloadPrompt />
     <RouterView />
     <Firework />
+    <ToastContainer />
   </Layout>
 </template>
