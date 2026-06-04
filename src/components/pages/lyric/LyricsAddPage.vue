@@ -303,7 +303,7 @@ const onSubmit = async () => {
                     <option disabled value="">Select kind</option>
                     <option v-for="k in availableKindsFor(idx)" :key="k" :value="k">{{ k }}</option>
                   </select>
-                    <!-- language is auto-selected based on kind; no UI shown -->
+                  <!-- language is auto-selected based on kind; no UI shown -->
                   <button
                     type="button"
                     @click="removeContent(idx)"

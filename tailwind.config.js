@@ -17,6 +17,7 @@ module.exports = {
         secondary: 'var(--color-secondary)',
         background: 'var(--color-background)',
         foreground: 'var(--color-foreground)',
+        card: 'var(--color-card)',
       },
       spacing: {
         nav: 'var(--nav-height)',
