@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FooterBar from './footer/FooterBar.vue';
+import FloatingEdgeMenu from './FloatingEdgeMenu.vue';
 import NavBar from './header/NavBar.vue';
 </script>
 
@@ -8,5 +9,6 @@ import NavBar from './header/NavBar.vue';
   <main>
     <slot />
   </main>
+  <FloatingEdgeMenu />
   <!-- <FooterBar /> -->
 </template>

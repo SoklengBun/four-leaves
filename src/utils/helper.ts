@@ -26,3 +26,12 @@ export const pxToRem = (px: number, withUnit = true) => {
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+export const pxOfCurrentScreenSize = (px: number) => {
+  const currentRoot = getComputedStyle(document.documentElement).fontSize.replace('px', '');
+
+  // root size 16px
+  const rootFontSize = 16;
+
+  return (px / rootFontSize) * +currentRoot;
+};
