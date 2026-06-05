@@ -18,14 +18,13 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <div
-    class="background"
-    :class="[loadingCharClass, { hidden: !appSetting.isFirstLoadHomePage }]"
-  >
-    <div id="loading_character" :class="loadingCharClass">
-      <div class="character-container char03"></div>
+  <Teleport to="body">
+    <div class="background" :class="[loadingCharClass, { hidden: !appSetting.isFirstLoadHomePage }]">
+      <div id="loading_character" :class="loadingCharClass">
+        <div class="character-container char03"></div>
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -42,6 +41,7 @@ onMounted(async () => {
   transition: transform 330ms;
   transition-timing-function: ease-in-out;
   transform: translate3d(0, 0, 0);
+  z-index: 10001;
 }
 
 .background.remove {

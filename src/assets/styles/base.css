@@ -2,39 +2,58 @@
 @import url('https://fonts.googleapis.com/css?family=Patrick+Hand');
 
 :root {
+  /* ── Anella raw palette ── */
+  /* pinks */
   --anella-primary: #f99ab8;
-  --anella-primary-dark: #f99ab8;
-
+  --anella-primary-hover: #f8a0bc;
   --anella-secondary: #ffb6cc;
-  --anella-secondary-dark: #ffb6cc;
-
-  --anella-foreground: #333333;
-  --anella-foreground-dark: #d0d0d0;
-
-  --anella-background: rgb(255, 255, 255);
-  --anella-background-dark: rgb(85, 85, 85);
-
+  --anella-soft-pink: #ffdce8;
+  --anella-bg-pink: #fff1f7;
+  /* purples / lavender */
+  --anella-hero: #c8c2ff;
+  --anella-lavender: #ddd8ff;
+  --anella-cloud-purple: #b9b0f5;
+  --anella-dark-lavender: #9a8de8;
+  /* neutrals – light */
+  --anella-foreground: #4a3f5c;
+  --anella-foreground-muted: #9a90b0;
+  --anella-background: #fdf8ff;
   --anella-card-background: #fff1f7;
+  --anella-surface: #fff8fc;
+  --anella-border: #f0d8e8;
+  /* neutrals – dark */
+  --anella-foreground-dk: #f0e8ff;
+  --anella-foreground-muted-dk: #a898c8;
+  --anella-background-dk: #1a1528;
+  --anella-card-background-dk: #251d3a;
+  --anella-surface-dk: #1f1835;
+  --anella-border-dk: #3d2f58;
 
-  --over-all-font-size: 16px;
-
+  /* ── Semantic tokens (light) ── */
   --color-primary: var(--anella-primary);
+  --color-primary-hover: var(--anella-primary-hover);
   --color-secondary: var(--anella-secondary);
+  --color-soft-pink: var(--anella-soft-pink);
   --color-foreground: var(--anella-foreground);
+  --color-foreground-muted: var(--anella-foreground-muted);
   --color-background: var(--anella-background);
   --color-card: var(--anella-card-background);
-
-  --color-border: var(--anella-foreground);
+  --color-surface: var(--anella-surface);
+  --color-border: var(--anella-border);
+  --color-accent: var(--anella-lavender);
+  --color-accent-strong: var(--anella-cloud-purple);
+  --color-hero: var(--anella-hero);
 }
 
 .dark:root {
-  --color-primary: var(--anella-primary-dark);
-  --color-secondary: var(--anella-secondary-dark);
-  --color-foreground: var(--anella-foreground-dark);
-  --color-background: var(--anella-background-dark);
-  --color-card: var(--anella-card-background);
-
-  --color-border: var(--anella-foreground);
+  /* flip only the semantic tokens that differ in dark mode */
+  --color-foreground: var(--anella-foreground-dk);
+  --color-foreground-muted: var(--anella-foreground-muted-dk);
+  --color-background: var(--anella-background-dk);
+  --color-card: var(--anella-card-background-dk);
+  --color-surface: var(--anella-surface-dk);
+  --color-border: var(--anella-border-dk);
+  /* primary/accent stay the same — pink pops on dark too */
 }
 
 html {
@@ -90,12 +109,14 @@ body,
     background-color 0.5s ease !important;
 }
 
-/* Primary CTA	#F99AB8
-Active Tab	#F8A0BC
-Hover Pink	#FFB6CC
-Soft Pink	#FFDCE8
-Background Pink	#FFF1F7
-Hero Background	#C8C2FF
-Light Lavender	#DDD8FF
-Cloud Purple	#B9B0F5
-Dark Lavender	#9A8DE8 */
+/* ── Anella palette reference ──────────────────────────
+   Primary CTA      #F99AB8   --color-primary
+   Primary Hover    #F8A0BC   --color-primary-hover
+   Secondary Pink   #FFB6CC   --color-secondary
+   Soft Pink        #FFDCE8   --color-soft-pink
+   Background Pink  #FFF1F7   --color-card  (light)
+   Hero Background  #C8C2FF   --color-hero
+   Light Lavender   #DDD8FF   --color-accent
+   Cloud Purple     #B9B0F5   --color-accent-strong
+   Dark Lavender    #9A8DE8   (available via Tailwind anella.dark-lavender)
+   ──────────────────────────────────────────────────── */

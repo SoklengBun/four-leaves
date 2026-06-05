@@ -203,6 +203,7 @@ const onPointerDown = (event: PointerEvent) => {
 
 const onPointerMove = (event: PointerEvent) => {
   if (!dragState.active) return;
+  if (isStuckOpen.value) return;
 
   const dx = Math.abs(event.clientX - dragState.startX);
   const dy = Math.abs(event.clientY - dragState.startY);
@@ -375,10 +376,13 @@ const handleResize = () => {
 watch(
   () => route.fullPath,
   () => {
-    clearTimers();
-    isMenuOpen.value = false;
-    isStuckOpen.value = false;
-    wheelReady.value = false;
+    if (isMenuOpen.value || isStuckOpen.value) {
+      closeMenu();
+    } else {
+      clearTimers();
+      wheelReady.value = false;
+    }
+
     const current = menuItems.findIndex((item) => item.path === route.path);
     if (current >= 0) activeIndex.value = current;
   },
