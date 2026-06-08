@@ -14,3 +14,26 @@
 body {
   height: var(--body-height);
 }
+
+.must-visible .hidden {
+  display: block !important;
+}
+
+::-webkit-scrollbar {
+  @apply h-0 w-0 md:h-1 md:w-1;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffeef7;
+  border-radius: 999px;
+  border: 1px solid #ffeef7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ffb7d5, #d9b3ff);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ff9fc9, #c99bff);
+}
