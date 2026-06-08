@@ -41,6 +41,7 @@ module.exports = {
       spacing: {
         nav: 'var(--nav-height)',
         body: 'var(--body-height)',
+        player: 'var(--player-height)',
       },
     },
   },

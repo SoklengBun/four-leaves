@@ -43,6 +43,16 @@
   --color-accent: var(--anella-lavender);
   --color-accent-strong: var(--anella-cloud-purple);
   --color-hero: var(--anella-hero);
+
+  --player-mini: 60px;
+  --player-full: 80px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --player-mini: 60px;
+    --player-full: 140px;
+  }
 }
 
 .dark:root {

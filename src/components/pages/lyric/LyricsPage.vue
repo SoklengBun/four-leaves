@@ -3,6 +3,7 @@ import { debouncedRef, useFetch, useStorage } from '@vueuse/core';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAppSetting } from '~/stores/app-setting';
+import { usePlayer } from '~/stores/player';
 
 const route = useRoute();
 const router = useRouter();
@@ -11,6 +12,7 @@ const searchDebounce = debouncedRef(searchText);
 const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
 const containerRef = ref<HTMLDivElement>();
 const appSetting = useAppSetting();
+const player = usePlayer();
 
 const isFetching = ref(false);
 
@@ -77,8 +79,10 @@ onBeforeUnmount(() => {
   appSetting.setScrollPosition('lyric', containerRef.value.scrollTop);
 });
 
-const onClick = (id: number) => {
-  router.push({ name: 'lyrics-detail', params: { id: id } });
+const onClick = (lyrics: Lyrics) => {
+  router.push({ name: 'lyrics-detail', params: { id: lyrics.id } });
+
+  player.selectSong(lyrics);
 };
 
 const onClear = async () => {
@@ -88,7 +92,7 @@ const onClear = async () => {
 </script>
 
 <template>
-  <div class="flex h-[calc(var(--body-height))] flex-col items-center pt-nav">
+  <div class="flex w-full flex-col items-center pt-nav">
     <div class="container h-12 w-full">
       <div class="fetch size-12" @click="fetchLyrics"></div>
     </div>
@@ -106,10 +110,10 @@ const onClear = async () => {
       </button>
     </div>
 
-    <div ref="containerRef" class="container mt-1 flex w-full flex-1 flex-col space-y-2 overflow-y-auto overflow-x-visible pb-5 pt-1">
+    <div class="container mt-1 flex w-full flex-col space-y-2 pb-5 pt-1">
       <div
         v-for="lyrics in searchResult"
-        @click="() => onClick(lyrics.id)"
+        @click="() => onClick(lyrics)"
         class="lyric-item line-clamp-1 flex h-[34px] min-h-[34px] items-center break-all rounded-md px-2 active:opacity-50"
       >
         {{ lyrics.title }}

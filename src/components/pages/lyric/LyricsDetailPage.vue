@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core';
-import { onMounted, ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import MarqueeText from '~/components/shares/MarqueeText.vue';
+import { usePlayer } from '~/stores/player';
 
 const router = useRouter();
+const player = usePlayer();
+const { src, current, isPlaying, mode } = storeToRefs(player);
 
 const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
 const lyrics = ref<Lyrics>();
@@ -13,7 +18,7 @@ const availableLang = ref<LyricsKeys[]>(['romaji']);
 const languages = ['en', 'jp', 'romaji', 'kh', 'cn', 'pinyin'];
 const currentLang = ref<LyricsKeys>('romaji');
 
-onMounted(() => {
+onMounted(async () => {
   if (!lyricsList.value.length) {
     router.replace({ name: 'lyrics' });
   } else {
@@ -50,6 +55,15 @@ onMounted(() => {
   }
 });
 
+watch(
+  () => player.isReady,
+  () => {
+    if (!player.src && lyrics.value) {
+      player.selectSong(lyrics.value);
+    }
+  },
+);
+
 const onPlay = () => {
   isExpand.value = !isExpand.value;
 };
@@ -67,79 +81,49 @@ const onChangeLink = (link: string) => {
 const switchLang = (lang: keyof Lyrics) => {
   currentLang.value = lang;
 };
+
+const togglePlay = () => {
+  if (mode.value === 'off') return;
+
+  if (isPlaying.value) {
+    player.pause();
+  } else {
+    player.play();
+  }
+};
 </script>
 
 <template>
-  <div class="flex h-[calc(var(--body-height))] flex-col items-center overflow-hidden pt-nav">
-    <div class="px-2 py-2">
-      <div class="rounded-lg border-2 border-primary px-5 py-1 text-xl text-primary">
-        <p class="text-center">
-          {{ lyrics?.title }}
+  <div class="flex h-full w-full flex-col items-center overflow-hidden">
+    <div class="flex h-full w-full flex-col items-center overflow-auto overscroll-none pt-3">
+      <div class="ml-3 mr-auto flex size-[40px] shrink-0 items-center justify-center rounded-full border text-[20px]" @click="back"><</div>
+
+      <div class="mt-[-20px] size-[150px] shrink-0 overflow-hidden rounded-lg border bg-gray-100">
+        <img :src="`https://img.youtube.com/vi/${src}/maxresdefault.jpg`" class="size-full object-cover" />
+      </div>
+      <div class="mt-2 flex h-[50px] w-full flex-col items-center justify-center space-y-1 px-2">
+        <MarqueeText :text="current?.title" class="min-w-0 flex-1 shrink-0 text-lg font-bold" :gap="50" />
+        <MarqueeText :text="current?.artist" class="min-w-0 flex-1 shrink-0 text-sm font-bold text-gray-500" :gap="50" />
+      </div>
+
+      <div class="mt-3 w-[340px]">
+        <div class="h-1 w-full shrink-0 rounded-full bg-primary"></div>
+        <div class="flex w-full shrink-0 items-center justify-between rounded-full text-xs text-gray-500">
+          <p>0:00</p>
+          <p>3:13</p>
+        </div>
+
+        <div class="flex w-full items-center justify-center">
+          <button>⏮</button>
+          <button class="mx-4 size-10 rounded-full bg-primary" @click="togglePlay">{{ isPlaying ? '❚❚' : '▶' }}</button>
+          <button>⏭</button>
+        </div>
+      </div>
+
+      <div class="pb-player mt-3 w-full rounded-t-2xl bg-white pt-4 shadow-xl shadow-red-500">
+        <p class="h-fit whitespace-pre-line text-center text-base lowercase">
+          {{ lyrics?.[currentLang] }}
         </p>
-      </div>
-    </div>
-    <div class="flex w-full flex-1 flex-col overflow-hidden">
-      <div class="flex flex-1 overflow-hidden">
-        <div class="flex flex-1 justify-center overflow-scroll py-2">
-          <p class="h-fit whitespace-pre-line pb-10 text-center text-base lowercase">
-            {{ lyrics?.[currentLang] }}
-          </p>
-        </div>
-      </div>
-
-      <div
-        class="relative z-10 mt-auto flex h-0 w-full flex-col items-center justify-start border-t-[1.5px] border-primary transition-all duration-300"
-        :class="{ '!h-[300px]': isExpand }"
-      >
-        <div class="absolute left-0 top-[-2px] z-[7] h-3 w-full border-t-2 border-red-400 bg-white"></div>
-
-        <button @click="back" class="absolute right-[76px] top-[-30px] z-[5] h-[30px] w-[70px] rounded-t-md bg-primary text-white">Back</button>
-        <button @click="onPlay" class="absolute right-1 top-[-30px] z-[5] h-[30px] w-[70px] rounded-t-md bg-primary text-white">Music</button>
-
-        <!-- Available Language  -->
-        <div class="absolute left-0 top-[-30px] z-[5] flex h-[30px] space-x-1 px-1">
-          <div
-            v-for="lang in availableLang"
-            :key="lang"
-            class="flex h-full items-center rounded-t-md bg-primary px-4 capitalize"
-            :class="{
-              'active-lang bg-red-400 text-white': currentLang === lang,
-            }"
-            @click="switchLang(lang)"
-          >
-            <span>
-              {{ lang }}
-            </span>
-          </div>
-        </div>
-
-        <iframe
-          v-if="selectedLink"
-          :src="`https://www.youtube.com/embed/${selectedLink}?si=0IWQ9Kbz7n-ixbBR`"
-          :key="selectedLink"
-          title="YouTube video player"
-          frameborder="0"
-          class="relative z-10 my-auto aspect-[375/240] w-full rounded-b-lg bg-black text-[10px]"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen
-        />
-        <div class="flex w-screen flex-1 items-center space-x-2 overflow-x-auto overflow-y-hidden p-2">
-          <template v-if="typeof lyrics?.url === 'object'">
-            <div
-              v-for="url in lyrics.url"
-              :key="url.l"
-              class="whitespace-nowrap rounded-md border-[1.5px] border-primary px-3 py-0.5 text-primary first:ml-auto last:!mr-auto"
-              @click="onChangeLink(url.l)"
-            >
-              {{ url.a }}
-            </div>
-          </template>
-
-          <div v-else class="mx-auto whitespace-nowrap rounded-md border-[1.5px] border-primary px-3 py-0.5 text-primary">
-            {{ (lyrics?.artists || (lyrics?.artist ? [{ id: 0, name: lyrics.artist }] : [])).map((a) => a.name).join(', ') }}
-          </div>
-        </div>
       </div>
     </div>
   </div>

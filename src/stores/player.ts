@@ -1,0 +1,227 @@
+import { computed, ref, shallowRef, watch } from 'vue';
+import { defineStore } from 'pinia';
+import { sleep } from '~/utils/helper';
+type PlayerMode = 'off' | 'mini' | 'full';
+
+declare global {
+  interface Window {
+    YT?: {
+      Player: new (elementId: string, options: Record<string, unknown>) => YTPlayer;
+      PlayerState: {
+        PLAYING: number;
+      };
+    };
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+type YTPlayer = {
+  playVideo: () => void;
+  pauseVideo: () => void;
+  seekTo: (seconds: number, allowSeekAhead?: boolean) => void;
+  loadVideoById: (videoId: string) => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  destroy: () => void;
+};
+
+let ytApiPromise: Promise<void> | null = null;
+
+const loadYoutubeApi = () => {
+  if (window.YT?.Player) return Promise.resolve();
+  if (ytApiPromise) return ytApiPromise;
+
+  ytApiPromise = new Promise<void>((resolve) => {
+    const existing = document.querySelector('script[data-yt-iframe-api]');
+    if (!existing) {
+      const script = document.createElement('script');
+      script.src = 'https://www.youtube.com/iframe_api';
+      script.async = true;
+      script.dataset.ytIframeApi = 'true';
+      document.head.appendChild(script);
+    }
+
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      prev?.();
+      resolve();
+    };
+  });
+
+  return ytApiPromise;
+};
+
+const extractVideoId = (value: string) => {
+  if (!value) return '';
+  const v = value.trim();
+
+  if (/^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+
+  try {
+    const url = new URL(v);
+    if (url.hostname.includes('youtu.be')) return url.pathname.slice(1);
+    if (url.hostname.includes('youtube.com')) {
+      const byQuery = url.searchParams.get('v');
+      if (byQuery) return byQuery;
+
+      const parts = url.pathname.split('/');
+      const embedIdx = parts.findIndex((p) => p === 'embed');
+      if (embedIdx >= 0) return parts[embedIdx + 1] || '';
+    }
+  } catch {
+    return '';
+  }
+
+  return '';
+};
+
+export const usePlayer = defineStore('player', () => {
+  const src = ref('');
+  const current = ref<Lyrics | null>(null);
+  const player = shallowRef<YTPlayer | null>(null);
+  const isReady = ref(false);
+  const isPlaying = ref(false);
+  const currentTime = ref(0);
+  const duration = ref(0);
+  const mode = ref<PlayerMode>('off');
+
+  let timer: number | null = null;
+
+  const progress = computed(() => {
+    if (!duration.value) return 0;
+    return (currentTime.value / duration.value) * 100;
+  });
+
+  const clearTimer = () => {
+    if (!timer) return;
+    window.clearInterval(timer);
+    timer = null;
+  };
+
+  const startTimer = () => {
+    clearTimer();
+    timer = window.setInterval(() => {
+      if (!player.value || !isReady.value) return;
+      currentTime.value = player.value.getCurrentTime();
+      duration.value = player.value.getDuration();
+    }, 250);
+  };
+
+  const init = async (containerId: string) => {
+    await loadYoutubeApi();
+    if (!window.YT?.Player || player.value) return;
+
+    console.log('containerId', containerId);
+    console.log('element', document.getElementById(containerId));
+    player.value = new window.YT.Player(containerId, {
+      height: '0',
+      width: '0',
+      videoId: extractVideoId(src.value),
+      playerVars: {
+        controls: 0,
+        rel: 0,
+        modestbranding: 1,
+        playsinline: 1,
+      },
+      events: {
+        onReady: () => {
+          isReady.value = true;
+          duration.value = player.value?.getDuration() ?? 0;
+        },
+        onStateChange: (e: { data: number }) => {
+          isPlaying.value = e.data === window.YT?.PlayerState.PLAYING;
+          if (isPlaying.value) startTimer();
+          else clearTimer();
+        },
+        onError: (e: any) => {
+          console.log('YT error', e.data);
+          console.log('current src', src.value);
+        },
+      },
+    });
+  };
+
+  const selectSong = async (song: Lyrics) => {
+    let youtubeId = song.url;
+    if (typeof song.url === 'string') {
+      youtubeId = song.url;
+    } else {
+      youtubeId = song.url?.[0].l || '';
+    }
+
+    console.log('selectSong called with:', { song, youtubeId });
+    if (src.value === youtubeId) return;
+    src.value = youtubeId;
+    current.value = song;
+    console.log('Selected song:', song);
+    const videoId = extractVideoId(youtubeId);
+    if (!videoId || !player.value || !isReady.value) return;
+    console.log('videoId', videoId);
+    player.value.loadVideoById(videoId);
+
+    if (mode.value === 'off') mode.value = 'full';
+  };
+
+  const play = () => {
+    player.value?.playVideo();
+  };
+
+  const pause = () => {
+    player.value?.pauseVideo();
+  };
+
+  const seekTo = (time: number) => {
+    player.value?.seekTo(Math.max(0, time), true);
+  };
+
+  const destroy = () => {
+    clearTimer();
+    mode.value = 'off';
+    player.value?.destroy();
+    player.value = null;
+    isReady.value = false;
+    isPlaying.value = false;
+    currentTime.value = 0;
+    duration.value = 0;
+  };
+
+  const updateMode = (newMode: PlayerMode) => {
+    if (mode.value === newMode) return;
+    mode.value = newMode;
+  };
+
+  watch(mode, (newMode) => {
+    let playerHeight = 'var(--player-full)';
+    switch (newMode) {
+      case 'mini':
+        playerHeight = 'var(--player-mini)';
+        break;
+      case 'full':
+        playerHeight = 'var(--player-full)';
+        break;
+      case 'off':
+        playerHeight = '';
+        break;
+    }
+
+    document.documentElement.style.setProperty('--player-height', playerHeight);
+  });
+
+  return {
+    src,
+    current,
+    isReady,
+    isPlaying,
+    currentTime,
+    duration,
+    progress,
+    init,
+    selectSong,
+    play,
+    pause,
+    seekTo,
+    destroy,
+    mode,
+    updateMode,
+  };
+});
