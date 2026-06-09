@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { CSSProperties } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { pxOfCurrentScreenSize, requireImage } from '~/utils/helper';
+import IconMenu from '../icons/IconMenu.vue';
 
 type Edge = 'left' | 'right' | 'top' | 'bottom';
 
@@ -436,14 +437,14 @@ onBeforeUnmount(() => {
       </transition>
 
       <button
-        class="floating-fab pointer-events-auto fixed flex items-center justify-center rounded-full border border-[#cae7ff] bg-gradient-to-br from-[#ffffff] to-[#dceeff] text-sm font-semibold text-[#2f5f95] shadow-[0_8px_24px_rgba(88,141,196,0.34)] transition"
+        class="floating-fab pointer-events-auto fixed flex items-center justify-center rounded-full border border-primary bg-gradient-to-br from-white to-[#dceeff] transition-all"
         :class="{ 'fab-open': isStuckOpen }"
         :style="fabStyle"
         @pointerdown="onPointerDown"
         @pointermove="onPointerMove"
         @pointerup="onPointerUp"
       >
-        MENU
+        <IconMenu :active="isStuckOpen" />
       </button>
     </div>
   </div>
@@ -460,10 +461,18 @@ onBeforeUnmount(() => {
   touch-action: none;
   user-select: none;
   z-index: 20;
+  box-shadow:
+    0 0 10px #ffb1ed,
+    0 0 10px #f5fcff,
+    0 0 20px #ffc1f7;
 }
 
 .fab-open {
-  box-shadow: 0 10px 30px rgba(76, 138, 202, 0.46);
+  border-color: #4baeff;
+  box-shadow:
+    0 0 3px #45a8ff,
+    0 0 6px #b4dcff,
+    0 0 5px #6bbaff;
 }
 
 .wheel-half {
@@ -496,8 +505,12 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: var(--wheel-ring-inset);
   border-radius: 9999px;
-  border: 2px solid #c8e5ff;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.28) 0%, rgba(234, 245, 255, 0.68) 100%);
+  border: 1px solid #289aff;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.28) 0%, rgba(117, 188, 255, 0.68) 100%);
+  box-shadow:
+    0 0 3px #45a8ff,
+    0 0 6px #b4dcff,
+    0 0 5px #6bbaff;
 }
 
 .wheel-item {
@@ -520,7 +533,7 @@ onBeforeUnmount(() => {
 }
 
 .wheel-item.active {
-  border-color: #8cc5f5;
+  border-color: #4baeff;
   box-shadow:
     0 10px 18px #2f5f8f33,
     0 0 0 2px #d8ecff;

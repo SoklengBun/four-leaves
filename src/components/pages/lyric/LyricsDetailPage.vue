@@ -6,6 +6,11 @@ import { useRouter } from 'vue-router';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
 import { usePlayer } from '~/stores/player';
 
+import NextImage from '~/assets/images/player/next.png';
+import PrevImage from '~/assets/images/player/previous.png';
+import PauseImage from '~/assets/images/player/pause.png';
+import PlayImage from '~/assets/images/player/play.png';
+
 const router = useRouter();
 const player = usePlayer();
 const { src, current, isPlaying, mode } = storeToRefs(player);
@@ -95,13 +100,13 @@ const togglePlay = () => {
 
 <template>
   <div class="flex h-full w-full flex-col items-center overflow-hidden">
-    <div class="flex h-full w-full flex-col items-center overflow-auto overscroll-none pt-3">
-      <div class="ml-3 mr-auto flex size-[40px] shrink-0 items-center justify-center rounded-full border text-[20px]" @click="back"><</div>
+    <div class="flex h-full w-full flex-col items-center overflow-auto overscroll-none px-3 pb-player pt-3">
+      <div class="ml-3 mr-auto flex size-[40px] shrink-0 items-center justify-center rounded-full border text-[20px] md:hidden" @click="back"><</div>
 
-      <div class="mt-[-20px] size-[150px] shrink-0 overflow-hidden rounded-lg border bg-gray-100">
+      <div class="lyrics-box-cover mt-[-20px] size-[150px] shrink-0 overflow-hidden rounded-lg border bg-gray-100 md:mt-5">
         <img :src="`https://img.youtube.com/vi/${src}/maxresdefault.jpg`" class="size-full object-cover" />
       </div>
-      <div class="mt-2 flex h-[50px] w-full flex-col items-center justify-center space-y-1 px-2">
+      <div class="mt-2 flex h-[50px] w-full shrink-0 flex-col items-center justify-center space-y-1 px-2">
         <MarqueeText :text="current?.title" class="min-w-0 flex-1 shrink-0 text-lg font-bold" :gap="50" />
         <MarqueeText :text="current?.artist" class="min-w-0 flex-1 shrink-0 text-sm font-bold text-gray-500" :gap="50" />
       </div>
@@ -114,14 +119,14 @@ const togglePlay = () => {
         </div>
 
         <div class="flex w-full items-center justify-center">
-          <button>⏮</button>
-          <button class="mx-4 size-10 rounded-full bg-primary" @click="togglePlay">{{ isPlaying ? '❚❚' : '▶' }}</button>
-          <button>⏭</button>
+          <button class="size-6 md:size-9"><img :src="PrevImage" /></button>
+          <button class="mx-4 size-7 md:mx-10 md:size-10" @click="togglePlay"><img :src="isPlaying ? PauseImage : PlayImage" /></button>
+          <button class="size-6 md:size-9"><img :src="NextImage" /></button>
         </div>
       </div>
 
-      <div class="pb-player mt-3 w-full rounded-t-2xl bg-white pt-4 shadow-xl shadow-red-500">
-        <p class="h-fit whitespace-pre-line text-center text-base lowercase">
+      <div class="lyrics-box-cover mt-5 w-full rounded-t-2xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-b-2xl md:pb-6 md:pt-6">
+        <p class="h-fit whitespace-pre-line text-center text-base uppercase">
           {{ lyrics?.[currentLang] }}
         </p>
       </div>
@@ -134,5 +139,13 @@ const togglePlay = () => {
   box-shadow:
     0px 2px 4px 4px #ff8b8b inset,
     0px 2px 4px 4px #ff3636;
+}
+
+.lyrics-box-cover {
+  @apply rounded-xl border border-primary md:border-2;
+  box-shadow:
+    0 0 10px #ffb1ed,
+    0 0 10px #f5fcff,
+    0 0 20px #ffc1f7;
 }
 </style>

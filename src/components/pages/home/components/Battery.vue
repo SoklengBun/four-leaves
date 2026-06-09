@@ -20,7 +20,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#fff7fb] via-[#ffffff] to-[#e9f4ff] p-4 text-[#2d3748]">
+  <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#fff7fb] via-[#ffffff] to-[#e9f4ff] p-3 text-[#2d3748]">
     <div class="pointer-events-none absolute -top-6 right-4 h-12 w-20 rounded-full bg-[#ffffff] opacity-80" />
     <div class="pointer-events-none absolute -top-3 right-14 h-10 w-14 rounded-full bg-[#fff0f8]" />
     <div class="pointer-events-none absolute -bottom-5 -left-3 h-11 w-16 rounded-full bg-[#eef7ff] opacity-80" />

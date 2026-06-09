@@ -53,7 +53,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ebf8ff] via-[#ffffff] to-[#d6ecff] p-4 text-[#1a365d]">
+  <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ebf8ff] via-[#ffffff] to-[#d6ecff] p-3 text-[#1a365d]">
     <div class="cloud cloud-a pointer-events-none absolute -left-3 -top-5 h-12 w-16 rounded-full bg-[#ffffff] opacity-90" />
     <div class="cloud cloud-b pointer-events-none absolute -top-3 left-8 h-10 w-14 rounded-full bg-[#f5fbff]" />
     <div class="cloud cloud-c pointer-events-none absolute -right-4 top-3 h-14 w-20 rounded-full bg-[#ffffff] opacity-80" />
@@ -67,7 +67,7 @@ onMounted(() => {
         <span class="rounded-full bg-[#ffffff]/70 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-[#5d7ca3]">{{ dayLabel }}</span>
       </div>
 
-      <div class="mt-3 flex items-end gap-2">
+      <div class="mt-1 flex items-end gap-2">
         <span class="text-6xl leading-none">{{ weatherEmoji }}</span>
         <p class="text-4xl font-bold tabular-nums leading-none text-[#1a365d]">{{ temperature.toFixed(1) }}<span class="text-2xl">°C</span></p>
         <span class="mb-1 rounded-full bg-[#ffffff]/80 px-2 py-0.5 text-xs font-semibold text-[#3f6ea3]">{{ comfortLabel }}</span>
