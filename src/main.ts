@@ -9,6 +9,8 @@ import 'vant/lib/index.css';
 import './assets/styles/main.css';
 import './styles/tailwind.css';
 
+import { imageDirective } from './directives/image';
+
 const app = createApp(App);
 
 app.use(createPinia());
@@ -16,5 +18,7 @@ app.use(router);
 app.use(i18n);
 app.use(Popup);
 app.use(Switch);
+
+app.directive('img', imageDirective);
 
 router.isReady().then(() => app.mount('#app'));

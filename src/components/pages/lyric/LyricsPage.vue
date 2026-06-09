@@ -92,7 +92,7 @@ const onClear = async () => {
 </script>
 
 <template>
-  <div class="flex w-full flex-col items-center pt-nav">
+  <div class="flex w-full flex-col items-center pb-player pt-nav">
     <div class="container h-12 w-full">
       <div class="fetch size-12" @click="fetchLyrics"></div>
     </div>
@@ -110,7 +110,7 @@ const onClear = async () => {
       </button>
     </div>
 
-    <div class="container mt-1 flex w-full flex-col space-y-2 pb-5 pt-1">
+    <div class="container mt-1 flex w-full flex-col space-y-2 pb-2 pt-1">
       <div
         v-for="lyrics in searchResult"
         @click="() => onClick(lyrics)"

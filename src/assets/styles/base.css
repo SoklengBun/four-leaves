@@ -45,7 +45,7 @@
   --color-hero: var(--anella-hero);
 
   --player-mini: 60px;
-  --player-full: 80px;
+  --player-full: 100px;
 }
 
 @media (min-width: 768px) {

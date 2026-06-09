@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useNow } from '@vueuse/core';
-import { requireImage } from '~/utils/helper';
+import AnimateImage from '~/assets/images/animate.gif';
 
 const now = useNow({ interval: 1000 });
 
@@ -44,7 +44,7 @@ const tzString = computed(() => {
 </script>
 
 <template>
-  <div class="bg-card relative w-full rounded-lg p-3">
+  <div class="relative w-full rounded-lg bg-card p-3">
     <div class="mb-3 flex items-center justify-between">
       <div class="flex flex-col">
         <div class="text-lg font-bold text-purple-600">{{ monthName }}</div>
@@ -81,7 +81,7 @@ const tzString = computed(() => {
       </div>
     </div>
 
-    <img :src="requireImage('images/animate.gif')" class="absolute -bottom-[7px] -right-[15px] size-32" />
+    <img :src="AnimateImage" class="absolute -bottom-[7px] -right-[15px] size-32" />
   </div>
 </template>
 
