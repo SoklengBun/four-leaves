@@ -2,7 +2,12 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { CSSProperties } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { pxOfCurrentScreenSize, requireImage } from '~/utils/helper';
+import menuHomeIcon from '~/assets/images/menus/home.png';
+import menuLyricIcon from '~/assets/images/menus/lyric.png';
+import menuLyricMineIcon from '~/assets/images/menus/lyric-mine.png';
+import menuLyricAddIcon from '~/assets/images/menus/lyric-add.png';
+import menuDefaultIcon from '~/assets/images/yunli.png';
+import { pxOfCurrentScreenSize } from '~/utils/helper';
 import IconMenu from '../icons/IconMenu.vue';
 
 type Edge = 'left' | 'right' | 'top' | 'bottom';
@@ -15,14 +20,13 @@ type MenuItem = {
 
 const router = useRouter();
 const route = useRoute();
-const defaultMenuIcon = requireImage('images/yunli.png');
 
 const menuItems: MenuItem[] = [
-  { label: 'Home', path: '/', icon: requireImage('images/menus/home.png') },
-  { label: 'Lyrics', path: '/lyrics', icon: requireImage('images/menus/lyric.png') },
-  { label: 'My Lyrics', path: '/lyrics/mine', icon: requireImage('images/menus/lyric-mine.png') },
-  { label: 'Add Lyrics', path: '/lyrics/add', icon: requireImage('images/menus/lyric-add.png') },
-  { label: 'About', path: '/about', icon: defaultMenuIcon },
+  { label: 'Home', path: '/', icon: menuHomeIcon },
+  { label: 'Lyrics', path: '/lyrics', icon: menuLyricIcon },
+  { label: 'My Lyrics', path: '/lyrics/mine', icon: menuLyricMineIcon },
+  { label: 'Add Lyrics', path: '/lyrics/add', icon: menuLyricAddIcon },
+  { label: 'About', path: '/about', icon: menuDefaultIcon },
 ];
 
 const FAB_SIZE = 56;
@@ -437,7 +441,7 @@ onBeforeUnmount(() => {
       </transition>
 
       <button
-        class="floating-fab pointer-events-auto fixed flex items-center justify-center rounded-full border border-primary bg-gradient-to-br from-white to-[#dceeff] transition-all"
+        class="floating-fab pointer-events-auto fixed flex items-center justify-center rounded-full border border-primary bg-gradient-to-br from-white to-[#dceeff] transition"
         :class="{ 'fab-open': isStuckOpen }"
         :style="fabStyle"
         @pointerdown="onPointerDown"

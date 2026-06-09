@@ -7,6 +7,8 @@ import PauseImage from '~/assets/images/player/pause.png';
 import PlayImage from '~/assets/images/player/play.png';
 
 import { usePlayer } from '~/stores/player';
+import PlayerSeekBar from './PlayerSeekBar.vue';
+import YoutubeThumbnail from './YoutubeThumbnail.vue';
 
 const player = usePlayer();
 const { mode, current, src, isPlaying } = storeToRefs(player);
@@ -27,24 +29,33 @@ const togglePlay = () => {
     <div id="yt-player" class="hidden h-full w-full" />
     <Transition>
       <div v-if="mode !== 'off'" class="fixed bottom-0 h-player w-full px-3 pb-3 pt-2 md:p-5">
-        <div class="liquid mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-[#efefef] md:rounded-2xl">
+        <div
+          class="liquid mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-[#efefef] pb-5 md:rounded-2xl md:pb-0"
+        >
           <div class="relative z-10 flex h-fit flex-1 items-center space-x-1 overflow-hidden px-2 md:space-x-3 md:px-4">
             <div class="size-10 overflow-hidden rounded-lg border border-primary bg-gray-300 md:size-16 md:rounded-xl">
-              <img :src="`https://img.youtube.com/vi/${src}/maxresdefault.jpg`" class="size-full object-cover" />
+              <YoutubeThumbnail :id="src" />
             </div>
-            <MarqueeText :text="current?.title" class="min-w-0 flex-1 text-xs md:text-base" :gap="50" />
+            <MarqueeText :text="current?.title" class="min-w-0 flex-1 text-sm font-semibold md:text-base" :gap="50" />
           </div>
 
-          <div class="relative z-10 flex items-center px-2 md:flex-1">
-            <button class="mx-1 size-6 md:size-8">
-              <img :src="PrevImage" />
-            </button>
-            <button class="mx-2 size-6 md:mx-7 md:size-9" @click="togglePlay">
-              <img :src="isPlaying ? PauseImage : PlayImage" />
-            </button>
-            <button class="mx-1 size-6 md:size-8">
-              <img :src="NextImage" />
-            </button>
+          <div class="absolute bottom-2 w-[328px]">
+            <PlayerSeekBar time-class="hidden" class="md:hidden" />
+          </div>
+          <div class="relative z-10 flex flex-col px-2 md:flex-1">
+            <PlayerSeekBar time-class="text-[10px] text-gray-500 md:text-xs" class="hidden md:block" />
+
+            <div class="flex items-center justify-center">
+              <button class="mx-1 size-6 md:size-8" @click="player.playPrevious()">
+                <img :src="PrevImage" />
+              </button>
+              <button class="mx-2 size-6 md:mx-7 md:size-9" @click="togglePlay">
+                <img :src="isPlaying ? PauseImage : PlayImage" />
+              </button>
+              <button class="mx-1 size-6 md:size-8" @click="player.playNext()">
+                <img :src="NextImage" />
+              </button>
+            </div>
           </div>
           <div class="relative z-10 hidden md:flex md:flex-1"></div>
         </div>

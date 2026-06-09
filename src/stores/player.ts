@@ -1,6 +1,8 @@
 import { computed, ref, shallowRef, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { sleep } from '~/utils/helper';
+import { useStorage } from '@vueuse/core';
+import { useRouter } from 'vue-router';
 type PlayerMode = 'off' | 'mini' | 'full';
 
 declare global {
@@ -81,6 +83,7 @@ export const usePlayer = defineStore('player', () => {
   const player = shallowRef<YTPlayer | null>(null);
   const isReady = ref(false);
   const isPlaying = ref(false);
+  const songEnded = ref(false);
   const currentTime = ref(0);
   const duration = ref(0);
   const mode = ref<PlayerMode>('off');
@@ -129,9 +132,15 @@ export const usePlayer = defineStore('player', () => {
           duration.value = player.value?.getDuration() ?? 0;
         },
         onStateChange: (e: { data: number }) => {
+          console.log('YT state change', e.data);
           isPlaying.value = e.data === window.YT?.PlayerState.PLAYING;
           if (isPlaying.value) startTimer();
           else clearTimer();
+          if (e.data === 0) {
+            songEnded.value = true;
+          } else {
+            songEnded.value = false;
+          }
         },
         onError: (e: any) => {
           console.log('YT error', e.data);
@@ -139,6 +148,8 @@ export const usePlayer = defineStore('player', () => {
         },
       },
     });
+
+    console.log('YT Player initialized', player.value);
   };
 
   const selectSong = async (song: Lyrics) => {
@@ -207,6 +218,47 @@ export const usePlayer = defineStore('player', () => {
     document.documentElement.style.setProperty('--player-height', playerHeight);
   });
 
+  const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
+  const router = useRouter();
+
+  const playNext = () => {
+    // Implement the logic for playing the next song
+    const currentIndex = lyricsList.value.findIndex((s) => s.id === current.value?.id);
+
+    let nextSong = lyricsList.value[currentIndex + 1];
+    if (currentIndex === lyricsList.value.length - 1) {
+      nextSong = lyricsList.value[0];
+    } else if (currentIndex !== -1 && currentIndex < lyricsList.value.length - 1) {
+      nextSong = lyricsList.value[currentIndex + 1];
+    }
+
+    selectSong(nextSong);
+    if (router.currentRoute.value.name === 'lyrics-detail') {
+      router.replace({ params: { id: nextSong.id } });
+    }
+  };
+
+  const playPrevious = () => {
+    // Implement the logic for playing the previous song
+    const currentIndex = lyricsList.value.findIndex((s) => s.id === current.value?.id);
+
+    let previousSong = lyricsList.value[currentIndex - 1];
+    if (currentIndex === 0) {
+      previousSong = lyricsList.value[lyricsList.value.length - 1];
+    } else if (router.currentRoute.value.name === 'lyrics-detail') {
+      previousSong = lyricsList.value[currentIndex - 1];
+    }
+
+    selectSong(previousSong);
+    if (router.currentRoute.value.name === 'lyrics-detail') {
+      router.replace({ params: { id: previousSong.id } });
+    }
+  };
+
+  watch(songEnded, (ended) => {
+    if (ended) playNext();
+  });
+
   return {
     src,
     current,
@@ -223,5 +275,7 @@ export const usePlayer = defineStore('player', () => {
     destroy,
     mode,
     updateMode,
+    playNext,
+    playPrevious,
   };
 });
