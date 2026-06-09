@@ -18,8 +18,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  player.destroy();
-
   const html = document.getElementById('anella-container');
 
   if (html) {

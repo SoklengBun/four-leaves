@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
+import NextImage from '~/assets/images/player/next.png';
+import PrevImage from '~/assets/images/player/previous.png';
+import PauseImage from '~/assets/images/player/pause.png';
+import PlayImage from '~/assets/images/player/play.png';
+
 import { usePlayer } from '~/stores/player';
 
 const player = usePlayer();
@@ -21,19 +26,25 @@ const togglePlay = () => {
   <Teleport to="body">
     <div id="yt-player" class="hidden h-full w-full" />
     <Transition>
-      <div v-if="mode !== 'off'" class="h-player fixed bottom-0 w-full px-3 pb-3 pt-2 md:p-5">
-        <div class="liquid mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border md:rounded-2xl">
-          <div class="relative z-10 flex h-fit flex-1 items-center space-x-1 overflow-hidden px-2 md:space-x-3 md:px-5">
-            <div class="size-10 overflow-hidden rounded-lg border bg-gray-300 md:size-12 md:rounded-xl">
+      <div v-if="mode !== 'off'" class="fixed bottom-0 h-player w-full px-3 pb-3 pt-2 md:p-5">
+        <div class="liquid mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-[#efefef] md:rounded-2xl">
+          <div class="relative z-10 flex h-fit flex-1 items-center space-x-1 overflow-hidden px-2 md:space-x-3 md:px-4">
+            <div class="size-10 overflow-hidden rounded-lg border border-primary bg-gray-300 md:size-16 md:rounded-xl">
               <img :src="`https://img.youtube.com/vi/${src}/maxresdefault.jpg`" class="size-full object-cover" />
             </div>
-            <MarqueeText :text="current?.title" class="min-w-0 flex-1 text-xs md:text-sm" :gap="50" />
+            <MarqueeText :text="current?.title" class="min-w-0 flex-1 text-xs md:text-base" :gap="50" />
           </div>
 
-          <div class="relative z-10 flex items-center justify-evenly md:flex-1">
-            <button class="mx-1">⏮</button>
-            <button class="mx-1" @click="togglePlay">{{ isPlaying ? '❚❚' : '▶' }}</button>
-            <button class="mx-1">⏭</button>
+          <div class="relative z-10 flex items-center px-2 md:flex-1">
+            <button class="mx-1 size-6 md:size-8">
+              <img :src="PrevImage" />
+            </button>
+            <button class="mx-2 size-6 md:mx-7 md:size-9" @click="togglePlay">
+              <img :src="isPlaying ? PauseImage : PlayImage" />
+            </button>
+            <button class="mx-1 size-6 md:size-8">
+              <img :src="NextImage" />
+            </button>
           </div>
           <div class="relative z-10 hidden md:flex md:flex-1"></div>
         </div>
