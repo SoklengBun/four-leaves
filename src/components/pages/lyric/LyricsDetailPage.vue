@@ -11,11 +11,16 @@ import NextImage from '~/assets/images/player/next.png';
 import PrevImage from '~/assets/images/player/previous.png';
 import PauseImage from '~/assets/images/player/pause.png';
 import PlayImage from '~/assets/images/player/play.png';
+import ShuffleImage from '~/assets/images/player/shuffle.png';
+import RepeatImage from '~/assets/images/player/repeat.png';
+
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
+import LoopSetting from './components/LoopSetting.vue';
+import SongCoverList from './components/SongCoverList.vue';
 
 const router = useRouter();
 const player = usePlayer();
-const { src, current, isPlaying, mode } = storeToRefs(player);
+const { src, current, isPlaying, mode, shuffle, repeatOne, currentArtist } = storeToRefs(player);
 
 const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
 const lyrics = ref<Lyrics>();
@@ -116,21 +121,33 @@ const togglePlay = () => {
         </span>
       </button>
 
-      <div class="lyrics-box-cover mt-[-20px] size-[150px] shrink-0 overflow-hidden rounded-lg border bg-gray-100 md:mt-5">
+      <div class="lyrics-box-cover relative mt-[-20px] size-[150px] shrink-0 overflow-hidden rounded-lg border bg-gray-100 md:mt-5">
         <YoutubeThumbnail :id="src" />
+        <SongCoverList />
       </div>
       <div class="mt-2 flex h-[50px] w-full shrink-0 flex-col items-center justify-center space-y-1 px-2">
         <MarqueeText :text="current?.title" class="min-w-0 flex-1 shrink-0 text-lg font-bold" :gap="50" />
-        <MarqueeText :text="current?.artist" class="min-w-0 flex-1 shrink-0 text-sm font-bold text-gray-500" :gap="50" />
+        <MarqueeText :text="currentArtist" class="min-w-0 flex-1 shrink-0 text-sm font-bold text-gray-500" :gap="50" />
       </div>
 
-      <div class="mt-3 w-[340px]">
+      <div class="mt-3 w-[340px] md:w-[450px]">
         <PlayerSeekBar time-class="text-xs text-gray-500" />
 
         <div class="flex w-full items-center justify-center">
-          <button class="size-6 md:size-9" @click="player.playPrevious()"><img :src="PrevImage" /></button>
+          <div class="flex flex-1"></div>
+          <button class="mr-4 size-4 md:mr-8 md:size-6" @click="player.toggleShuffle()" :class="{ 'opacity-50': !shuffle }">
+            <img :src="ShuffleImage" />
+          </button>
+          <button class="size-6 md:size-8" @click="player.playPrevious()"><img :src="PrevImage" /></button>
           <button class="mx-4 size-7 md:mx-10 md:size-10" @click="togglePlay"><img :src="isPlaying ? PauseImage : PlayImage" /></button>
-          <button class="size-6 md:size-9" @click="player.playNext()"><img :src="NextImage" /></button>
+          <button class="size-6 md:size-8" @click="player.playNext()"><img :src="NextImage" /></button>
+          <button class="ml-4 size-4 md:ml-8 md:size-6" @click="player.toggleRepeatOne()" :class="{ 'opacity-50': !repeatOne }">
+            <img :src="RepeatImage" />
+          </button>
+
+          <div class="flex flex-1 justify-end">
+            <LoopSetting />
+          </div>
         </div>
       </div>
 

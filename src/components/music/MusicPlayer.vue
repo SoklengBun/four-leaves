@@ -9,9 +9,12 @@ import PlayImage from '~/assets/images/player/play.png';
 import { usePlayer } from '~/stores/player';
 import PlayerSeekBar from './PlayerSeekBar.vue';
 import YoutubeThumbnail from './YoutubeThumbnail.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const player = usePlayer();
-const { mode, current, src, isPlaying } = storeToRefs(player);
+const { mode, current, src, isPlaying, currentArtist } = storeToRefs(player);
 
 const togglePlay = () => {
   if (mode.value === 'off') return;
@@ -22,21 +25,31 @@ const togglePlay = () => {
     player.play();
   }
 };
+
+const goToLyrics = () => {
+  if (mode.value === 'off') return;
+  if (router.currentRoute.value.name === 'lyrics-detail') return;
+
+  router.push({ name: 'lyrics-detail', params: { id: current.value?.id } });
+};
 </script>
 
 <template>
   <Teleport to="body">
     <div id="yt-player" class="hidden h-full w-full" />
     <Transition>
-      <div v-if="mode !== 'off'" class="fixed bottom-0 h-player w-full px-3 pb-3 pt-2 md:p-5">
+      <div v-if="mode !== 'off'" class="fixed bottom-0 z-[10] h-player w-full px-3.5 pb-3 pt-2 md:p-5">
         <div
           class="liquid mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-[#efefef] pb-5 md:rounded-2xl md:pb-0"
         >
           <div class="relative z-10 flex h-fit flex-1 items-center space-x-1 overflow-hidden px-2 md:space-x-3 md:px-4">
             <div class="size-10 overflow-hidden rounded-lg border border-primary bg-gray-300 md:size-16 md:rounded-xl">
-              <YoutubeThumbnail :id="src" />
+              <YoutubeThumbnail :id="src" @click="goToLyrics" />
             </div>
-            <MarqueeText :text="current?.title" class="min-w-0 flex-1 text-sm font-semibold md:text-base" :gap="50" />
+            <div class="relative z-10 flex h-fit flex-1 flex-col justify-center overflow-hidden px-2 md:px-4">
+              <MarqueeText :text="current?.title" class="w-full min-w-0 text-sm font-semibold md:text-base" :gap="50" />
+              <MarqueeText :text="currentArtist" class="w-full min-w-0 text-xs text-gray-500" :gap="50" />
+            </div>
           </div>
 
           <div class="absolute bottom-2 w-[328px]">

@@ -2,6 +2,7 @@
 import { debouncedRef, useFetch, useStorage } from '@vueuse/core';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import MarqueeText from '~/components/shares/MarqueeText.vue';
 import { useAppSetting } from '~/stores/app-setting';
 import { usePlayer } from '~/stores/player';
 
@@ -92,56 +93,62 @@ const onClear = async () => {
 </script>
 
 <template>
-  <div class="flex w-full flex-col items-center pb-player pt-nav">
-    <div class="container h-12 w-full">
-      <div class="fetch size-12" @click="fetchLyrics"></div>
-    </div>
-    <div class="container flex w-full items-center gap-2">
-      <input
-        v-model="searchText"
-        class="h-[34px] w-full max-w-[300px] rounded-md border bg-white px-2 py-1 transition-colors duration-500 dark:border-gray-500 dark:bg-[#484848]"
-      />
-
-      <button
-        @click="onClear"
-        class="h-[34px] rounded-md border border-black/10 bg-gray-200 px-4 active:opacity-50 dark:border-gray-500 dark:bg-gray-700"
-      >
-        Clear
-      </button>
+  <div class="flex w-full flex-col items-center px-3 pb-player pt-3">
+    <div class="box-cover relative h-[200px] w-full overflow-hidden rounded-lg border bg-black">
+      <div class="hero-banner absolute left-0 top-0 h-full w-full opacity-70" @click="fetchLyrics"></div>
+      <div class="absolute left-1/2 top-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-white p-1 shadow-xl">
+        <input
+          v-model="searchText"
+          class="h-[34px] w-full max-w-[300px] rounded-md border bg-white px-2 py-1 transition-colors duration-500 dark:border-gray-500 dark:bg-[#484848]"
+        />
+      </div>
     </div>
 
-    <div class="container mt-1 flex w-full flex-col space-y-2 pb-2 pt-1">
-      <div
-        v-for="lyrics in searchResult"
-        @click="() => onClick(lyrics)"
-        class="lyric-item line-clamp-1 flex h-[34px] min-h-[34px] items-center break-all rounded-md px-2 active:opacity-50"
-      >
-        {{ lyrics.title }}
+    <div class="mt-1 flex w-full flex-col space-y-2 pb-2 pt-1">
+      <div class="text-lg font-semibold md:text-xl">My Playlist</div>
+      <div class="flex space-x-2 overflow-x-auto">
+        <div v-for="lyrics in searchResult" @click="() => onClick(lyrics)" class="lyric-item w-[80px] shrink-0 md:w-[140px]">
+          <div class="size-[80px] rounded-md bg-gray-500 md:size-[140px]"></div>
+          <MarqueeText :text="lyrics.title" class="mt-1 w-full text-center text-xs md:text-sm" />
+        </div>
+      </div>
+
+      <div class="text-lg font-semibold md:text-xl">My Playlist</div>
+      <div class="flex space-x-2 overflow-x-auto">
+        <div v-for="lyrics in searchResult" @click="() => onClick(lyrics)" class="lyric-item w-[80px] shrink-0 md:w-[140px]">
+          <div class="size-[80px] rounded-md bg-gray-500 md:size-[140px]"></div>
+          <MarqueeText :text="lyrics.title" class="mt-1 w-full text-center text-xs md:text-sm" />
+        </div>
+      </div>
+
+      <div class="text-lg font-semibold md:text-xl">My Playlist</div>
+      <div class="flex space-x-2 overflow-x-auto">
+        <div v-for="lyrics in searchResult" @click="() => onClick(lyrics)" class="lyric-item w-[80px] shrink-0 md:w-[140px]">
+          <div class="size-[80px] rounded-md bg-gray-500 md:size-[140px]"></div>
+          <MarqueeText :text="lyrics.title" class="mt-1 w-full text-center text-xs md:text-sm" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.fetch {
-  background-image: url('@/assets/images/yunli.png');
+.box-cover {
+  @apply border border-primary;
+  box-shadow:
+    0 0 3px #ffb1ed,
+    0 0 5px #f5fcff,
+    0 0 10px #ffc1f7;
+}
+
+.hero-banner {
+  background-image: url('https://redive.estertion.win/card/full/124131.webp');
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 48px 48px;
+  background-size: cover;
 }
 
 .lyric-item {
-  background: rgb(255, 253, 241);
-  box-shadow:
-    2px 2px 4px 0px #ffee3895,
-    2px 2px 8px 2px #ffd81737 inset;
-}
-.dark {
-  .lyric-item {
-    background: rgb(2, 23, 56);
-    box-shadow:
-      2px 2px 4px 0px #9dc1ff9b,
-      2px 2px 8px 2px #ceefff93 inset;
-  }
+  @apply flex flex-col items-center justify-center;
 }
 </style>

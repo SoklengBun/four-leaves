@@ -12,5 +12,6 @@ import MusicPlayer from '../music/MusicPlayer.vue';
   </main>
   <FloatingEdgeMenu />
   <MusicPlayer />
+
   <!-- <FooterBar /> -->
 </template>

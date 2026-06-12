@@ -351,11 +351,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <canvas ref="canvasRef" class="seasonal-fall pointer-events-none fixed inset-0" aria-hidden="true" />
+  <Teleport to="body">
+    <div v-if="mode === 'rain'" class="fixed left-0 top-0 z-[99] h-screen w-screen bg-black/60"></div>
+    <canvas ref="canvasRef" class="seasonal-fall pointer-events-none fixed inset-0 z-[100]" aria-hidden="true" />
+  </Teleport>
 </template>
-
-<style scoped>
-.seasonal-fall {
-  z-index: 3;
-}
-</style>
