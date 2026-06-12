@@ -1,6 +1,5 @@
 import { computed, ref, shallowRef, watch } from 'vue';
 import { defineStore } from 'pinia';
-import { sleep } from '~/utils/helper';
 import { useStorage } from '@vueuse/core';
 import { useRouter } from 'vue-router';
 type PlayerMode = 'off' | 'mini' | 'full';
@@ -87,6 +86,9 @@ export const usePlayer = defineStore('player', () => {
   const currentTime = ref(0);
   const duration = ref(0);
   const mode = ref<PlayerMode>('off');
+  const loopEnabled = ref(false);
+  const loopPointA = ref<number | null>(null);
+  const loopPointB = ref<number | null>(null);
 
   let timer: number | null = null;
 
@@ -94,6 +96,30 @@ export const usePlayer = defineStore('player', () => {
     if (!duration.value) return 0;
     return (currentTime.value / duration.value) * 100;
   });
+
+  const currentArtist = computed(() => {
+    const song = current.value;
+    if (!song) return '';
+
+    if (Array.isArray(song.url)) {
+      const active = song.url.find((item) => extractVideoId(item.l) === extractVideoId(src.value));
+      if (active?.a) return active.a;
+    }
+
+    if (song.artist) return song.artist;
+    if (song.artists?.length) return song.artists.map((a) => a.name).join(', ');
+    return '';
+  });
+
+  const hasValidLoopRange = computed(() => {
+    if (loopPointA.value === null || loopPointB.value === null) return false;
+    return loopPointB.value > loopPointA.value;
+  });
+
+  const clampToDuration = (time: number) => {
+    if (!Number.isFinite(time)) return 0;
+    return Math.min(Math.max(time, 0), duration.value || time);
+  };
 
   const clearTimer = () => {
     if (!timer) return;
@@ -107,6 +133,16 @@ export const usePlayer = defineStore('player', () => {
       if (!player.value || !isReady.value) return;
       currentTime.value = player.value.getCurrentTime();
       duration.value = player.value.getDuration();
+
+      if (loopEnabled.value && hasValidLoopRange.value) {
+        const pointA = loopPointA.value as number;
+        const pointB = loopPointB.value as number;
+
+        if (currentTime.value >= pointB) {
+          player.value.seekTo(pointA, true);
+          currentTime.value = pointA;
+        }
+      }
     }, 250);
   };
 
@@ -169,8 +205,11 @@ export const usePlayer = defineStore('player', () => {
     if (!videoId || !player.value || !isReady.value) return;
     console.log('videoId', videoId);
     player.value.loadVideoById(videoId);
+    player.value.playVideo();
 
     if (mode.value === 'off') mode.value = 'full';
+
+    clearLoopRange();
   };
 
   const play = () => {
@@ -221,17 +260,86 @@ export const usePlayer = defineStore('player', () => {
   const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
   const router = useRouter();
 
-  const playNext = () => {
-    // Implement the logic for playing the next song
+  const shuffle = ref(false);
+  const repeatOne = ref(false);
+
+  const toggleShuffle = () => {
+    shuffle.value = !shuffle.value;
+  };
+
+  const toggleRepeatOne = () => {
+    repeatOne.value = !repeatOne.value;
+  };
+
+  const setLoopPointA = (time = currentTime.value) => {
+    loopPointA.value = clampToDuration(time);
+    if (hasValidLoopRange.value) return;
+    loopEnabled.value = false;
+  };
+
+  const setLoopPointB = (time = currentTime.value) => {
+    loopPointB.value = clampToDuration(time);
+    if (hasValidLoopRange.value) return;
+    loopEnabled.value = false;
+  };
+
+  const clearLoopRange = () => {
+    loopEnabled.value = false;
+    loopPointA.value = null;
+    loopPointB.value = null;
+  };
+
+  const toggleLoopEnabled = () => {
+    if (!hasValidLoopRange.value) {
+      loopEnabled.value = false;
+      return;
+    }
+    loopEnabled.value = !loopEnabled.value;
+  };
+
+  const switchVersion = (videoUrl: string) => {
+    const videoId = extractVideoId(videoUrl);
+    if (!videoId || !player.value || !isReady.value) return;
+    src.value = videoUrl;
+    clearLoopRange();
+    player.value.loadVideoById(videoId);
+    player.value.playVideo();
+  };
+
+  const playNext = (fromSongEnd = false) => {
+    if (!lyricsList.value.length || !current.value) return;
     const currentIndex = lyricsList.value.findIndex((s) => s.id === current.value?.id);
 
-    let nextSong = lyricsList.value[currentIndex + 1];
-    if (currentIndex === lyricsList.value.length - 1) {
-      nextSong = lyricsList.value[0];
-    } else if (currentIndex !== -1 && currentIndex < lyricsList.value.length - 1) {
-      nextSong = lyricsList.value[currentIndex + 1];
+    // Repeat current song
+    if (repeatOne.value && fromSongEnd) {
+      seekTo(0);
+      play();
+      return;
     }
 
+    // Shuffle -> pick random different song when possible
+    if (shuffle.value && lyricsList.value.length > 1) {
+      let idx = currentIndex;
+      while (idx === currentIndex) {
+        idx = Math.floor(Math.random() * lyricsList.value.length);
+      }
+      const nextSong = lyricsList.value[idx];
+      selectSong(nextSong);
+      if (router.currentRoute.value.name === 'lyrics-detail') {
+        router.replace({ params: { id: nextSong.id } });
+      }
+      return;
+    }
+
+    // Normal sequential next
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= lyricsList.value.length) {
+      // End of list and no repeat -> stop playback
+      pause();
+      return;
+    }
+
+    const nextSong = lyricsList.value[nextIndex];
     selectSong(nextSong);
     if (router.currentRoute.value.name === 'lyrics-detail') {
       router.replace({ params: { id: nextSong.id } });
@@ -239,16 +347,31 @@ export const usePlayer = defineStore('player', () => {
   };
 
   const playPrevious = () => {
-    // Implement the logic for playing the previous song
+    if (!lyricsList.value.length || !current.value) return;
     const currentIndex = lyricsList.value.findIndex((s) => s.id === current.value?.id);
 
-    let previousSong = lyricsList.value[currentIndex - 1];
-    if (currentIndex === 0) {
-      previousSong = lyricsList.value[lyricsList.value.length - 1];
-    } else if (router.currentRoute.value.name === 'lyrics-detail') {
-      previousSong = lyricsList.value[currentIndex - 1];
+    // Shuffle -> pick random different song when possible
+    if (shuffle.value && lyricsList.value.length > 1) {
+      let idx = currentIndex;
+      while (idx === currentIndex) {
+        idx = Math.floor(Math.random() * lyricsList.value.length);
+      }
+      const prevSong = lyricsList.value[idx];
+      selectSong(prevSong);
+      if (router.currentRoute.value.name === 'lyrics-detail') {
+        router.replace({ params: { id: prevSong.id } });
+      }
+      return;
     }
 
+    let prevIndex = currentIndex - 1;
+    if (prevIndex < 0) {
+      // Start of list and no repeat -> stop playback
+      pause();
+      return;
+    }
+
+    const previousSong = lyricsList.value[prevIndex];
     selectSong(previousSong);
     if (router.currentRoute.value.name === 'lyrics-detail') {
       router.replace({ params: { id: previousSong.id } });
@@ -256,7 +379,7 @@ export const usePlayer = defineStore('player', () => {
   };
 
   watch(songEnded, (ended) => {
-    if (ended) playNext();
+    if (ended) playNext(true);
   });
 
   return {
@@ -277,5 +400,19 @@ export const usePlayer = defineStore('player', () => {
     updateMode,
     playNext,
     playPrevious,
+    shuffle,
+    repeatOne,
+    loopEnabled,
+    loopPointA,
+    loopPointB,
+    hasValidLoopRange,
+    toggleShuffle,
+    toggleRepeatOne,
+    currentArtist,
+    setLoopPointA,
+    setLoopPointB,
+    clearLoopRange,
+    toggleLoopEnabled,
+    switchVersion,
   };
 });

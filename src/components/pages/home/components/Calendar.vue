@@ -87,7 +87,7 @@ const tzString = computed(() => {
 
 <style scoped>
 .active-day {
-  @apply border border-primary text-xl font-bold text-blue-500;
+  @apply border-2 border-primary text-xl font-bold text-blue-500;
   box-shadow:
     0 0 3px #ffb1ed,
     0 0 5px #f5fcff,
