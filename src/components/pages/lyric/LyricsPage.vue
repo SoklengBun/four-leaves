@@ -93,8 +93,8 @@ const onClear = async () => {
 </script>
 
 <template>
-  <div class="flex w-full flex-col items-center px-3 pb-player pt-3">
-    <div class="box-cover relative h-[200px] w-full overflow-hidden rounded-lg border bg-black">
+  <div class="container flex w-full flex-col items-center px-3 pb-player pt-3">
+    <div class="box-cover relative h-[200px] w-full overflow-hidden rounded-lg border bg-black md:h-[400px] md:rounded-2xl">
       <div class="hero-banner absolute left-0 top-0 h-full w-full opacity-70" @click="fetchLyrics"></div>
       <div class="absolute left-1/2 top-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-white p-1 shadow-xl">
         <input

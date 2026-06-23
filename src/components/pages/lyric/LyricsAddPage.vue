@@ -1,174 +1,392 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
+import ArtistInputMenu from './components/ArtistInputMenu.vue';
 import useAppFetch from '~/services';
 import showToast from '~/utils/toast';
-import ArtistSearch from '../../artist/ArtistSearch.vue';
 
-type Artist = { id: number; name: string };
-
-const titles = ref<string[]>(['']);
-const artistIds = ref<number[]>([]);
-const contents = ref<Array<{ kind: string; lang?: string; content: string }>>([{ kind: '', lang: '', content: '' }]);
-const references = ref<Array<{ link?: string; name?: string }>>([]);
-const summary = ref<string>('');
-
-const artists = ref<Artist[]>([]);
-const isSubmitting = ref(false);
-const error = ref<string | null>(null);
-const success = ref(false);
-
-// Add-artist UI state
-const showAddArtist = ref(false);
-const newArtistName = ref('');
-const addArtistError = ref<string | null>(null);
-const addArtistSubmitting = ref(false);
-
-const addTitle = () => titles.value.push('');
-const removeTitle = (i: number) => titles.value.splice(i, 1);
-
-const allKinds = ['romaji', 'japanese', 'english', 'translation'];
-
-const addContent = () => {
-  // find first unused kind
-  const used = new Set(contents.value.map((c) => c.kind).filter(Boolean));
-  const unused = allKinds.find((k) => !used.has(k));
-  if (!unused) {
-    showToast({ message: 'All content kinds have been added', type: 'error' });
-    return;
-  }
-  contents.value.push({ kind: unused, lang: '', content: '' });
+type Artist = {
+  id: number;
+  name: string;
+  altName?: string;
+  cv?: {
+    id?: number;
+    name: string;
+    altName?: string;
+  } | null;
 };
 
-const setContentLang = (idx: number) => {
-  const kind = contents.value[idx]?.kind || '';
-  const map: Record<string, string> = {
-    romaji: 'romaji',
-    japanese: 'ja',
-    english: 'en',
-    translation: '',
-  };
-  contents.value[idx].lang = map[kind] ?? '';
+type CoverDraft = {
+  id: string;
+  artists: Artist[];
 };
 
-const availableKindsFor = (idx: number) => {
-  const used = new Set(contents.value.map((c, i) => (i === idx ? null : c.kind)).filter(Boolean));
-  return allKinds.filter((k) => !used.has(k) || contents.value[idx]?.kind === k);
+type ContentDraft = {
+  kind: string;
+  content: string;
 };
-const removeContent = (i: number) => contents.value.splice(i, 1);
 
-const addReference = () => references.value.push({ link: '', name: '' });
-const removeReference = (i: number) => references.value.splice(i, 1);
-
-const fetchArtists = async () => {
-  try {
-    const { data } = await useAppFetch('artist/list').get().json();
-    if (data && data.value && Array.isArray(data.value.data)) {
-      artists.value = data.value.data;
-    }
-  } catch (e) {
-    // ignore — artist list optional
-  }
+type LyricsPayload = {
+  videoId: string;
+  title: string;
+  altTitles: string[];
+  artistIds: number[];
+  covers: Array<{ id: string; artistIds: number[] }>;
+  contents: ContentDraft[];
 };
+
+type LyricsPatch = Partial<LyricsPayload>;
 
 const route = useRoute();
 const router = useRouter();
 
-const editingId = ref<number | null>(null);
+const videoId = ref('');
+const title = ref('');
+const altTitles = ref<string[]>([]);
+const artistIds = ref<number[]>([]);
+const selectedArtists = ref<Artist[]>([]);
+const artistNameById = ref<Record<number, string>>({});
 
-const fetchLyricForEdit = async (id: number) => {
-  try {
-    const { data } = await useAppFetch(`lyrics/${id}`).get().json();
-    if (data.value && data.value.code === 0) {
-      const item = data.value.data;
-      // prefill fields based on payload shape
-      titles.value = (item.titles || []).map((t: any) => t.title || '');
-      artistIds.value = (item.artists || []).map((a: any) => a.id);
-      contents.value = (item.contents || []).map((c: any) => ({ kind: c.kind || '', lang: c.lang || '', content: c.content || '' }));
-      references.value = (item.references || []).map((r: any) => ({ link: r.link || '', name: r.name || '' }));
-      summary.value = item.summary || '';
-    } else {
-      showToast({ message: data.value?.message || 'Failed to load lyric', type: 'error' });
-    }
-  } catch (e) {
-    showToast({ message: 'Network error while loading lyric', type: 'error' });
-  }
+const covers = ref<CoverDraft[]>([]);
+const contents = ref<ContentDraft[]>([{ kind: '', content: '' }]);
+
+const isSubmitting = ref(false);
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+const originalPayload = ref<LyricsPayload | null>(null);
+
+const contentKinds = ['japanese', 'romaji', 'english', 'translation'];
+const legacyContentKinds: Record<string, string> = {
+  jp: 'japanese',
+  en: 'english',
 };
 
-onMounted(async () => {
-  await fetchArtists();
-  const idParam = route.params.id as string | undefined;
-  if (idParam) {
-    const idNum = parseInt(idParam, 10);
-    if (!Number.isNaN(idNum)) {
-      editingId.value = idNum;
-      await fetchLyricForEdit(idNum);
+const lyricId = computed(() => route.params.id?.toString() || '');
+const isEditMode = computed(() => route.name === 'lyrics-edit' && Boolean(lyricId.value));
+
+const cleanAltTitles = computed(() => altTitles.value.map((item) => item.trim()).filter(Boolean));
+const cleanCovers = computed(() =>
+  covers.value
+    .map((cover) => ({
+      id: extractYoutubeVideoId(cover.id),
+      artistIds: cover.artists.map((artist) => artist.id),
+    }))
+    .filter((cover) => cover.id),
+);
+
+const normalizedPayload = computed<LyricsPayload>(() => ({
+  videoId: videoId.value.trim(),
+  title: title.value.trim(),
+  altTitles: cleanAltTitles.value,
+  artistIds: [...artistIds.value],
+  covers: cleanCovers.value,
+  contents: contents.value
+    .map((item) => ({
+      kind: item.kind.trim(),
+      content: item.content.trim(),
+    }))
+    .filter((item) => item.kind && item.content),
+}));
+
+const normalizeForCompare = (value: unknown) => JSON.stringify(value);
+
+const dirtyPatch = computed<LyricsPatch>(() => {
+  if (!originalPayload.value) return {};
+
+  const patch: LyricsPatch = {};
+  const current = normalizedPayload.value;
+  (Object.keys(current) as Array<keyof LyricsPayload>).forEach((key) => {
+    if (normalizeForCompare(current[key]) !== normalizeForCompare(originalPayload.value?.[key])) {
+      patch[key] = current[key] as never;
     }
+  });
+
+  return patch;
+});
+
+const isDirty = computed(() => {
+  if (!isEditMode.value) {
+    const payload = normalizedPayload.value;
+    return Boolean(
+      payload.videoId ||
+        payload.title ||
+        payload.altTitles.length ||
+        payload.artistIds.length ||
+        payload.covers.length ||
+        payload.contents.length ||
+        contents.value.some((item) => item.kind.trim() || item.content.trim()),
+    );
+  }
+
+  return Boolean(Object.keys(dirtyPatch.value).length);
+});
+
+const extractYoutubeVideoId = (value: string) => {
+  const trimmedValue = value.trim();
+  if (!trimmedValue) return '';
+
+  const directId = trimmedValue.match(/^[\w-]{11}$/);
+  if (directId) return trimmedValue;
+
+  try {
+    const url = new URL(trimmedValue);
+    const videoParam = url.searchParams.get('v');
+    if (videoParam?.match(/^[\w-]{11}$/)) return videoParam;
+
+    const pathParts = url.pathname.split('/').filter(Boolean);
+    const pathId = url.hostname.includes('youtu.be') ? pathParts[0] : pathParts.find((part) => part.match(/^[\w-]{11}$/));
+    if (pathId?.match(/^[\w-]{11}$/)) return pathId;
+  } catch {
+    const videoParam = trimmedValue.match(/[?&]v=([\w-]{11})/);
+    if (videoParam) return videoParam[1];
+
+    const shortUrlId = trimmedValue.match(/youtu\.be\/([\w-]{11})/);
+    if (shortUrlId) return shortUrlId[1];
+  }
+
+  return trimmedValue;
+};
+
+watch(videoId, (value) => {
+  const detectedVideoId = extractYoutubeVideoId(value);
+  if (detectedVideoId && detectedVideoId !== value) {
+    videoId.value = detectedVideoId;
   }
 });
 
-const addArtist = async () => {
-  const name = (newArtistName.value || '').trim();
-  addArtistError.value = null;
-  if (!name) {
-    showToast({ message: 'Name is required', type: 'error' });
-    addArtistError.value = 'Name is required';
-    return;
+const normalizeArtists = (payload: any): Artist[] => {
+  const source = Array.isArray(payload?.data) ? payload.data : Array.isArray(payload) ? payload : [];
+
+  return source
+    .map((item: any) => ({
+      id: Number(item.id),
+      name: String(item.name || item.title || '').trim(),
+      altName: String(item.altName || item.alt_name || '').trim() || undefined,
+      cv: normalizeCv(item.cv),
+    }))
+    .filter((item: Artist) => Number.isFinite(item.id) && item.name);
+};
+
+const normalizeCv = (payload: any): Artist['cv'] => {
+  if (!payload || typeof payload !== 'object') return null;
+
+  const name = String(payload.name || payload.title || '').trim();
+  if (!name) return null;
+
+  return {
+    id: Number.isFinite(Number(payload.id)) ? Number(payload.id) : undefined,
+    name,
+    altName: String(payload.altName || payload.alt_name || '').trim() || undefined,
+  };
+};
+
+const normalizeArtistId = (value: any) => {
+  const id = Number(typeof value === 'object' ? value?.id : value);
+  return Number.isFinite(id) ? id : null;
+};
+
+const normalizeArtistList = (payload: any): Artist[] => {
+  const source = Array.isArray(payload) ? payload : [];
+
+  return source
+    .map((item: any) => ({
+      id: Number(item?.id ?? item?.artistId),
+      name: String(item?.name ?? item?.artist?.name ?? item?.title ?? '').trim(),
+      altName: String(item?.altName ?? item?.alt_name ?? item?.artist?.altName ?? item?.artist?.alt_name ?? '').trim() || undefined,
+      cv: normalizeCv(item?.cv ?? item?.artist?.cv),
+    }))
+    .filter((item: Artist) => Number.isFinite(item.id));
+};
+
+const normalizeArtistIds = (payload: any): number[] => {
+  const source = Array.isArray(payload) ? payload : [];
+  return source.map(normalizeArtistId).filter((id): id is number => id !== null);
+};
+
+const searchArtists = async (keyword: string) => {
+  const query = keyword.trim();
+  if (query.length < 2) return [];
+
+  const { data } = await useAppFetch(`artist/search?q=${encodeURIComponent(query)}`)
+    .get()
+    .json();
+  if (data.value?.code !== undefined && data.value.code !== 0) {
+    throw new Error(data.value?.message || 'Artist search failed');
   }
 
-  // client-side duplicate check
-  const dup = artists.value.find((a) => a.name.toLowerCase() === name.toLowerCase());
-  if (dup) {
-    showToast({ message: 'An artist with this name already exists', type: 'error' });
-    addArtistError.value = 'An artist with this name already exists';
-    return;
+  return normalizeArtists(data.value?.data ?? data.value);
+};
+
+watch(
+  selectedArtists,
+  (artists) => {
+    artistIds.value = artists.map((artist) => artist.id);
+    artists.forEach((artist) => {
+      artistNameById.value[artist.id] = artist.name;
+    });
+  },
+  { deep: true },
+);
+
+watch(
+  covers,
+  (items) => {
+    items.forEach((cover) => {
+      cover.artists.forEach((artist) => {
+        artistNameById.value[artist.id] = artist.name;
+      });
+    });
+  },
+  { deep: true },
+);
+
+const addAltTitle = () => altTitles.value.push('');
+const removeAltTitle = (index: number) => altTitles.value.splice(index, 1);
+
+const addCover = () => {
+  covers.value.push({
+    id: '',
+    artists: [],
+  });
+};
+
+const removeCover = (index: number) => covers.value.splice(index, 1);
+
+const normalizeCoverVideoId = (cover: CoverDraft) => {
+  const detectedVideoId = extractYoutubeVideoId(cover.id);
+  if (detectedVideoId && detectedVideoId !== cover.id) {
+    cover.id = detectedVideoId;
+  }
+};
+
+const addContent = () => contents.value.push({ kind: '', content: '' });
+const removeContent = (index: number) => contents.value.splice(index, 1);
+
+const normalizeContents = (payload: any): ContentDraft[] => {
+  if (Array.isArray(payload?.contents)) {
+    return payload.contents
+      .map((item: any) => ({
+        kind: String(item.kind ?? item.type ?? item.language ?? '').trim(),
+        content: String(item.content ?? item.text ?? item.value ?? '').trim(),
+      }))
+      .filter((item: ContentDraft) => item.kind || item.content);
   }
 
-  addArtistSubmitting.value = true;
+  return Object.entries(legacyContentKinds)
+    .map(([sourceKey, kind]) => ({
+      kind,
+      content: String(payload?.[sourceKey] ?? '').trim(),
+    }))
+    .filter((item) => item.content);
+};
+
+const normalizeCovers = (payload: any): CoverDraft[] => {
+  const source = Array.isArray(payload?.covers) ? payload.covers : [];
+
+  return source
+    .map((cover: any) => {
+      const coverArtists = normalizeArtistList(cover.artists ?? cover.artist ?? []);
+      const coverArtistIds = normalizeArtistIds(cover.artistIds ?? cover.artist_ids ?? coverArtists);
+      const selectedCoverArtists = coverArtists.length
+        ? coverArtists
+        : coverArtistIds.map((id) => ({ id, name: artistNameById.value[id] || `Artist #${id}` }));
+
+      selectedCoverArtists.forEach((artist) => {
+        artistNameById.value[artist.id] = artist.name;
+      });
+
+      return {
+        id: String(cover.videoId ?? cover.video_id ?? cover.youtubeId ?? cover.id ?? '').trim(),
+        artists: selectedCoverArtists,
+      };
+    })
+    .filter((cover: CoverDraft) => cover.id || cover.artists.length);
+};
+
+const applyLyricsPayload = (payload: any) => {
+  const primaryTitle = Array.isArray(payload?.titles) ? payload.titles[0]?.title : payload?.title;
+  const alternateTitles = Array.isArray(payload?.altTitles)
+    ? payload.altTitles
+    : Array.isArray(payload?.titles)
+      ? payload.titles.slice(1).map((item: any) => item?.title)
+      : [];
+  const artists = normalizeArtistList(payload?.artists ?? []);
+  artistNameById.value = {};
+  artists.forEach((artist) => {
+    artistNameById.value[artist.id] = artist.name;
+  });
+  const payloadArtistIds = normalizeArtistIds(payload?.artistIds ?? payload?.artist_ids ?? artists);
+
+  videoId.value = String(payload?.videoId ?? payload?.video_id ?? payload?.youtubeId ?? payload?.url ?? '').trim();
+  title.value = String(primaryTitle ?? '').trim();
+  altTitles.value = alternateTitles.map((item: any) => String(item ?? '').trim()).filter(Boolean);
+  selectedArtists.value = artists.length ? artists : payloadArtistIds.map((id) => ({ id, name: `Artist #${id}` }));
+  artistIds.value = payloadArtistIds;
+  contents.value = normalizeContents(payload);
+  if (!contents.value.length) contents.value = [{ kind: '', content: '' }];
+  covers.value = normalizeCovers(payload);
+
+  originalPayload.value = normalizedPayload.value;
+};
+
+const fetchLyricsForEdit = async () => {
+  if (!isEditMode.value) return;
+
+  isLoading.value = true;
+  error.value = null;
+
   try {
-    const { data } = await useAppFetch('artist/add').post({ name }).json();
-    if (data.value && data.value.code === 0) {
-      const artist: Artist = data.value.data;
-      // append to local cache and select
-      artists.value.push(artist);
-      artistIds.value.push(artist.id);
-      showToast({ message: 'Artist added', type: 'success' });
-      newArtistName.value = '';
-      showAddArtist.value = false;
-      addArtistError.value = null;
-    } else {
-      const msg = data.value?.message || 'Failed to add artist';
-      showToast({ message: msg, type: 'error' });
-      addArtistError.value = msg;
+    let { data } = await useAppFetch(`lyric/${encodeURIComponent(lyricId.value)}`)
+      .get()
+      .json();
+    if (data.value?.code !== 0) {
+      ({ data } = await useAppFetch(`lyrics/${encodeURIComponent(lyricId.value)}`)
+        .get()
+        .json());
     }
-  } catch (e) {
-    showToast({ message: 'Network error while adding artist', type: 'error' });
-    addArtistError.value = 'Network error while adding artist';
+
+    if (data.value?.code === 0) {
+      applyLyricsPayload(data.value.data);
+      return;
+    }
+
+    const message = data.value?.message || 'Failed to load lyrics';
+    error.value = message;
+    showToast({ message, type: 'error' });
+  } catch {
+    error.value = 'Network error while loading lyrics';
+    showToast({ message: error.value, type: 'error' });
   } finally {
-    addArtistSubmitting.value = false;
+    isLoading.value = false;
   }
 };
 
 const validate = () => {
-  if (!titles.value.some((t) => t && t.trim().length > 0)) {
-    showToast({ message: 'At least one title is required', type: 'error' });
-    error.value = 'At least one title is required';
+  const trimmedTitle = title.value.trim();
+  const trimmedVideoId = videoId.value.trim();
+
+  if (!trimmedVideoId) {
+    error.value = 'Video ID is required';
+    showToast({ message: error.value, type: 'error' });
     return false;
   }
 
-  for (const c of contents.value) {
-    if (!c.kind || !c.content || !c.content.trim()) {
-      showToast({ message: 'Each content entry requires a kind and content', type: 'error' });
-      error.value = 'Each content entry requires a kind and content';
-      return false;
-    }
+  if (!trimmedTitle) {
+    error.value = 'Title is required';
+    showToast({ message: error.value, type: 'error' });
+    return false;
   }
 
-  // ensure kinds are unique
-  const kinds = contents.value.map((c) => c.kind).filter(Boolean);
-  if (new Set(kinds).size !== kinds.length) {
-    showToast({ message: 'Duplicate content kinds are not allowed', type: 'error' });
-    error.value = 'Duplicate content kinds are not allowed';
+  if (!artistIds.value.length) {
+    error.value = 'Select at least one artist';
+    showToast({ message: error.value, type: 'error' });
+    return false;
+  }
+
+  const filledContents = contents.value.filter((item) => item.kind.trim() || item.content.trim());
+  if (!filledContents.length || filledContents.some((item) => !item.kind.trim() || !item.content.trim())) {
+    error.value = 'Each lyric block needs a kind and content';
+    showToast({ message: error.value, type: 'error' });
     return false;
   }
 
@@ -179,192 +397,281 @@ const validate = () => {
 const onSubmit = async () => {
   if (!validate()) return;
 
-  const payload = {
-    titles: titles.value.filter((t) => t && t.trim()),
-    artistIds: artistIds.value,
-    contents: contents.value.map((c) => ({ kind: c.kind, lang: c.lang || undefined, content: c.content })),
-    references: references.value.filter((r) => (r.link && r.link.trim()) || (r.name && r.name.trim())),
-    summary: summary.value || undefined,
-  };
+  const payload = isEditMode.value ? dirtyPatch.value : normalizedPayload.value;
+
+  if (isEditMode.value && !Object.keys(payload).length) {
+    showToast({ message: 'No changes to save', type: 'warning' });
+    return;
+  }
 
   isSubmitting.value = true;
-  success.value = false;
   try {
-    let data: any = null;
-    if (editingId.value) {
-      const resp = await useAppFetch(`lyrics/${editingId.value}`).put(payload).json();
-      data = resp.data;
-    } else {
-      const resp = await useAppFetch('lyrics/add').post(payload).json();
-      data = resp.data;
+    const request = isEditMode.value
+      ? useAppFetch(`lyric/edit/${encodeURIComponent(lyricId.value)}`).put(payload)
+      : useAppFetch('lyrics/add').post(payload);
+    const { data } = await request.json();
+    if (data.value?.code === 0) {
+      originalPayload.value = normalizedPayload.value;
+      showToast({ message: isEditMode.value ? 'Lyrics updated' : 'Lyrics added', type: 'success' });
+      router.push({ name: 'lyrics-mine' }).catch(() => {});
+      return;
     }
 
-    if (data.value && data.value.code === 0) {
-      success.value = true;
-      // navigate back to my lyrics after save
-      router.push({ name: 'lyrics-mine' }).catch(() => {});
-    } else {
-      const msg = data.value?.message || 'Save failed';
-      showToast({ message: msg, type: 'error' });
-      error.value = msg;
-    }
-  } catch (e) {
-    showToast({ message: 'Network error while saving', type: 'error' });
-    error.value = 'Network error while saving';
+    const message = data.value?.message || (isEditMode.value ? 'Failed to update lyrics' : 'Failed to add lyrics');
+    error.value = message;
+    showToast({ message, type: 'error' });
+  } catch (err) {
+    error.value = isEditMode.value ? 'Network error while updating lyrics' : 'Network error while adding lyrics';
+    showToast({ message: error.value, type: 'error' });
   } finally {
     isSubmitting.value = false;
   }
 };
+
+const confirmLeave = () => !isDirty.value || window.confirm('You have unsaved lyric changes. Leave this page?');
+
+const onBeforeUnload = (event: BeforeUnloadEvent) => {
+  if (!isDirty.value) return;
+
+  event.preventDefault();
+  event.returnValue = '';
+};
+
+onMounted(() => {
+  window.addEventListener('beforeunload', onBeforeUnload);
+  if (isEditMode.value) {
+    fetchLyricsForEdit();
+  } else {
+    originalPayload.value = normalizedPayload.value;
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', onBeforeUnload);
+});
+
+onBeforeRouteLeave(() => confirmLeave());
 </script>
 
 <template>
-  <div class="flex h-[calc(var(--body-height))] flex-col items-center pt-nav">
-    <div class="container mt-1 flex w-full flex-1 flex-col space-y-2 overflow-y-auto pb-5 pt-1">
-      <div class="mx-auto w-full space-y-2 md:space-y-6">
-        <header>
-          <h1 class="text-2xl font-semibold">{{ editingId ? 'Edit Lyrics' : 'Add Lyrics' }}</h1>
-          <p class="text-muted-foreground text-sm">
-            {{ editingId ? 'Edit the lyric entry below.' : 'Provide titles, artists, and one or more content blocks.' }}
-          </p>
-        </header>
+  <div class="min-h-[calc(var(--body-height))] bg-[#fff8fb] text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+    <div class="px-3 py-4">
+      <form @submit.prevent="onSubmit" class="grid gap-4">
+        <section
+          class="sticky top-4 z-20 rounded-lg border border-pink-300 bg-white p-4 shadow-[0_14px_45px_rgba(244,114,182,0.12)] dark:border-slate-800 dark:bg-slate-900"
+        >
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-pink-500">{{ isEditMode ? 'edit lyric' : 'new lyric' }}</p>
+              <h1 class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+                {{ isEditMode ? 'Edit this soft little lyric' : 'Add a soft little lyric' }}
+              </h1>
+            </div>
+            <button
+              type="submit"
+              :disabled="isSubmitting || isLoading"
+              class="inline-flex h-11 items-center justify-center rounded-lg bg-pink-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {{ isSubmitting ? 'Saving...' : isEditMode ? 'Update lyric' : 'Save lyric' }}
+            </button>
+          </div>
+        </section>
 
-        <form @submit.prevent="onSubmit" class="w-full space-y-2 md:space-y-6">
-          <section class="rounded bg-white p-3 shadow-sm dark:bg-slate-800 sm:p-4">
-            <label class="block text-sm font-medium">Titles (at least one)</label>
-            <div class="mt-3 space-y-2">
-              <div v-for="(t, i) in titles" :key="i" class="flex gap-2">
-                <input v-model="titles[i]" placeholder="Title" class="flex-1 rounded border px-3 py-2" />
+        <section
+          v-if="isLoading"
+          class="rounded-lg border border-pink-300 bg-white p-4 text-sm font-semibold text-slate-500 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+        >
+          Loading lyric...
+        </section>
+
+        <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div class="grid gap-3 md:grid-cols-2">
+            <label class="block">
+              <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Video ID</span>
+              <input
+                v-model="videoId"
+                class="mt-1 h-11 w-full rounded-lg border border-pink-300 bg-pink-50/60 px-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-pink-950"
+                placeholder="youtube video ID, e.g: 84YBqfpCGW8 or paste the youtube link here"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Title</span>
+              <input
+                v-model="title"
+                class="mt-1 h-11 w-full rounded-lg border border-pink-300 bg-pink-50/60 px-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-pink-950"
+                placeholder="Song title"
+              />
+            </label>
+          </div>
+
+          <div class="mt-4">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold text-slate-700 dark:text-slate-200">Alt titles</span>
+              <button
+                type="button"
+                @click="addAltTitle"
+                class="rounded-lg border border-pink-300 px-3 py-1.5 text-xs font-semibold text-pink-600 hover:bg-pink-50 dark:border-slate-700 dark:hover:bg-slate-800"
+              >
+                Add
+              </button>
+            </div>
+            <div class="mt-2 space-y-2">
+              <div v-for="(_, index) in altTitles" :key="index" class="flex gap-2">
+                <input
+                  v-model="altTitles[index]"
+                  class="h-10 flex-1 rounded-lg border border-pink-300 bg-pink-50/60 px-3 text-sm outline-none focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-pink-950"
+                  placeholder="Alternative title"
+                />
                 <button
                   type="button"
-                  @click="removeTitle(i)"
-                  class="inline-flex items-center rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
+                  @click="removeAltTitle(index)"
+                  class="rounded-lg border border-rose-200 px-3 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:border-slate-700 dark:hover:bg-slate-800"
                 >
                   Remove
                 </button>
               </div>
-              <button type="button" @click="addTitle" class="inline-flex items-center rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700">
-                Add title
-              </button>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section class="rounded bg-white p-3 shadow-sm dark:bg-slate-800 sm:p-4">
-            <label class="block text-sm font-medium">Artists</label>
+        <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white">Artists</h2>
+            <span class="rounded-lg bg-pink-50 px-2.5 py-1 text-xs font-semibold text-pink-600 dark:bg-slate-800"
+              >{{ artistIds.length }} selected</span
+            >
+          </div>
 
-            <div class="mt-2 flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-              <button
-                type="button"
-                @click="showAddArtist = !showAddArtist"
-                class="inline-flex items-center rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700"
-              >
-                {{ showAddArtist ? 'Close' : 'Add artist' }}
-              </button>
-              <span class="text-muted-foreground text-sm">or select from the list</span>
-            </div>
+          <div class="mt-3">
+            <ArtistInputMenu v-model="selectedArtists" :search="searchArtists" :disabled="isLoading" placeholder="Search and select artists" />
+          </div>
+        </section>
 
-            <div v-if="showAddArtist" class="mt-3 rounded border bg-gray-50 p-3 dark:bg-slate-900">
-              <input v-model="newArtistName" placeholder="Artist name" class="w-full rounded border px-3 py-2" />
-              <div class="mt-2 flex w-full flex-col items-start gap-2 sm:flex-row sm:items-center">
+        <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white">Lyrics</h2>
+            <button
+              type="button"
+              @click="addContent"
+              class="rounded-lg border border-pink-300 px-3 py-1.5 text-xs font-semibold text-pink-600 hover:bg-pink-50 dark:border-slate-700 dark:hover:bg-slate-800"
+            >
+              Add block
+            </button>
+          </div>
+
+          <div class="mt-3 space-y-3">
+            <div
+              v-for="(content, index) in contents"
+              :key="index"
+              class="rounded-lg border border-pink-300 bg-pink-50/50 p-3 dark:border-slate-700 dark:bg-slate-950"
+            >
+              <div class="flex items-center gap-2">
+                <select
+                  v-model="content.kind"
+                  class="h-10 rounded-lg border border-pink-300 bg-white px-3 text-sm outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-pink-950 sm:w-48"
+                >
+                  <option value="">Kind</option>
+                  <option v-for="kind in contentKinds" :key="kind" :value="kind">{{ kind }}</option>
+                </select>
                 <button
                   type="button"
-                  @click="addArtist"
-                  :disabled="addArtistSubmitting"
-                  class="inline-flex w-full items-center justify-center rounded bg-green-600 px-3 py-2 text-white hover:bg-green-700 sm:w-auto"
+                  @click="removeContent(index)"
+                  class="ml-auto h-10 rounded-lg border border-rose-200 px-3 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:border-slate-700 dark:hover:bg-slate-800"
                 >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  @click="
-                    () => {
-                      showAddArtist = false;
-                      newArtistName = '';
-                      addArtistError = null;
-                    }
-                  "
-                  class="inline-flex w-full items-center justify-center rounded bg-gray-300 px-3 py-2 hover:bg-gray-400 sm:w-auto"
-                >
-                  Cancel
+                  Remove
                 </button>
               </div>
+              <textarea
+                v-model="content.content"
+                rows="9"
+                class="mt-3 w-full resize-y rounded-lg border border-pink-300 bg-white px-3 py-2 text-sm leading-6 outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:ring-4 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-pink-950"
+                placeholder="Paste lyrics here"
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <aside class="space-y-4 lg:sticky lg:top-[calc(var(--nav-height)+1rem)] lg:self-start">
+          <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">Covers</h2>
+              <button
+                type="button"
+                @click="addCover"
+                class="rounded-lg border border-pink-300 px-3 py-1.5 text-xs font-semibold text-pink-600 hover:bg-pink-50 dark:border-slate-700 dark:hover:bg-slate-800"
+              >
+                Add
+              </button>
             </div>
 
-            <div class="mt-3">
-              <ArtistSearch v-model="artistIds" :known-artists="artists" placeholder="Search and select artists" :release-delay-ms="1500" />
-            </div>
-          </section>
-
-          <section class="rounded bg-white p-3 shadow-sm dark:bg-slate-800 sm:p-4">
-            <label class="block text-sm font-medium">Contents</label>
             <div class="mt-3 space-y-3">
-              <div v-for="(c, idx) in contents" :key="idx" class="rounded border bg-gray-50 p-3 dark:bg-slate-900">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:gap-3">
-                  <select v-model="c.kind" @change="setContentLang(idx)" class="w-full rounded border px-2 py-1 sm:w-48">
-                    <option disabled value="">Select kind</option>
-                    <option v-for="k in availableKindsFor(idx)" :key="k" :value="k">{{ k }}</option>
-                  </select>
-                  <!-- language is auto-selected based on kind; no UI shown -->
+              <p v-if="!covers.length" class="rounded-lg bg-pink-50 px-3 py-3 text-sm text-slate-500 dark:bg-slate-950">No covers yet.</p>
+              <div
+                v-for="(cover, index) in covers"
+                :key="index"
+                class="rounded-lg border border-gray-300 bg-gray-200/50 p-3 dark:border-slate-700 dark:bg-slate-950"
+              >
+                <div class="flex items-center gap-2">
+                  <input
+                    v-model="cover.id"
+                    @input="normalizeCoverVideoId(cover)"
+                    class="h-10 min-w-0 flex-1 rounded-lg border border-pink-300 bg-white px-3 text-sm outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-900 dark:focus:ring-pink-950"
+                    placeholder="Cover youtube video ID or link"
+                  />
                   <button
                     type="button"
-                    @click="removeContent(idx)"
-                    class="mt-2 inline-flex items-center rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700 sm:mt-0"
+                    @click="removeCover(index)"
+                    class="h-10 rounded-lg border border-rose-200 px-3 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:border-slate-700 dark:hover:bg-slate-800"
                   >
                     Remove
                   </button>
                 </div>
-                <textarea v-model="c.content" rows="6" class="mt-3 w-full rounded border px-3 py-2" placeholder="Lyrics or translation"></textarea>
+
+                <div class="mt-2">
+                  <ArtistInputMenu v-model="cover.artists" :search="searchArtists" :disabled="isLoading" placeholder="Search cover artists" />
+                </div>
               </div>
-              <button
-                type="button"
-                @click="addContent"
-                class="inline-flex items-center rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700"
-              >
-                Add content
-              </button>
             </div>
           </section>
 
-          <section class="rounded bg-white p-3 shadow-sm dark:bg-slate-800 sm:p-4">
-            <label class="block text-sm font-medium">References</label>
-            <div class="mt-3 space-y-2">
-              <div v-for="(r, i) in references" :key="i" class="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <input v-model="r.link" placeholder="Link (optional)" class="flex-1 rounded border px-3 py-2" />
-                <input v-model="r.name" placeholder="Name (optional)" class="w-full rounded border px-3 py-2 sm:w-48" />
-                <button
-                  type="button"
-                  @click="removeReference(i)"
-                  class="mt-2 inline-flex items-center rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700 sm:mt-0"
-                >
-                  Remove
-                </button>
+          <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white">Preview</h2>
+            <dl class="mt-3 space-y-2 text-sm">
+              <div class="flex justify-between gap-3">
+                <dt class="text-slate-500">Video</dt>
+                <dd class="truncate font-semibold">{{ videoId || '-' }}</dd>
               </div>
-              <button
-                type="button"
-                @click="addReference"
-                class="inline-flex w-full items-center justify-center rounded bg-indigo-600 px-3 py-1 text-white hover:bg-indigo-700 sm:w-auto"
-              >
-                Add reference
-              </button>
-            </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-slate-500">Title</dt>
+                <dd class="truncate font-semibold">{{ title || '-' }}</dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-slate-500">Alt</dt>
+                <dd class="font-semibold">{{ cleanAltTitles.length }}</dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-slate-500">Artists</dt>
+                <dd class="font-semibold">{{ artistIds.length }}</dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-slate-500">Covers</dt>
+                <dd class="font-semibold">{{ cleanCovers.length }}</dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-slate-500">Blocks</dt>
+                <dd class="font-semibold">{{ contents.filter((item) => item.kind && item.content).length }}</dd>
+              </div>
+              <div class="flex justify-between gap-3">
+                <dt class="text-slate-500">Unsaved</dt>
+                <dd class="font-semibold">{{ isDirty ? 'Yes' : 'No' }}</dd>
+              </div>
+            </dl>
+            <p v-if="error" class="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 dark:bg-rose-950/40 dark:text-rose-200">
+              {{ error }}
+            </p>
           </section>
-
-          <section class="rounded bg-white p-3 shadow-sm dark:bg-slate-800 sm:p-4">
-            <label class="block text-sm font-medium">Summary</label>
-            <input v-model="summary" placeholder="Short summary" class="mt-2 w-full rounded border px-3 py-2" />
-          </section>
-
-          <div class="flex items-center gap-4">
-            <button
-              type="submit"
-              :disabled="isSubmitting"
-              class="inline-flex w-full items-center justify-center rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700 sm:w-auto"
-            >
-              {{ editingId ? 'Save' : 'Submit' }}
-            </button>
-            <span v-if="success" class="text-green-600">Saved successfully</span>
-          </div>
-        </form>
-      </div>
+        </aside>
+      </form>
     </div>
   </div>
 </template>

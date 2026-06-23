@@ -41,7 +41,7 @@ const menus = [
           <span class="text-anella-dark-lavender"> {{ item.label }}</span>
         </button>
       </div>
-      <div class="w-full md:h-full md:overflow-auto">
+      <div class="mx-auto w-full max-w-[900px] md:h-full md:overflow-auto">
         <RouterView />
       </div>
     </div>
