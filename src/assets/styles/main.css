@@ -37,3 +37,11 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #ff9fc9, #c99bff);
 }
+
+.box-cover {
+  @apply rounded-xl border border-primary md:border-2;
+  box-shadow:
+    0 0 10px #ffb1ed,
+    0 0 10px #f5fcff,
+    0 0 20px #ffc1f7;
+}

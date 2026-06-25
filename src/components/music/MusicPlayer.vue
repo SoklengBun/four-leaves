@@ -38,7 +38,7 @@ const goToLyrics = () => {
   <Teleport to="body">
     <div id="yt-player" class="hidden h-full w-full" />
     <Transition>
-      <div v-if="mode !== 'off'" class="fixed bottom-0 z-[10] h-player w-full px-3.5 pb-3 pt-2 md:p-5">
+      <div v-if="mode !== 'off'" class="fixed bottom-0 z-[99] h-player w-full px-3.5 pb-3 pt-2 md:p-5">
         <div
           class="liquid mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-[#efefef] pb-5 md:rounded-2xl md:pb-0"
         >

@@ -61,7 +61,7 @@ const legacyContentKinds: Record<string, string> = {
   en: 'english',
 };
 
-const lyricId = computed(() => route.params.id?.toString() || '');
+const lyricId = ref(route.params.id?.toString() || '');
 const isEditMode = computed(() => route.name === 'lyrics-edit' && Boolean(lyricId.value));
 
 const cleanAltTitles = computed(() => altTitles.value.map((item) => item.trim()).filter(Boolean));
@@ -316,7 +316,7 @@ const applyLyricsPayload = (payload: any) => {
     artistNameById.value[artist.id] = artist.name;
   });
   const payloadArtistIds = normalizeArtistIds(payload?.artistIds ?? payload?.artist_ids ?? artists);
-
+  lyricId.value = payload?.id;
   videoId.value = String(payload?.videoId ?? payload?.video_id ?? payload?.youtubeId ?? payload?.url ?? '').trim();
   title.value = String(primaryTitle ?? '').trim();
   altTitles.value = alternateTitles.map((item: any) => String(item ?? '').trim()).filter(Boolean);
@@ -336,14 +336,9 @@ const fetchLyricsForEdit = async () => {
   error.value = null;
 
   try {
-    let { data } = await useAppFetch(`lyric/${encodeURIComponent(lyricId.value)}`)
+    const { data } = await useAppFetch(`lyrics/${encodeURIComponent(lyricId.value)}`)
       .get()
       .json();
-    if (data.value?.code !== 0) {
-      ({ data } = await useAppFetch(`lyrics/${encodeURIComponent(lyricId.value)}`)
-        .get()
-        .json());
-    }
 
     if (data.value?.code === 0) {
       applyLyricsPayload(data.value.data);
@@ -353,6 +348,7 @@ const fetchLyricsForEdit = async () => {
     const message = data.value?.message || 'Failed to load lyrics';
     error.value = message;
     showToast({ message, type: 'error' });
+    router.push({ name: 'lyrics-add' });
   } catch {
     error.value = 'Network error while loading lyrics';
     showToast({ message: error.value, type: 'error' });
@@ -407,13 +403,13 @@ const onSubmit = async () => {
   isSubmitting.value = true;
   try {
     const request = isEditMode.value
-      ? useAppFetch(`lyric/edit/${encodeURIComponent(lyricId.value)}`).put(payload)
+      ? useAppFetch(`lyrics/${encodeURIComponent(lyricId.value)}`).put(payload)
       : useAppFetch('lyrics/add').post(payload);
     const { data } = await request.json();
     if (data.value?.code === 0) {
       originalPayload.value = normalizedPayload.value;
       showToast({ message: isEditMode.value ? 'Lyrics updated' : 'Lyrics added', type: 'success' });
-      router.push({ name: 'lyrics-mine' }).catch(() => {});
+      router.replace({ name: 'lyrics-detail', params: { id: data.value.data.videoId } }).catch(() => {});
       return;
     }
 

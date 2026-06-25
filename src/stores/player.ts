@@ -1,7 +1,8 @@
 import { computed, ref, shallowRef, watch } from 'vue';
 import { defineStore } from 'pinia';
-import { useStorage } from '@vueuse/core';
 import { useRouter } from 'vue-router';
+import { useHomeStorage } from '~/utils/home-storage';
+import { getLyricsArtistLabel } from '~/utils/lyrics';
 type PlayerMode = 'off' | 'mini' | 'full';
 
 declare global {
@@ -107,8 +108,7 @@ export const usePlayer = defineStore('player', () => {
     }
 
     if (song.artist) return song.artist;
-    if (song.artists?.length) return song.artists.map((a) => a.name).join(', ');
-    return '';
+    return getLyricsArtistLabel(song);
   });
 
   const hasValidLoopRange = computed(() => {
@@ -189,11 +189,11 @@ export const usePlayer = defineStore('player', () => {
   };
 
   const selectSong = async (song: Lyrics) => {
-    let youtubeId = song.url;
+    let youtubeId = '';
     if (typeof song.url === 'string') {
       youtubeId = song.url;
     } else {
-      youtubeId = song.url?.[0].l || '';
+      youtubeId = song.url?.find((item) => extractVideoId(item.l))?.l || song.url?.[0].l || '';
     }
 
     console.log('selectSong called with:', { song, youtubeId });
@@ -257,7 +257,8 @@ export const usePlayer = defineStore('player', () => {
     document.documentElement.style.setProperty('--player-height', playerHeight);
   });
 
-  const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
+  const homeStorage = useHomeStorage();
+  const lyricsList = computed(() => homeStorage.value.data?.songs ?? []);
   const router = useRouter();
 
   const shuffle = ref(false);
@@ -326,7 +327,7 @@ export const usePlayer = defineStore('player', () => {
       const nextSong = lyricsList.value[idx];
       selectSong(nextSong);
       if (router.currentRoute.value.name === 'lyrics-detail') {
-        router.replace({ params: { id: nextSong.id } });
+        router.replace({ params: { id: nextSong.videoId } });
       }
       return;
     }
@@ -342,7 +343,7 @@ export const usePlayer = defineStore('player', () => {
     const nextSong = lyricsList.value[nextIndex];
     selectSong(nextSong);
     if (router.currentRoute.value.name === 'lyrics-detail') {
-      router.replace({ params: { id: nextSong.id } });
+      router.replace({ params: { id: nextSong.videoId } });
     }
   };
 
@@ -359,7 +360,7 @@ export const usePlayer = defineStore('player', () => {
       const prevSong = lyricsList.value[idx];
       selectSong(prevSong);
       if (router.currentRoute.value.name === 'lyrics-detail') {
-        router.replace({ params: { id: prevSong.id } });
+        router.replace({ params: { id: prevSong.videoId } });
       }
       return;
     }
@@ -374,7 +375,7 @@ export const usePlayer = defineStore('player', () => {
     const previousSong = lyricsList.value[prevIndex];
     selectSong(previousSong);
     if (router.currentRoute.value.name === 'lyrics-detail') {
-      router.replace({ params: { id: previousSong.id } });
+      router.replace({ params: { id: previousSong.videoId } });
     }
   };
 

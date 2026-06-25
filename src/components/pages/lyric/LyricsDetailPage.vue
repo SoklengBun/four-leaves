@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
 import { usePlayer } from '~/stores/player';
@@ -15,6 +14,8 @@ import ShuffleImage from '~/assets/images/player/shuffle.png';
 import RepeatImage from '~/assets/images/player/repeat.png';
 
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
+import useAppFetch from '~/services';
+import { extractYoutubeVideoId, getLyricsArtistLabel, getLyricsTitleLabel, hasLyricsContent, normalizeLyrics } from '~/utils/lyrics';
 import LoopSetting from './components/LoopSetting.vue';
 import SongCoverList from './components/SongCoverList.vue';
 
@@ -22,56 +23,79 @@ const router = useRouter();
 const player = usePlayer();
 const { src, current, isPlaying, mode, shuffle, repeatOne, currentArtist } = storeToRefs(player);
 
-const lyricsList = useStorage<Lyrics[]>('lyrics-list', []);
-const lyrics = ref<Lyrics>();
 const isExpand = ref(false);
 const selectedLink = ref('');
 const availableLang = ref<LyricsKeys[]>(['romaji']);
 const languages = ['en', 'jp', 'romaji', 'kh', 'cn', 'pinyin'];
 const currentLang = ref<LyricsKeys>('romaji');
+const displayTitle = computed(() => getLyricsTitleLabel(current.value));
+const displayArtist = computed(() => currentArtist.value);
 
-onMounted(async () => {
-  if (!lyricsList.value.length) {
-    router.replace({ name: 'lyrics' });
-  } else {
-    const id = +router.currentRoute.value.params.id;
+const applyLyrics = (song: Lyrics) => {
+  current.value = song;
 
-    const temp = lyricsList.value.find((e) => e.id === id);
+  if (typeof song.url === 'string') {
+    selectedLink.value = song.url;
+  }
 
-    if (temp) {
-      lyrics.value = temp;
+  if (typeof song.url === 'object') {
+    selectedLink.value = song.url[0]?.l || '';
+  }
 
-      if (typeof lyrics.value.url === 'string') {
-        selectedLink.value = lyrics.value.url;
-      }
+  const tempLang: LyricsKeys[] = [];
+  Object.keys(song).forEach((key) => {
+    if (languages.includes(key)) tempLang.push(key as LyricsKeys);
+  });
+  availableLang.value = tempLang;
 
-      if (typeof lyrics.value.url === 'object') {
-        selectedLink.value = lyrics.value.url[0].l;
-      }
+  const preferredLanguageOrder: LyricsKeys[] = ['romaji', 'pinyin', 'jp', 'en', 'cn'];
+  currentLang.value = preferredLanguageOrder.find((lang) => tempLang.includes(lang)) ?? tempLang[0] ?? 'romaji';
+};
 
-      // Available Language
-      let tempLang: LyricsKeys[] = [];
-      Object.keys(temp).forEach((key) => {
-        if (languages.includes(key)) tempLang.push(key as LyricsKeys);
-      });
-      availableLang.value = tempLang;
+const fetchLyricsDetail = async (id: string) => {
+  const { data } = await useAppFetch(`lyrics/${encodeURIComponent(id)}`)
+    .get()
+    .json();
 
-      if (tempLang.includes('romaji')) {
-        currentLang.value = 'romaji';
-      }
+  if (data.value?.code !== 0 || !data.value.data) return null;
 
-      if (tempLang.includes('pinyin')) {
-        currentLang.value = 'pinyin';
-      }
-    }
+  const normalized = normalizeLyrics(data.value.data);
+  applyLyrics(normalized);
+  return normalized;
+};
+
+const syncLyricsByRoute = async (id: string) => {
+  const routeId = Number(id);
+  const currentSong = current.value;
+
+  if (currentSong?.id === routeId) {
+    applyLyrics(currentSong);
+    if (hasLyricsContent(currentSong)) return;
+  }
+
+  await fetchLyricsDetail(id);
+};
+
+onMounted(() => {
+  const id = router.currentRoute.value.params.id;
+  if (typeof id === 'string' && id) {
+    syncLyricsByRoute(id);
   }
 });
 
 watch(
+  () => router.currentRoute.value.params.id,
+  (id, previousId) => {
+    if (typeof id !== 'string' || !id || id === previousId) return;
+    syncLyricsByRoute(id);
+  },
+);
+
+watch(
   () => player.isReady,
   () => {
-    if (!player.src && lyrics.value) {
-      player.selectSong(lyrics.value);
+    if (!player.src && current.value) {
+      player.selectSong(current.value);
     }
   },
 );
@@ -103,59 +127,83 @@ const togglePlay = () => {
     player.play();
   }
 };
+
+const edit = () => {
+  router.push({ name: 'lyrics-edit', params: { id: current.value?.id } });
+};
 </script>
 
 <template>
-  <div class="flex h-full w-full flex-col items-center overflow-hidden">
-    <div class="flex h-full w-full flex-col items-center overflow-auto overscroll-none px-3 pb-player pt-3">
-      <button
-        type="button"
-        class="fluffy-back-btn sticky top-0 z-20 mr-auto flex size-[40px] shrink-0 items-center justify-center md:hidden"
-        aria-label="Go back"
-        @click="back"
-      >
-        <span class="fluffy-back-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M14.5 6.5L9 12L14.5 17.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-      </button>
+  <div class="flex h-full min-h-[80vh] w-full flex-col items-center px-3 pb-1 pt-3">
+    <button
+      type="button"
+      class="fluffy-back-btn fixed left-3 top-3 z-20 mr-auto flex size-[40px] shrink-0 items-center justify-center md:hidden"
+      aria-label="Go back"
+      @click="back"
+    >
+      <span class="fluffy-back-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14.5 6.5L9 12L14.5 17.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+    </button>
 
-      <div class="lyrics-box-cover relative mt-[-20px] size-[150px] shrink-0 overflow-hidden rounded-lg border bg-gray-100 md:mt-5">
-        <YoutubeThumbnail :id="src" />
-        <SongCoverList />
-      </div>
-      <div class="mt-2 flex h-[50px] w-full shrink-0 flex-col items-center justify-center space-y-1 px-2">
-        <MarqueeText :text="current?.title" class="min-w-0 flex-1 shrink-0 text-lg font-bold" :gap="50" />
-        <MarqueeText :text="currentArtist" class="min-w-0 flex-1 shrink-0 text-sm font-bold text-gray-500" :gap="50" />
-      </div>
+    <button
+      type="button"
+      class="fluffy-back-btn fixed right-3 top-3 z-20 mr-auto flex size-[40px] shrink-0 items-center justify-center md:hidden"
+      aria-label="Edit lyrics"
+      @click="edit"
+    >
+      <span class="fluffy-back-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M4 20H8L18.5 9.5C19.3284 8.67157 19.3284 7.32843 18.5 6.5C17.6716 5.67157 16.3284 5.67157 15.5 6.5L5 17V20Z"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path d="M13.5 8.5L16.5 11.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+    </button>
 
-      <div class="mt-3 w-[340px] md:w-[450px]">
-        <PlayerSeekBar time-class="text-xs text-gray-500" />
+    <div class="relative mt-5 size-[150px] shrink-0">
+      <YoutubeThumbnail :id="extractYoutubeVideoId(src)" class="box-cover overflow-hidden rounded-lg" />
+      <SongCoverList />
+    </div>
+    <div
+      class="mt-2 flex h-[50px] w-full max-w-[340px] shrink-0 flex-col items-center justify-center space-y-1 overflow-hidden px-2 md:max-w-[450px]"
+    >
+      <MarqueeText :text="displayTitle" class="w-full min-w-0 shrink-0 text-center text-lg font-bold" :gap="50" />
+      <MarqueeText :text="displayArtist" class="w-full min-w-0 shrink-0 text-center text-sm font-bold text-gray-500" :gap="50" />
+    </div>
 
-        <div class="flex w-full items-center justify-center">
-          <div class="flex flex-1"></div>
-          <button class="mr-4 size-4 md:mr-8 md:size-6" @click="player.toggleShuffle()" :class="{ 'opacity-50': !shuffle }">
-            <img :src="ShuffleImage" />
-          </button>
-          <button class="size-6 md:size-8" @click="player.playPrevious()"><img :src="PrevImage" /></button>
-          <button class="mx-4 size-7 md:mx-10 md:size-10" @click="togglePlay"><img :src="isPlaying ? PauseImage : PlayImage" /></button>
-          <button class="size-6 md:size-8" @click="player.playNext()"><img :src="NextImage" /></button>
-          <button class="ml-4 size-4 md:ml-8 md:size-6" @click="player.toggleRepeatOne()" :class="{ 'opacity-50': !repeatOne }">
-            <img :src="RepeatImage" />
-          </button>
+    <div class="mt-3 w-[340px] md:w-[450px]">
+      <PlayerSeekBar time-class="text-xs text-gray-500" />
 
-          <div class="flex flex-1 justify-end">
-            <LoopSetting />
-          </div>
+      <div class="flex w-full items-center justify-center">
+        <div class="flex flex-1"></div>
+        <button class="mr-4 size-4 md:mr-8 md:size-6" @click="player.toggleShuffle()" :class="{ 'opacity-50': !shuffle }">
+          <img :src="ShuffleImage" />
+        </button>
+        <button class="size-6 md:size-8" @click="player.playPrevious()"><img :src="PrevImage" /></button>
+        <button class="mx-4 size-7 md:mx-10 md:size-10" @click="togglePlay"><img :src="isPlaying ? PauseImage : PlayImage" /></button>
+        <button class="size-6 md:size-8" @click="player.playNext()"><img :src="NextImage" /></button>
+        <button class="ml-4 size-4 md:ml-8 md:size-6" @click="player.toggleRepeatOne()" :class="{ 'opacity-50': !repeatOne }">
+          <img :src="RepeatImage" />
+        </button>
+
+        <div class="flex flex-1 justify-end">
+          <LoopSetting />
         </div>
       </div>
+    </div>
 
-      <div class="lyrics-box-cover mt-5 w-full flex-1 rounded-t-2xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-b-2xl md:pb-6 md:pt-6">
-        <p class="h-fit whitespace-pre-line text-center text-base lowercase">
-          {{ current?.[currentLang] }}
-        </p>
-      </div>
+    <div class="box-cover mt-5 w-full flex-1 rounded-t-2xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-b-2xl md:pb-6 md:pt-6">
+      <p class="h-fit whitespace-pre-line text-center text-base lowercase">
+        {{ current?.[currentLang] }}
+      </p>
     </div>
   </div>
 </template>
@@ -165,14 +213,6 @@ const togglePlay = () => {
   box-shadow:
     0px 2px 4px 4px #ff8b8b inset,
     0px 2px 4px 4px #ff3636;
-}
-
-.lyrics-box-cover {
-  @apply rounded-xl border border-primary md:border-2;
-  box-shadow:
-    0 0 10px #ffb1ed,
-    0 0 10px #f5fcff,
-    0 0 20px #ffc1f7;
 }
 
 .fluffy-back-btn {

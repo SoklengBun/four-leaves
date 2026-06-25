@@ -2,7 +2,9 @@
 import { onClickOutside, useMediaQuery } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
+import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
 import { usePlayer } from '~/stores/player';
+import { getLyricsTitleLabel } from '~/utils/lyrics';
 
 const player = usePlayer();
 const { current, src } = storeToRefs(player);
@@ -18,6 +20,7 @@ const versions = computed(() => {
 });
 
 const hasVersions = computed(() => versions.value.length > 1);
+const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 
 const extractVideoId = (value: string) => {
   if (!value) return '';
@@ -37,11 +40,6 @@ const extractVideoId = (value: string) => {
     return '';
   }
   return '';
-};
-
-const thumbnailUrl = (videoUrl: string) => {
-  const id = extractVideoId(videoUrl);
-  return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : '';
 };
 
 const isActive = (videoUrl: string) => extractVideoId(videoUrl) === extractVideoId(src.value);
@@ -90,7 +88,7 @@ onClickOutside(
     <div
       v-if="isOpen && !isMobile"
       ref="panelRef"
-      class="absolute left-0 top-full z-30 mt-2 flex max-h-[70vh] w-[280px] flex-col overflow-hidden rounded-xl border border-[#ffd5eb] bg-white shadow-[0_8px_24px_#ff8bc44d]"
+      class="box-cover absolute -top-2 left-[calc(100%+0.5rem)] z-30 mt-2 flex max-h-[70vh] w-[280px] flex-col overflow-hidden rounded-xl bg-white"
     >
       <p class="border-b border-[#fff0f8] px-3 py-2 text-xs font-semibold text-[#ff4f9b]">Versions ({{ versions.length }})</p>
       <ul class="min-h-0 flex-1 overflow-y-auto">
@@ -102,15 +100,10 @@ onClickOutside(
           @click="selectVersion(item)"
         >
           <div class="relative size-12 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-            <img :src="thumbnailUrl(item.l)" class="size-full object-cover" alt="" />
-            <div v-if="isActive(item.l)" class="absolute inset-0 flex items-center justify-center rounded-lg bg-[#ff4f9b55]">
-              <svg class="size-4 text-white drop-shadow" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
+            <YoutubeThumbnail :id="extractVideoId(item.l)" />
           </div>
           <div class="min-w-0 flex-1">
-            <p class="truncate text-xs font-semibold text-[#1f1f1f]">{{ current?.title }}</p>
+            <p class="truncate text-xs font-semibold text-[#1f1f1f]">{{ displayTitle }}</p>
             <p class="truncate text-[11px] text-[#6b7280]">{{ item.a }}</p>
           </div>
           <svg v-if="isActive(item.l)" class="size-3.5 shrink-0 text-[#ff4f9b]" viewBox="0 0 24 24" fill="currentColor">
@@ -133,7 +126,7 @@ onClickOutside(
     >
       <div class="flex h-full max-h-[70vh] flex-col p-4">
         <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[#ffc5e4]"></div>
-        <p class="mb-3 text-sm font-semibold text-[#ff4f9b]">Versions ({{ versions.length }})</p>
+        <p class="mb-3 text-sm font-semibold text-[#ff4f9b]">Covers ({{ versions.length }})</p>
         <ul class="min-h-0 flex-1 space-y-2 overflow-y-auto">
           <li
             v-for="(item, i) in versions"
@@ -143,15 +136,10 @@ onClickOutside(
             @click="selectVersion(item)"
           >
             <div class="relative size-14 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-              <img :src="thumbnailUrl(item.l)" class="size-full object-cover" alt="" />
-              <div v-if="isActive(item.l)" class="absolute inset-0 flex items-center justify-center rounded-xl bg-[#ff4f9b55]">
-                <svg class="size-5 text-white drop-shadow" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
+              <YoutubeThumbnail :id="extractVideoId(item.l)" />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-semibold text-[#1f1f1f]">{{ current?.title }}</p>
+              <p class="truncate text-sm font-semibold text-[#1f1f1f]">{{ displayTitle }}</p>
               <p class="truncate text-xs text-[#6b7280]">{{ item.a }}</p>
             </div>
             <svg v-if="isActive(item.l)" class="size-4 shrink-0 text-[#ff4f9b]" viewBox="0 0 24 24" fill="currentColor">
