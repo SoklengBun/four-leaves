@@ -33,7 +33,7 @@ const menus = [
 </script>
 
 <template>
-  <div class="flex h-body w-full flex-col overflow-auto overscroll-none md:overflow-hidden">
+  <div class="flex h-body w-full flex-col overflow-hidden">
     <div class="flex h-full w-full">
       <div class="hidden h-full w-[300px] bg-red-50 md:block">
         <button v-for="item in menus" :key="item.name" class="flex w-full items-center space-x-3 border-b px-5 py-2">
@@ -41,8 +41,10 @@ const menus = [
           <span class="text-anella-dark-lavender"> {{ item.label }}</span>
         </button>
       </div>
-      <div class="mx-auto w-full max-w-[900px] md:h-full md:overflow-auto">
-        <RouterView />
+      <div class="h-full w-full overflow-auto">
+        <div class="mx-auto w-full max-w-[900px] pb-player">
+          <RouterView />
+        </div>
       </div>
     </div>
   </div>

@@ -9,21 +9,28 @@ const props = defineProps<{
 const src = ref(defaultImage);
 
 async function loadThumbnail(videoId: string) {
-  const url = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+  const urls = [
+    `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
+  ];
 
-  try {
-    const res = await fetch(url);
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
 
-    if (!res.ok) {
-      src.value = defaultImage;
+      if (!res.ok) {
+        continue;
+      }
+
+      const blob = await res.blob();
+      src.value = URL.createObjectURL(blob);
       return;
+    } catch {
+      continue;
     }
-
-    const blob = await res.blob();
-    src.value = URL.createObjectURL(blob);
-  } catch {
-    src.value = defaultImage;
   }
+
+  src.value = defaultImage;
 }
 
 watch(

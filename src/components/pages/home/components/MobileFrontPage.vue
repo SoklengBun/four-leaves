@@ -8,7 +8,7 @@ const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home
 <template>
   <div class="mobile-front-container flex flex-col overflow-y-auto overflow-x-hidden overscroll-none p-3">
     <div class="background-image" />
-    <div class="relative z-[2] flex flex-col">
+    <div class="relative z-[2] flex flex-col pb-player">
       <img src="https://redive.estertion.win/card/full/124131.webp" class="box-cover h-[200px] w-full rounded-lg" />
 
       <BatteryWeather class="box-cover mt-3" />

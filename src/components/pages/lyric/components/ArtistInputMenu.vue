@@ -205,7 +205,7 @@ onBeforeUnmount(() => {
         v-model="query"
         :disabled="disabled"
         :placeholder="modelValue.length ? '' : placeholder || 'Search artists'"
-        class="h-7 min-w-[140px] flex-1 bg-transparent px-1 outline-none placeholder:text-slate-400 disabled:cursor-not-allowed"
+        class="h-7 min-w-[40px] flex-1 bg-transparent px-1 outline-none placeholder:text-slate-400 disabled:cursor-not-allowed"
         @focus="isOpen = true"
         @keydown="onKeydown"
       />
