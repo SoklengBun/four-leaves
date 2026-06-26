@@ -10,11 +10,12 @@ import { usePlayer } from '~/stores/player';
 import PlayerSeekBar from './PlayerSeekBar.vue';
 import YoutubeThumbnail from './YoutubeThumbnail.vue';
 import { useRouter } from 'vue-router';
+import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics.js';
 
 const router = useRouter();
 
 const player = usePlayer();
-const { mode, current, src, isPlaying, currentArtist } = storeToRefs(player);
+const { mode, current, videoId, artists, isPlaying } = storeToRefs(player);
 
 const togglePlay = () => {
   if (mode.value === 'off') return;
@@ -44,11 +45,11 @@ const goToLyrics = () => {
         >
           <div class="relative z-10 flex h-fit flex-1 items-center space-x-1 overflow-hidden px-2 md:space-x-3 md:px-4">
             <div class="size-10 overflow-hidden rounded-lg border border-primary bg-gray-300 md:size-16 md:rounded-xl">
-              <YoutubeThumbnail :id="src" @click="goToLyrics" />
+              <YoutubeThumbnail :id="videoId" @click="goToLyrics" />
             </div>
             <div class="relative z-10 flex h-fit flex-1 flex-col justify-center overflow-hidden px-2 md:px-4">
-              <MarqueeText :text="current?.title" class="w-full min-w-0 text-sm font-semibold md:text-base" :gap="50" />
-              <MarqueeText :text="currentArtist" class="w-full min-w-0 text-xs text-gray-500" :gap="50" />
+              <MarqueeText :text="getLyricsTitleLabel(current)" class="w-full min-w-0 text-sm font-semibold md:text-base" :gap="50" />
+              <MarqueeText :text="getLyricsArtistsLabel(artists)" class="w-full min-w-0 text-xs text-gray-500" :gap="50" />
             </div>
           </div>
 

@@ -4,13 +4,7 @@ import { useLocalStorage } from '@vueuse/core';
 import { userLogin, userQuickLogin, userSignUp } from '~/services/user';
 import type { LoginForm, SignUpForm } from '~/services/user';
 import showToast from '~/utils/toast';
-
-type User = {
-  id: number;
-  createdAt: string;
-  name: string;
-  role: number;
-};
+import type { User } from '~/types/user';
 
 export const useAuth = defineStore('auth', () => {
   const token = useLocalStorage<string | null>('auth_token', null);

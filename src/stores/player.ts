@@ -1,31 +1,6 @@
 import { computed, ref, shallowRef, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
-import { useHomeStorage } from '~/utils/home-storage';
-import { getLyricsArtistLabel } from '~/utils/lyrics';
-type PlayerMode = 'off' | 'mini' | 'full';
-
-declare global {
-  interface Window {
-    YT?: {
-      Player: new (elementId: string, options: Record<string, unknown>) => YTPlayer;
-      PlayerState: {
-        PLAYING: number;
-      };
-    };
-    onYouTubeIframeAPIReady?: () => void;
-  }
-}
-
-type YTPlayer = {
-  playVideo: () => void;
-  pauseVideo: () => void;
-  seekTo: (seconds: number, allowSeekAhead?: boolean) => void;
-  loadVideoById: (videoId: string) => void;
-  getCurrentTime: () => number;
-  getDuration: () => number;
-  destroy: () => void;
-};
 
 let ytApiPromise: Promise<void> | null = null;
 
@@ -53,62 +28,36 @@ const loadYoutubeApi = () => {
   return ytApiPromise;
 };
 
-const extractVideoId = (value: string) => {
-  if (!value) return '';
-  const v = value.trim();
-
-  if (/^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
-
-  try {
-    const url = new URL(v);
-    if (url.hostname.includes('youtu.be')) return url.pathname.slice(1);
-    if (url.hostname.includes('youtube.com')) {
-      const byQuery = url.searchParams.get('v');
-      if (byQuery) return byQuery;
-
-      const parts = url.pathname.split('/');
-      const embedIdx = parts.findIndex((p) => p === 'embed');
-      if (embedIdx >= 0) return parts[embedIdx + 1] || '';
-    }
-  } catch {
-    return '';
-  }
-
-  return '';
-};
-
 export const usePlayer = defineStore('player', () => {
-  const src = ref('');
   const current = ref<Lyrics | null>(null);
+  const videoId = ref<string>('');
+  const artists = ref<LyricsArtist[]>([]);
+
   const player = shallowRef<YTPlayer | null>(null);
   const isReady = ref(false);
   const isPlaying = ref(false);
   const songEnded = ref(false);
   const currentTime = ref(0);
   const duration = ref(0);
+
   const mode = ref<PlayerMode>('off');
+
   const loopEnabled = ref(false);
   const loopPointA = ref<number | null>(null);
   const loopPointB = ref<number | null>(null);
+
+  const shuffle = ref(false);
+  const repeatOne = ref(false);
+
+  const showPlaylist = ref(false);
+  const playlist = ref<Playlist | null>(null);
+  const router = useRouter();
 
   let timer: number | null = null;
 
   const progress = computed(() => {
     if (!duration.value) return 0;
     return (currentTime.value / duration.value) * 100;
-  });
-
-  const currentArtist = computed(() => {
-    const song = current.value;
-    if (!song) return '';
-
-    if (Array.isArray(song.url)) {
-      const active = song.url.find((item) => extractVideoId(item.l) === extractVideoId(src.value));
-      if (active?.a) return active.a;
-    }
-
-    if (song.artist) return song.artist;
-    return getLyricsArtistLabel(song);
   });
 
   const hasValidLoopRange = computed(() => {
@@ -155,7 +104,7 @@ export const usePlayer = defineStore('player', () => {
     player.value = new window.YT.Player(containerId, {
       height: '0',
       width: '0',
-      videoId: extractVideoId(src.value),
+      videoId: videoId.value,
       playerVars: {
         controls: 0,
         rel: 0,
@@ -180,7 +129,7 @@ export const usePlayer = defineStore('player', () => {
         },
         onError: (e: any) => {
           console.log('YT error', e.data);
-          console.log('current src', src.value);
+          console.log('current videoId', videoId.value);
         },
       },
     });
@@ -188,23 +137,30 @@ export const usePlayer = defineStore('player', () => {
     console.log('YT Player initialized', player.value);
   };
 
-  const selectSong = async (song: Lyrics) => {
-    let youtubeId = '';
-    if (typeof song.url === 'string') {
-      youtubeId = song.url;
-    } else {
-      youtubeId = song.url?.find((item) => extractVideoId(item.l))?.l || song.url?.[0].l || '';
+  const selectSong = async (song: Lyrics, coverId?: string, selectedPlaylist?: Playlist | null) => {
+    console.log('selectSong called with:', song);
+
+    const selectedId = coverId ?? song.videoId;
+
+    if (selectedPlaylist !== undefined) {
+      playlist.value = selectedPlaylist;
     }
 
-    console.log('selectSong called with:', { song, youtubeId });
-    if (src.value === youtubeId) return;
-    src.value = youtubeId;
+    if (videoId.value === selectedId) return;
+
+    videoId.value = selectedId;
     current.value = song;
-    console.log('Selected song:', song);
-    const videoId = extractVideoId(youtubeId);
-    if (!videoId || !player.value || !isReady.value) return;
-    console.log('videoId', videoId);
-    player.value.loadVideoById(videoId);
+
+    if (coverId) {
+      const cover = song.covers?.find((c) => c.id === coverId);
+      artists.value = cover?.artists ?? [];
+    } else {
+      artists.value = song.artists;
+    }
+
+    if (!videoId.value || !player.value || !isReady.value) return;
+
+    player.value.loadVideoById(videoId.value);
     player.value.playVideo();
 
     if (mode.value === 'off') mode.value = 'full';
@@ -212,13 +168,9 @@ export const usePlayer = defineStore('player', () => {
     clearLoopRange();
   };
 
-  const play = () => {
-    player.value?.playVideo();
-  };
+  const play = () => player.value?.playVideo();
 
-  const pause = () => {
-    player.value?.pauseVideo();
-  };
+  const pause = () => player.value?.pauseVideo();
 
   const seekTo = (time: number) => {
     player.value?.seekTo(Math.max(0, time), true);
@@ -257,13 +209,6 @@ export const usePlayer = defineStore('player', () => {
     document.documentElement.style.setProperty('--player-height', playerHeight);
   });
 
-  const homeStorage = useHomeStorage();
-  const lyricsList = computed(() => homeStorage.value.data?.songs ?? []);
-  const router = useRouter();
-
-  const shuffle = ref(false);
-  const repeatOne = ref(false);
-
   const toggleShuffle = () => {
     shuffle.value = !shuffle.value;
   };
@@ -298,18 +243,10 @@ export const usePlayer = defineStore('player', () => {
     loopEnabled.value = !loopEnabled.value;
   };
 
-  const switchVersion = (videoUrl: string) => {
-    const videoId = extractVideoId(videoUrl);
-    if (!videoId || !player.value || !isReady.value) return;
-    src.value = videoUrl;
-    clearLoopRange();
-    player.value.loadVideoById(videoId);
-    player.value.playVideo();
-  };
-
   const playNext = (fromSongEnd = false) => {
-    if (!lyricsList.value.length || !current.value) return;
-    const currentIndex = lyricsList.value.findIndex((s) => s.id === current.value?.id);
+    const lyricsList = playlist.value?.items ?? [];
+    if (!lyricsList.length || !current.value) return;
+    const currentIndex = lyricsList.findIndex((s) => s.id === current.value?.id);
 
     // Repeat current song
     if (repeatOne.value && fromSongEnd) {
@@ -319,12 +256,12 @@ export const usePlayer = defineStore('player', () => {
     }
 
     // Shuffle -> pick random different song when possible
-    if (shuffle.value && lyricsList.value.length > 1) {
+    if (shuffle.value && lyricsList.length > 1) {
       let idx = currentIndex;
       while (idx === currentIndex) {
-        idx = Math.floor(Math.random() * lyricsList.value.length);
+        idx = Math.floor(Math.random() * lyricsList.length);
       }
-      const nextSong = lyricsList.value[idx];
+      const nextSong = lyricsList[idx];
       selectSong(nextSong);
       if (router.currentRoute.value.name === 'lyrics-detail') {
         router.replace({ params: { id: nextSong.videoId } });
@@ -334,13 +271,11 @@ export const usePlayer = defineStore('player', () => {
 
     // Normal sequential next
     let nextIndex = currentIndex + 1;
-    if (nextIndex >= lyricsList.value.length) {
-      // End of list and no repeat -> stop playback
-      pause();
-      return;
+    if (nextIndex >= lyricsList.length) {
+      nextIndex = 0;
     }
 
-    const nextSong = lyricsList.value[nextIndex];
+    const nextSong = lyricsList[nextIndex];
     selectSong(nextSong);
     if (router.currentRoute.value.name === 'lyrics-detail') {
       router.replace({ params: { id: nextSong.videoId } });
@@ -348,16 +283,17 @@ export const usePlayer = defineStore('player', () => {
   };
 
   const playPrevious = () => {
-    if (!lyricsList.value.length || !current.value) return;
-    const currentIndex = lyricsList.value.findIndex((s) => s.id === current.value?.id);
+    const lyricsList = playlist.value?.items ?? [];
+    if (!lyricsList.length || !current.value) return;
+    const currentIndex = lyricsList.findIndex((s) => s.id === current.value?.id);
 
     // Shuffle -> pick random different song when possible
-    if (shuffle.value && lyricsList.value.length > 1) {
+    if (shuffle.value && lyricsList.length > 1) {
       let idx = currentIndex;
       while (idx === currentIndex) {
-        idx = Math.floor(Math.random() * lyricsList.value.length);
+        idx = Math.floor(Math.random() * lyricsList.length);
       }
-      const prevSong = lyricsList.value[idx];
+      const prevSong = lyricsList[idx];
       selectSong(prevSong);
       if (router.currentRoute.value.name === 'lyrics-detail') {
         router.replace({ params: { id: prevSong.videoId } });
@@ -367,12 +303,10 @@ export const usePlayer = defineStore('player', () => {
 
     let prevIndex = currentIndex - 1;
     if (prevIndex < 0) {
-      // Start of list and no repeat -> stop playback
-      pause();
-      return;
+      prevIndex = lyricsList.length - 1;
     }
 
-    const previousSong = lyricsList.value[prevIndex];
+    const previousSong = lyricsList[prevIndex];
     selectSong(previousSong);
     if (router.currentRoute.value.name === 'lyrics-detail') {
       router.replace({ params: { id: previousSong.videoId } });
@@ -384,7 +318,8 @@ export const usePlayer = defineStore('player', () => {
   });
 
   return {
-    src,
+    videoId,
+    artists,
     current,
     isReady,
     isPlaying,
@@ -409,11 +344,11 @@ export const usePlayer = defineStore('player', () => {
     hasValidLoopRange,
     toggleShuffle,
     toggleRepeatOne,
-    currentArtist,
     setLoopPointA,
     setLoopPointB,
     clearLoopRange,
     toggleLoopEnabled,
-    switchVersion,
+    showPlaylist,
+    playlist,
   };
 });

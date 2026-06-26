@@ -15,71 +15,37 @@ import RepeatImage from '~/assets/images/player/repeat.png';
 
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
 import useAppFetch from '~/services';
-import { extractYoutubeVideoId, getLyricsArtistLabel, getLyricsTitleLabel, hasLyricsContent, normalizeLyrics } from '~/utils/lyrics';
+import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
 import LoopSetting from './components/LoopSetting.vue';
 import SongCoverList from './components/SongCoverList.vue';
+import { getLyricsById } from '~/services/lyrics.js';
 
 const router = useRouter();
 const player = usePlayer();
-const { src, current, isPlaying, mode, shuffle, repeatOne, currentArtist } = storeToRefs(player);
+const { videoId, artists, current, isPlaying, mode, shuffle, repeatOne, showPlaylist } = storeToRefs(player);
 
-const isExpand = ref(false);
-const selectedLink = ref('');
-const availableLang = ref<LyricsKeys[]>(['romaji']);
-const languages = ['en', 'jp', 'romaji', 'kh', 'cn', 'pinyin'];
 const currentLang = ref<LyricsKeys>('romaji');
+const isLoading = ref(false);
 const displayTitle = computed(() => getLyricsTitleLabel(current.value));
-const displayArtist = computed(() => currentArtist.value);
-
-const applyLyrics = (song: Lyrics) => {
-  current.value = song;
-
-  if (typeof song.url === 'string') {
-    selectedLink.value = song.url;
-  }
-
-  if (typeof song.url === 'object') {
-    selectedLink.value = song.url[0]?.l || '';
-  }
-
-  const tempLang: LyricsKeys[] = [];
-  Object.keys(song).forEach((key) => {
-    if (languages.includes(key)) tempLang.push(key as LyricsKeys);
-  });
-  availableLang.value = tempLang;
-
-  const preferredLanguageOrder: LyricsKeys[] = ['romaji', 'pinyin', 'jp', 'en', 'cn'];
-  currentLang.value = preferredLanguageOrder.find((lang) => tempLang.includes(lang)) ?? tempLang[0] ?? 'romaji';
-};
+const displayArtist = computed(() => getLyricsArtistsLabel(artists.value));
+const lyricsContent = computed(() => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content ?? '');
 
 const fetchLyricsDetail = async (id: string) => {
-  const { data } = await useAppFetch(`lyrics/${encodeURIComponent(id)}`)
-    .get()
-    .json();
-
-  if (data.value?.code !== 0 || !data.value.data) return null;
-
-  const normalized = normalizeLyrics(data.value.data);
-  applyLyrics(normalized);
-  return normalized;
-};
-
-const syncLyricsByRoute = async (id: string) => {
-  const routeId = Number(id);
-  const currentSong = current.value;
-
-  if (currentSong?.id === routeId) {
-    applyLyrics(currentSong);
-    if (hasLyricsContent(currentSong)) return;
+  isLoading.value = true;
+  try {
+    const song = await getLyricsById(id);
+    if (!song) return null;
+    current.value = song;
+    return song;
+  } finally {
+    isLoading.value = false;
   }
-
-  await fetchLyricsDetail(id);
 };
 
 onMounted(() => {
   const id = router.currentRoute.value.params.id;
   if (typeof id === 'string' && id) {
-    syncLyricsByRoute(id);
+    fetchLyricsDetail(id);
   }
 });
 
@@ -87,35 +53,21 @@ watch(
   () => router.currentRoute.value.params.id,
   (id, previousId) => {
     if (typeof id !== 'string' || !id || id === previousId) return;
-    syncLyricsByRoute(id);
+    fetchLyricsDetail(id);
   },
 );
 
 watch(
   () => player.isReady,
   () => {
-    if (!player.src && current.value) {
+    if (!player.videoId && current.value) {
       player.selectSong(current.value);
     }
   },
 );
 
-const onPlay = () => {
-  isExpand.value = !isExpand.value;
-};
-
 const back = () => {
   router.back();
-};
-
-const onChangeLink = (link: string) => {
-  if (selectedLink.value === link) return;
-
-  selectedLink.value = link;
-};
-
-const switchLang = (lang: keyof Lyrics) => {
-  currentLang.value = lang;
 };
 
 const togglePlay = () => {
@@ -129,7 +81,8 @@ const togglePlay = () => {
 };
 
 const edit = () => {
-  router.push({ name: 'lyrics-edit', params: { id: current.value?.id } });
+  showPlaylist.value = true;
+  // router.push({ name: 'lyrics-edit', params: { id: current.value?.id } });
 };
 </script>
 
@@ -169,7 +122,7 @@ const edit = () => {
     </button>
 
     <div class="relative mt-5 size-[150px] shrink-0">
-      <YoutubeThumbnail :id="extractYoutubeVideoId(src)" class="box-cover overflow-hidden rounded-lg" />
+      <YoutubeThumbnail :id="videoId" class="box-cover overflow-hidden rounded-lg" />
       <SongCoverList />
     </div>
     <div
@@ -200,9 +153,27 @@ const edit = () => {
       </div>
     </div>
 
-    <div class="box-cover mt-5 w-full flex-1 rounded-t-2xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-b-2xl md:pb-6 md:pt-6">
+    <div v-if="isLoading" class="fluffy-loading flex min-h-[220px] flex-col items-center justify-center px-6 text-center">
+      <div class="fluffy-loading-cloud" aria-hidden="true">
+        <span class="fluffy-loading-ear fluffy-loading-ear-left"></span>
+        <span class="fluffy-loading-ear fluffy-loading-ear-right"></span>
+        <span class="fluffy-loading-face">
+          <span class="fluffy-loading-eye"></span>
+          <span class="fluffy-loading-eye"></span>
+          <span class="fluffy-loading-mouth"></span>
+        </span>
+      </div>
+      <div class="mt-5 flex items-center gap-2 text-sm font-semibold text-[#ff7cb4]">
+        <span>Fetching lyrics</span>
+        <span class="fluffy-loading-dot"></span>
+        <span class="fluffy-loading-dot"></span>
+        <span class="fluffy-loading-dot"></span>
+      </div>
+    </div>
+
+    <div v-else class="box-cover mt-5 w-full flex-1 rounded-t-2xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-b-2xl md:pb-6 md:pt-6">
       <p class="h-fit whitespace-pre-line text-center text-base lowercase">
-        {{ current?.[currentLang] }}
+        {{ lyricsContent || 'No lyrics available' }}
       </p>
     </div>
   </div>
@@ -260,5 +231,163 @@ const edit = () => {
   box-shadow:
     0 0 0 1px #ffd2ea,
     0 0 6px #fff7fc;
+}
+
+.fluffy-loading-cloud {
+  position: relative;
+  display: flex;
+  height: 88px;
+  width: 122px;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #ffd3e7;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #fffafd 0%, #ffeef7 100%);
+  box-shadow:
+    0 14px 24px rgb(255 197 223 / 0.45),
+    inset 0 -8px 14px rgb(255 230 241 / 0.95);
+  animation: fluffy-float 1.8s ease-in-out infinite;
+}
+
+.fluffy-loading-cloud::before,
+.fluffy-loading-cloud::after {
+  content: '';
+  position: absolute;
+  bottom: 10px;
+  border: 3px solid #ffd3e7;
+  border-radius: 9999px;
+  background: linear-gradient(180deg, #fffafd 0%, #ffeef7 100%);
+}
+
+.fluffy-loading-cloud::before {
+  left: 10px;
+  height: 48px;
+  width: 48px;
+}
+
+.fluffy-loading-cloud::after {
+  right: 10px;
+  height: 58px;
+  width: 58px;
+}
+
+.fluffy-loading-ear {
+  position: absolute;
+  top: -9px;
+  z-index: -1;
+  height: 24px;
+  width: 24px;
+  border: 3px solid #ffd3e7;
+  border-radius: 9999px 9999px 10px 10px;
+  background: #fff5fb;
+}
+
+.fluffy-loading-ear-left {
+  left: 24px;
+  transform: rotate(-16deg);
+}
+
+.fluffy-loading-ear-right {
+  right: 24px;
+  transform: rotate(16deg);
+}
+
+.fluffy-loading-face {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.fluffy-loading-eye {
+  height: 10px;
+  width: 10px;
+  border-radius: 9999px;
+  background: #ff78af;
+  animation: fluffy-blink 2.4s ease-in-out infinite;
+}
+
+.fluffy-loading-mouth {
+  position: relative;
+  height: 14px;
+  width: 18px;
+}
+
+.fluffy-loading-mouth::before,
+.fluffy-loading-mouth::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  height: 12px;
+  width: 10px;
+  border-bottom: 3px solid #ff78af;
+  border-radius: 0 0 9999px 9999px;
+}
+
+.fluffy-loading-mouth::before {
+  left: -1px;
+  transform: rotate(12deg);
+}
+
+.fluffy-loading-mouth::after {
+  right: -1px;
+  transform: rotate(-12deg);
+}
+
+.fluffy-loading-dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 9999px;
+  background: #ff9bc4;
+  animation: fluffy-bounce 1s ease-in-out infinite;
+}
+
+.fluffy-loading-dot:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.fluffy-loading-dot:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.fluffy-loading-dot:nth-child(4) {
+  animation-delay: 0.36s;
+}
+
+@keyframes fluffy-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fluffy-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+@keyframes fluffy-blink {
+  0%,
+  42%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  46%,
+  50% {
+    transform: scaleY(0.2);
+  }
 }
 </style>

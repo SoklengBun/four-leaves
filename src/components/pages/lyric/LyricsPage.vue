@@ -6,8 +6,8 @@ import LyricsSongShelf from './components/LyricsSongShelf.vue';
 import useAppFetch from '~/services';
 import { useAppSetting } from '~/stores/app-setting';
 import { usePlayer } from '~/stores/player';
-import { getTodayStorageDate, useHomeStorage, type HomePlaylist } from '~/utils/home-storage';
-import { getLyricsArtistLabel, normalizeLyrics, type HomeSong } from '~/utils/lyrics';
+import { getTodayStorageDate, useHomeStorage } from '~/utils/home-storage';
+import { getLyricsArtistsLabel, normalizePlaylistItems } from '~/utils/lyrics';
 
 const route = useRoute();
 const router = useRouter();
@@ -23,28 +23,22 @@ const isSearching = ref(false);
 const searchResults = ref<Lyrics[]>([]);
 const searchError = ref('');
 
-const lyricsList = computed({
-  get: () => homeStorage.value.data?.songs ?? [],
-  set: (songs: Lyrics[]) => {
+const todaySelection = computed({
+  get: () => homeStorage.value.songs ?? [],
+  set: (value: Lyrics[]) => {
     homeStorage.value = {
       ...homeStorage.value,
-      data: {
-        songs,
-        playlists: homeStorage.value.data?.playlists ?? [],
-      },
+      songs: value,
     };
   },
 });
 
 const playlists = computed({
-  get: () => homeStorage.value.data?.playlists ?? [],
-  set: (value: HomePlaylist[]) => {
+  get: () => homeStorage.value.playlists ?? [],
+  set: (value: Playlist[]) => {
     homeStorage.value = {
       ...homeStorage.value,
-      data: {
-        songs: homeStorage.value.data?.songs ?? [],
-        playlists: value,
-      },
+      playlists: value,
     };
   },
 });
@@ -52,8 +46,8 @@ const playlists = computed({
 const filterLocalSongs = (query: string) => {
   const normalizedQuery = query.toLocaleLowerCase();
 
-  return lyricsList.value.filter((e) => {
-    const artistStr = getLyricsArtistLabel(e);
+  return todaySelection.value.filter((e) => {
+    const artistStr = getLyricsArtistsLabel(e.artists);
     const altTitleStr = e.altTitles?.join(' | ') || '';
     const titleAndArtist = `${e.title.toLocaleLowerCase()} | ${altTitleStr.toLocaleLowerCase()} | ${artistStr.toLocaleLowerCase()}`;
     return titleAndArtist.includes(normalizedQuery);
@@ -61,34 +55,20 @@ const filterLocalSongs = (query: string) => {
 };
 
 const searchResult = computed(() => {
-  if (!searchDebounce.value) return lyricsList.value;
+  if (!searchDebounce.value) return todaySelection.value;
   if (searchResults.value.length) return searchResults.value;
   return filterLocalSongs(searchDebounce.value);
 });
 
-const playlistSections = computed(() =>
-  playlists.value
-    .map((playlist) => {
-      const songs = (playlist.items ?? [])
-        .map((item) => {
-          const lyricsId = Number(item.lyricsId ?? item.song?.id);
-          const existingSong = lyricsList.value.find((song) => song.id === lyricsId);
-
-          if (existingSong) return existingSong;
-          if (item.song) return normalizeLyrics(item.song as HomeSong);
-          return null;
-        })
-        .filter((song): song is Lyrics => Boolean(song));
-
-      return {
-        id: playlist.id,
-        name: playlist.name,
-        description: playlist.description,
-        songs,
-      };
-    })
-    .filter((playlist) => playlist.songs.length),
-);
+const createTodaySelectionTemplate = (): Playlist => ({
+  id: 0,
+  name: 'Today selection',
+  description: '10 songs from the home feed',
+  isPublic: false,
+  items: todaySelection.value.map((song) => ({
+    ...song,
+  })),
+});
 
 const searchDescription = computed(() => {
   if (!searchText.value) return '';
@@ -106,8 +86,9 @@ const fetchLyrics = async () => {
     if (data.value?.code !== 0) return;
 
     const payload = data.value.data ?? {};
-    lyricsList.value = Array.isArray(payload.songs) ? payload.songs.map((song: HomeSong) => normalizeLyrics(song)) : [];
-    playlists.value = Array.isArray(payload.playlists) ? payload.playlists : [];
+    todaySelection.value = Array.isArray(payload.songs) ? (payload.songs as Lyrics[]) : [];
+
+    playlists.value = Array.isArray(payload.playlists) ? payload.playlists.map((playlist: RawPlaylist) => normalizePlaylistItems(playlist)) : [];
     homeStorage.value = {
       ...homeStorage.value,
       date: getTodayStorageDate(),
@@ -115,19 +96,6 @@ const fetchLyrics = async () => {
   } finally {
     isFetching.value = false;
   }
-};
-
-const mergeLyricsCache = (songs: Lyrics[]) => {
-  if (!songs.length) return;
-
-  const cache = new Map(lyricsList.value.map((song) => [song.id, song]));
-  songs.forEach((song) => {
-    cache.set(song.id, {
-      ...cache.get(song.id),
-      ...song,
-    });
-  });
-  lyricsList.value = Array.from(cache.values());
 };
 
 const searchSongs = async (query: string) => {
@@ -149,9 +117,8 @@ const searchSongs = async (query: string) => {
     if (query.trim() !== searchDebounce.value.trim()) return;
 
     if (data.value?.code === 0 && Array.isArray(data.value.data)) {
-      const songs = data.value.data.map((song: never) => normalizeLyrics(song));
+      const songs = data.value.data as Lyrics[];
       searchResults.value = songs;
-      mergeLyricsCache(songs);
       return;
     }
 
@@ -169,7 +136,7 @@ const searchSongs = async (query: string) => {
 };
 
 onMounted(async () => {
-  const hasHomeCacheForToday = homeStorage.value.date === getTodayStorageDate() && (lyricsList.value.length > 0 || playlists.value.length > 0);
+  const hasHomeCacheForToday = homeStorage.value.date === getTodayStorageDate() && (todaySelection.value.length > 0 || playlists.value.length > 0);
 
   if (!hasHomeCacheForToday) {
     await fetchLyrics();
@@ -203,10 +170,9 @@ onBeforeUnmount(() => {
   appSetting.setScrollPosition('lyric', containerRef.value.scrollTop);
 });
 
-const onClick = (lyrics: Lyrics) => {
+const onClick = (lyrics: Lyrics, selectedPlaylist: Playlist | null = null) => {
   router.push({ name: 'lyrics-detail', params: { id: lyrics.videoId } });
-
-  player.selectSong(lyrics);
+  player.selectSong(lyrics, undefined, selectedPlaylist);
 };
 
 const onClear = async () => {
@@ -232,11 +198,11 @@ const onClear = async () => {
         <div class="mt-5 flex flex-wrap gap-3">
           <div class="hero-chip">
             <span class="hero-chip__label">Songs</span>
-            <span class="hero-chip__value">{{ lyricsList.length }}</span>
+            <span class="hero-chip__value">{{ todaySelection.length }}</span>
           </div>
           <div class="hero-chip">
             <span class="hero-chip__label">Playlists</span>
-            <span class="hero-chip__value">{{ playlistSections.length }}</span>
+            <!-- <span class="hero-chip__value">{{ playlistSections.length }}</span> -->
           </div>
           <button type="button" class="hero-chip hero-chip--button" :disabled="isFetching" @click="fetchLyrics">
             <span class="hero-chip__label">{{ isFetching ? 'Refreshing' : 'Refresh Home' }}</span>
@@ -273,32 +239,32 @@ const onClear = async () => {
         :description="searchDescription"
         :songs="searchResult"
         layout="grid"
-        @select="onClick"
+        @select="(song) => onClick(song, null)"
       />
 
       <template v-else>
         <LyricsSongShelf
-          v-if="lyricsList.length"
+          v-if="todaySelection.length"
           title="Today selection"
           description="10 songs from the home feed"
-          :songs="lyricsList"
+          :songs="todaySelection"
           layout="grid"
-          @select="onClick"
+          @select="(song) => onClick(song, createTodaySelectionTemplate())"
         />
 
         <LyricsSongShelf
-          v-for="playlist in playlistSections"
+          v-for="playlist in playlists"
           :key="playlist.id"
           :title="playlist.name"
           :description="playlist.description"
-          :songs="playlist.songs"
+          :songs="playlist.items"
           layout="grid"
-          @select="onClick"
+          @select="(song) => onClick(song, playlist)"
         />
       </template>
 
       <div
-        v-if="!searchText && !playlistSections.length && !isFetching"
+        v-if="!searchText && !todaySelection.length && !isFetching"
         class="box-cover rounded-[28px] border border-dashed border-[#ffd3e6] bg-white/70 px-6 py-10 text-center text-sm text-[#8b6f80]"
       >
         No playlist data yet. Tap refresh to load the home feed.
