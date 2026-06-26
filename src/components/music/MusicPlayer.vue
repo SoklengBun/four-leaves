@@ -10,11 +10,12 @@ import { usePlayer } from '~/stores/player';
 import PlayerSeekBar from './PlayerSeekBar.vue';
 import YoutubeThumbnail from './YoutubeThumbnail.vue';
 import { useRouter } from 'vue-router';
+import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics.js';
 
 const router = useRouter();
 
 const player = usePlayer();
-const { mode, current, src, isPlaying, currentArtist } = storeToRefs(player);
+const { mode, current, videoId, artists, isPlaying, showPlaylist, playlist } = storeToRefs(player);
 
 const togglePlay = () => {
   if (mode.value === 'off') return;
@@ -32,6 +33,12 @@ const goToLyrics = () => {
 
   router.push({ name: 'lyrics-detail', params: { id: current.value?.id } });
 };
+
+const togglePlaylist = () => {
+  if (mode.value === 'off') return;
+
+  showPlaylist.value = !showPlaylist.value;
+};
 </script>
 
 <template>
@@ -40,15 +47,15 @@ const goToLyrics = () => {
     <Transition>
       <div v-if="mode !== 'off'" class="fixed bottom-0 z-[99] h-player w-full px-3.5 pb-3 pt-2 md:p-5">
         <div
-          class="liquid mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-[#efefef] pb-5 md:rounded-2xl md:pb-0"
+          class="liquid relative z-10 mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-[#efefef] pb-5 md:rounded-2xl md:pb-0"
         >
           <div class="relative z-10 flex h-fit flex-1 items-center space-x-1 overflow-hidden px-2 md:space-x-3 md:px-4">
             <div class="size-10 overflow-hidden rounded-lg border border-primary bg-gray-300 md:size-16 md:rounded-xl">
-              <YoutubeThumbnail :id="src" @click="goToLyrics" />
+              <YoutubeThumbnail :id="videoId" @click="goToLyrics" />
             </div>
             <div class="relative z-10 flex h-fit flex-1 flex-col justify-center overflow-hidden px-2 md:px-4">
-              <MarqueeText :text="current?.title" class="w-full min-w-0 text-sm font-semibold md:text-base" :gap="50" />
-              <MarqueeText :text="currentArtist" class="w-full min-w-0 text-xs text-gray-500" :gap="50" />
+              <MarqueeText :text="getLyricsTitleLabel(current)" class="w-full min-w-0 text-sm font-semibold md:text-base" :gap="50" />
+              <MarqueeText :text="getLyricsArtistsLabel(artists)" class="w-full min-w-0 text-xs text-gray-500" :gap="50" />
             </div>
           </div>
 
@@ -71,6 +78,17 @@ const goToLyrics = () => {
             </div>
           </div>
           <div class="relative z-10 hidden md:flex md:flex-1"></div>
+        </div>
+        <div class="h-0 w-full">
+          <div
+            v-if="playlist?.items?.length"
+            class="liquid absolute right-0 top-1/2 flex h-10 w-[18px] -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-[#efefef] bg-red-100 md:hidden"
+            @click="togglePlaylist"
+          >
+            <svg class="h-3.5 w-3.5 text-[#8d60ff]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M6 4.5v11l8-5.5-8-5.5Z" />
+            </svg>
+          </div>
         </div>
       </div>
     </Transition>

@@ -4,10 +4,10 @@ import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
 import { usePlayer } from '~/stores/player';
-import { getLyricsTitleLabel } from '~/utils/lyrics';
+import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
 
 const player = usePlayer();
-const { current, src } = storeToRefs(player);
+const { current, videoId } = storeToRefs(player);
 
 const isMobile = useMediaQuery('(max-width: 767px)');
 const isOpen = ref(false);
@@ -15,37 +15,22 @@ const panelRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLElement | null>(null);
 
 const versions = computed(() => {
-  if (!Array.isArray(current.value?.url)) return [];
-  return current.value.url as { a: string; l: string }[];
+  if (!current.value) return [];
+
+  const defaultVersion: { id: string; artists: LyricsArtist[] } = {
+    id: current.value?.videoId || '',
+    artists: current.value?.artists || [],
+  };
+  const covers = current.value.covers as { id: string; artists: LyricsArtist[] }[];
+  return [defaultVersion, ...covers];
 });
 
 const hasVersions = computed(() => versions.value.length > 1);
 const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 
-const extractVideoId = (value: string) => {
-  if (!value) return '';
-  const v = value.trim();
-  if (/^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
-  try {
-    const url = new URL(v);
-    if (url.hostname.includes('youtu.be')) return url.pathname.slice(1);
-    if (url.hostname.includes('youtube.com')) {
-      const byQuery = url.searchParams.get('v');
-      if (byQuery) return byQuery;
-      const parts = url.pathname.split('/');
-      const embedIdx = parts.findIndex((p) => p === 'embed');
-      if (embedIdx >= 0) return parts[embedIdx + 1] || '';
-    }
-  } catch {
-    return '';
-  }
-  return '';
-};
-
-const isActive = (videoUrl: string) => extractVideoId(videoUrl) === extractVideoId(src.value);
-
-const selectVersion = (item: { a: string; l: string }) => {
-  player.switchVersion(item.l);
+const selectVersion = (id: string) => {
+  if (!current.value) return;
+  player.selectSong(current.value, id);
   isOpen.value = false;
 };
 
@@ -96,17 +81,17 @@ onClickOutside(
           v-for="(item, i) in versions"
           :key="i"
           class="flex cursor-pointer items-center gap-2.5 px-3 py-2 transition-colors hover:bg-[#fff4fb]"
-          :class="{ 'bg-[#fff0f8]': isActive(item.l) }"
-          @click="selectVersion(item)"
+          :class="{ 'bg-[#fff0f8]': item.id === videoId }"
+          @click="selectVersion(item.id)"
         >
           <div class="relative size-12 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-            <YoutubeThumbnail :id="extractVideoId(item.l)" />
+            <YoutubeThumbnail :id="item.id" />
           </div>
           <div class="min-w-0 flex-1">
             <p class="truncate text-xs font-semibold text-[#1f1f1f]">{{ displayTitle }}</p>
-            <p class="truncate text-[11px] text-[#6b7280]">{{ item.a }}</p>
+            <p class="truncate text-[11px] text-[#6b7280]">{{ getLyricsArtistsLabel(item.artists) }}</p>
           </div>
-          <svg v-if="isActive(item.l)" class="size-3.5 shrink-0 text-[#ff4f9b]" viewBox="0 0 24 24" fill="currentColor">
+          <svg v-if="item.id === videoId" class="size-3.5 shrink-0 text-[#ff4f9b]" viewBox="0 0 24 24" fill="currentColor">
             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
           </svg>
         </li>
@@ -132,17 +117,17 @@ onClickOutside(
             v-for="(item, i) in versions"
             :key="i"
             class="flex cursor-pointer items-center gap-3 rounded-xl p-2 transition-colors active:bg-[#fff0f8]"
-            :class="{ 'bg-[#fff0f8]': isActive(item.l) }"
-            @click="selectVersion(item)"
+            :class="{ 'bg-[#fff0f8]': item.id === videoId }"
+            @click="selectVersion(item.id)"
           >
             <div class="relative size-14 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-              <YoutubeThumbnail :id="extractVideoId(item.l)" />
+              <YoutubeThumbnail :id="item.id" />
             </div>
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-semibold text-[#1f1f1f]">{{ displayTitle }}</p>
-              <p class="truncate text-xs text-[#6b7280]">{{ item.a }}</p>
+              <p class="truncate text-xs text-[#6b7280]">{{ getLyricsArtistsLabel(item.artists) }}</p>
             </div>
-            <svg v-if="isActive(item.l)" class="size-4 shrink-0 text-[#ff4f9b]" viewBox="0 0 24 24" fill="currentColor">
+            <svg v-if="item.id === videoId" class="size-4 shrink-0 text-[#ff4f9b]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
           </li>

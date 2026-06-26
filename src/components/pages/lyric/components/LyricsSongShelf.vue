@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
-import { getLyricsArtistLabel, getLyricsTitleLabel } from '~/utils/lyrics';
+import { getLyricsTitleLabel, getLyricsArtistsLabel } from '~/utils/lyrics';
 
 withDefaults(
   defineProps<{
     title: string;
     description?: string;
-    songs: Lyrics[];
+    songs: PlaylistItem[];
     layout?: 'row' | 'grid';
   }>(),
   {
@@ -16,10 +16,10 @@ withDefaults(
 );
 
 const emit = defineEmits<{
-  select: [song: Lyrics];
+  select: [song: PlaylistItem];
 }>();
 
-const onSelect = (song: Lyrics) => {
+const onSelect = (song: PlaylistItem) => {
   emit('select', song);
 };
 </script>
@@ -52,7 +52,12 @@ const onSelect = (song: Lyrics) => {
 
         <div class="mt-3 min-w-0">
           <MarqueeText :text="getLyricsTitleLabel(song)" class="text-sm font-semibold text-[#2b1f28] md:text-base" :gap="28" />
-          <MarqueeText :text="getLyricsArtistLabel(song) || 'Unknown artist'" class="mt-1 text-xs text-[#816776] md:text-sm" :gap="24" :speed="32" />
+          <MarqueeText
+            :text="getLyricsArtistsLabel(song.artists) || 'Unknown artist'"
+            class="mt-1 text-xs text-[#816776] md:text-sm"
+            :gap="24"
+            :speed="32"
+          />
         </div>
       </button>
     </div>
