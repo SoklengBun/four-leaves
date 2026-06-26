@@ -30,16 +30,20 @@ const menuItems: MenuItem[] = [
 ];
 
 const FAB_SIZE = 56;
+const MOBILE_FAB_SIZE = 40;
+const MOBILE_BREAKPOINT = 768;
 const EDGE_MARGIN = 14;
 const ITEM_RADIUS = 82;
+const MOBILE_ITEM_RADIUS = 66;
 const HALF_ARC_DEG = 176;
 const ROTATE_STEP_INTERVAL_MS = 90;
-const OPEN_STICK_OFFSET_PX = FAB_SIZE / 2 + EDGE_MARGIN;
 const FAB_STICK_TRANSITION_MS = 240;
 const WHEEL_COLLAPSE_TRANSITION_MS = 320;
 const WHEEL_DIAMETER = 260;
+const MOBILE_WHEEL_DIAMETER = 212;
 const WHEEL_RING_INSET = 12;
 const WHEEL_ITEM_SIZE = 50;
+const MOBILE_WHEEL_ITEM_SIZE = 42;
 
 const fabX = ref(0);
 const fabY = ref(0);
@@ -76,13 +80,17 @@ const scaledPx = (px: number) => {
   return pxOfCurrentScreenSize(px);
 };
 
-const fabSizePx = computed(() => scaledPx(FAB_SIZE));
+const isMobileViewport = computed(() => {
+  resizeTick.value;
+  return window.innerWidth <= MOBILE_BREAKPOINT;
+});
+const fabSizePx = computed(() => scaledPx(isMobileViewport.value ? MOBILE_FAB_SIZE : FAB_SIZE));
 const edgeMarginPx = computed(() => scaledPx(EDGE_MARGIN));
-const itemRadiusPx = computed(() => scaledPx(ITEM_RADIUS));
+const itemRadiusPx = computed(() => scaledPx(isMobileViewport.value ? MOBILE_ITEM_RADIUS : ITEM_RADIUS));
 const openStickOffsetPx = computed(() => fabSizePx.value / 2 + edgeMarginPx.value);
-const wheelDiameterPx = computed(() => scaledPx(WHEEL_DIAMETER));
+const wheelDiameterPx = computed(() => scaledPx(isMobileViewport.value ? MOBILE_WHEEL_DIAMETER : WHEEL_DIAMETER));
 const wheelInsetPx = computed(() => scaledPx(WHEEL_RING_INSET));
-const wheelItemSizePx = computed(() => scaledPx(WHEEL_ITEM_SIZE));
+const wheelItemSizePx = computed(() => scaledPx(isMobileViewport.value ? MOBILE_WHEEL_ITEM_SIZE : WHEEL_ITEM_SIZE));
 const wheelRootStyle = computed(() => ({
   ...wheelCenterStyle.value,
   '--fab-size': `${fabSizePx.value}px`,
@@ -465,10 +473,13 @@ onBeforeUnmount(() => {
   touch-action: none;
   user-select: none;
   z-index: 20;
+  border: 2px solid #ffcfe7;
+  border-radius: 9999px;
+  background: linear-gradient(160deg, #fff9fd 0%, #ffeaf5 100%);
+  color: #ff4f9b;
   box-shadow:
-    0 0 10px #ffb1ed,
-    0 0 10px #f5fcff,
-    0 0 20px #ffc1f7;
+    0 4px 10px #ffd9ec,
+    0 0 0 4px #fff4fb inset;
 }
 
 .fab-open {
