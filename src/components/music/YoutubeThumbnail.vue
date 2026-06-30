@@ -8,11 +8,8 @@ const props = defineProps<{
 
 const src = ref(defaultImage);
 
-async function loadThumbnail(videoId: string) {
-  const urls = [
-    `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-    `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
-  ];
+const loadThumbnail = async (videoId: string) => {
+  const urls = [`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`, `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`];
 
   for (const url of urls) {
     try {
@@ -31,7 +28,7 @@ async function loadThumbnail(videoId: string) {
   }
 
   src.value = defaultImage;
-}
+};
 
 watch(
   () => props.id,

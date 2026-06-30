@@ -186,7 +186,7 @@ const onClear = async () => {
   <div ref="containerRef" class="container flex w-full flex-col items-center px-3 pb-4 pt-3">
     <div class="hero-shell box-cover relative w-full overflow-hidden rounded-[28px] border border-[#ffd5e7] p-5 md:p-8">
       <div class="hero-banner absolute inset-0 opacity-25"></div>
-      <div class="absolute inset-0 bg-[linear-gradient(135deg,_rgba(255,255,255,0.95),_rgba(255,240,247,0.92)_48%,_rgba(255,227,239,0.88))]"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(135deg,_#fffffff2,_#fff0f7eb_48%,_#ffe3eff0)]"></div>
 
       <div class="relative z-10 max-w-xl">
         <p class="text-xs font-semibold uppercase tracking-[0.32em] text-[#d17ea8]">Lyrics Home</p>
@@ -213,7 +213,7 @@ const onClear = async () => {
         </div>
 
         <div
-          class="mt-6 flex max-w-md items-center gap-3 rounded-[22px] border border-white/80 bg-white/85 p-2 shadow-[0_18px_40px_rgba(255,180,210,0.22)] backdrop-blur"
+          class="mt-6 flex max-w-md items-center gap-3 rounded-[22px] border border-white/80 bg-white/85 p-2 shadow-[0_18px_40px_#ffb4d238] backdrop-blur"
         >
           <input
             v-model="searchText"
@@ -282,8 +282,8 @@ const onClear = async () => {
 
 <style scoped>
 .hero-shell {
-  background: radial-gradient(circle at top right, rgb(255 216 233 / 70%), transparent 30%), linear-gradient(180deg, #fffafc 0%, #fff3f8 100%);
-  box-shadow: 0 20px 45px rgb(255 178 210 / 18%);
+  background: radial-gradient(circle at top right, #ffd8e9b3, transparent 30%), linear-gradient(180deg, #fffafc 0%, #fff3f8 100%);
+  box-shadow: 0 20px 45px #ffb2d22e;
 }
 
 .hero-banner {
@@ -298,10 +298,10 @@ const onClear = async () => {
   align-items: center;
   gap: 0.65rem;
   border-radius: 9999px;
-  background: rgb(255 255 255 / 75%);
+  background: #ffffffbf;
   padding: 0.7rem 0.95rem;
   color: #805d72;
-  box-shadow: inset 0 0 0 1px rgb(255 215 232 / 85%);
+  box-shadow: inset 0 0 0 1px #ffd7e8d9;
 }
 
 .hero-chip--button {
@@ -312,7 +312,7 @@ const onClear = async () => {
 
 .hero-chip--button:hover {
   transform: translateY(-1px);
-  background: rgb(255 248 252 / 92%);
+  background: #fff8fceb;
 }
 
 .hero-chip__label {

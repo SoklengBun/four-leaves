@@ -7,8 +7,10 @@
 
 ## Project Rules (explicit)
 
+- `sfc order`: Follow the Vue SFC block order `<script setup>`, `<template>`, `<style>`.
 - `script first`: Place `<script setup>` at the top of Vue SFCs (above `<template>`).
-- `styling`: Prefer Tailwind utility classes for component styling when available; prefer adding Tailwind-friendly classes rather than large bespoke CSS blocks.
+- `styling`: Use Tailwind utility classes for component styling when possible; if Tailwind cannot reasonably express the styling, create normal CSS classes instead of forcing it.
+- `functions`: Prefer arrow function style for functions.
 - `colors`: Prefer hexadecimal color notation (e.g. `#6f56ff`) over `rgb()`/`rgba()` for consistent palette usage.
 - `formatting`: Use tabular numeric font-variant for time displays where appropriate (e.g. `tabular-nums`).
 

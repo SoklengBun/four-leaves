@@ -101,9 +101,9 @@ const togglePlaylist = () => {
   overflow: hidden;
   background: linear-gradient(135deg, #ffd6e750 0%, #ffc8dd50 30%, #d8b4fe50 70%, #c4b5fd50 100%);
   box-shadow:
-    inset 0 2px 8px rgba(255, 255, 255, 0.8),
-    inset 0 -4px 12px rgba(255, 255, 255, 0.2),
-    0 8px 24px rgba(216, 180, 254, 0.35);
+    inset 0 2px 8px #ffffffcc,
+    inset 0 -4px 12px #ffffff33,
+    0 8px 24px #d8b4fe59;
 
   backdrop-filter: blur(4px);
 }
@@ -116,7 +116,7 @@ const togglePlaylist = () => {
   left: -40%;
   top: -120%;
 
-  background: rgba(255, 255, 255, 0.4);
+  background: #ffffff66;
   border-radius: 45%;
 
   animation: liquid-wave 8s linear infinite;
@@ -130,7 +130,7 @@ const togglePlaylist = () => {
   left: -20%;
   top: -100%;
 
-  background: rgba(255, 255, 255, 0.2);
+  background: #ffffff33;
   border-radius: 40%;
 
   animation: liquid-wave 12s linear infinite reverse;
