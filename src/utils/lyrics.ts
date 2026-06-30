@@ -38,10 +38,20 @@ export const getLyricsArtistsLabel = (artists?: LyricsArtist[] | null) => {
   return artists.map((artist) => getLyricsArtistName(artist)).join(', ');
 };
 
+export const getCoverArtistsLabel = (song?: PlaylistItem) => {
+  if (!song?.defaultCoverId) return getLyricsArtistsLabel(song?.artists);
+
+  const cover = song.covers?.find((item) => item.id === song.defaultCoverId);
+  if (!cover?.artists?.length) return getLyricsArtistsLabel(song?.artists);
+
+  console.log('getCoverArtistsLabel', cover.artists);
+  return getLyricsArtistsLabel(cover.artists);
+};
+
 export const normalizePlaylistItems = (playlist?: RawPlaylist | null): Playlist => {
   const items = Array.isArray(playlist?.items)
     ? playlist.items.map((item: RawPlaylistItem) => {
-        return { ...item.song, note: item.note, defaultCoverId: item.defaultCoverId } as PlaylistItem;
+        return { ...item.song, note: item.note, defaultCoverId: item.defaultCoverId, playlistItemId: item.id } as PlaylistItem;
       })
     : [];
 

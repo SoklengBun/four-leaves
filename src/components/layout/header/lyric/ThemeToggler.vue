@@ -51,7 +51,7 @@ const onPointerUp = () => {
   isDark.value = !isDark.value;
 };
 
-function animateBack() {
+const animateBack = () => {
   const stiffness = 0.1;
   const damping = 0.85;
 
@@ -82,7 +82,7 @@ function animateBack() {
     ropeTransform.value = 'scaleY(1) rotate(0)';
     offsetY.value = 0;
   }
-}
+};
 
 onMounted(() => {
   window.addEventListener('pointerup', onPointerUp);

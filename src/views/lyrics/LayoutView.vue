@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, watch } from 'vue';
 import CloudNavBar from '~/components/layout/header/lyric/CloudNavBar.vue';
 import router from '~/router';
 import { pxToRem } from '~/utils/helper';
 import { usePlayer } from '~/stores/player';
+import { useAuth } from '~/stores/auth';
+import { usePlaylistStore } from '~/stores/usePlaylistStore';
 
 const player = usePlayer();
+const auth = useAuth();
+const playlistStore = usePlaylistStore();
 
 onMounted(() => {
   player.init('yt-player');
@@ -16,6 +20,19 @@ onMounted(() => {
     html.style.overflow = 'hidden';
   }
 });
+
+watch(
+  () => auth.user?.id ?? null,
+  async (userId) => {
+    if (!auth.isLoggedIn || !userId) {
+      playlistStore.clearPlaylists();
+      return;
+    }
+
+    await playlistStore.fetchMine();
+  },
+  { immediate: true },
+);
 
 onUnmounted(() => {
   const html = document.getElementById('anella-container');

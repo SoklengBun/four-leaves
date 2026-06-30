@@ -172,7 +172,7 @@ onBeforeUnmount(() => {
 <template>
   <div ref="rootRef" class="relative">
     <div
-      class="flex min-h-11 w-full flex-wrap items-center gap-1.5 rounded-lg border border-pink-300 bg-pink-50/60 px-2 py-1.5 text-sm outline-none transition focus-within:border-pink-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-pink-100 dark:border-slate-700 dark:bg-slate-950 dark:focus-within:ring-pink-950 md:py-2"
+      class="flex min-h-11 w-full flex-wrap items-center gap-1.5 rounded-lg border border-pink-300 bg-pink-50/60 px-2 py-1.5 text-sm outline-none transition focus-within:border-pink-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-pink-100 md:py-2"
       :class="{ 'cursor-not-allowed opacity-60': disabled }"
       role="combobox"
       :aria-expanded="isOpen"
@@ -182,17 +182,15 @@ onBeforeUnmount(() => {
       <span
         v-for="artist in modelValue"
         :key="artist.id"
-        class="inline-flex max-w-full items-center gap-1 rounded-md bg-pink-100 px-1.5 py-1 text-pink-700 dark:bg-slate-800 dark:text-pink-200 md:px-2.5 md:py-1.5"
+        class="inline-flex max-w-full items-center gap-1 rounded-md bg-pink-100 px-1.5 py-1 text-pink-700 md:px-2.5 md:py-1.5"
       >
         <div class="flex min-w-0 items-center space-x-2">
           <span class="block truncate text-xs font-semibold md:text-sm">{{ displayName(artist) }}</span>
-          <span v-if="cvName(artist)" class="block truncate text-[10px] font-medium text-pink-500 dark:text-pink-300 md:text-xs"
-            >({{ cvName(artist) }})</span
-          >
+          <span v-if="cvName(artist)" class="block truncate text-[10px] font-medium text-pink-500 md:text-xs">({{ cvName(artist) }})</span>
         </div>
         <button
           type="button"
-          class="grid size-4 shrink-0 place-items-center rounded text-xs font-semibold text-pink-700 hover:bg-pink-200 dark:text-pink-100 dark:hover:bg-slate-700 md:text-sm"
+          class="grid size-4 shrink-0 place-items-center rounded text-xs font-semibold text-pink-700 hover:bg-pink-200 md:text-sm"
           :aria-label="`Remove ${artist.name}`"
           @click.stop="removeArtist(artist.id)"
         >
@@ -213,7 +211,7 @@ onBeforeUnmount(() => {
 
     <div
       v-if="isOpen && query.trim().length >= 2"
-      class="absolute left-0 right-0 z-30 mt-2 max-h-56 overflow-auto rounded-lg border border-pink-300 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-950"
+      class="absolute left-0 right-0 z-30 mt-2 max-h-56 overflow-auto rounded-lg border border-pink-300 bg-white py-1 shadow-lg"
       role="listbox"
     >
       <p v-if="isSearching" class="px-3 py-2 text-sm text-slate-500">Searching...</p>
@@ -221,13 +219,13 @@ onBeforeUnmount(() => {
         v-for="(artist, index) in selectableResults"
         :key="artist.id"
         type="button"
-        class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-pink-50 dark:hover:bg-slate-800"
-        :class="{ 'bg-pink-50 dark:bg-slate-800': index === activeIndex }"
+        class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-pink-50"
+        :class="{ 'bg-pink-50': index === activeIndex }"
         role="option"
         @mousedown.prevent="selectArtist(artist)"
       >
         <span class="block truncate font-medium">{{ displayName(artist) }}</span>
-        <span v-if="cvName(artist)" class="block truncate text-xs text-pink-500 dark:text-pink-300">({{ cvName(artist) }})</span>
+        <span v-if="cvName(artist)" class="block truncate text-xs text-pink-500">({{ cvName(artist) }})</span>
       </button>
       <p v-if="!isSearching && !selectableResults.length" class="px-3 py-2 text-sm text-slate-500">No matches</p>
     </div>

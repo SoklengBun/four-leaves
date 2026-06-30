@@ -102,7 +102,7 @@ const closePlaylist = () => {
 
 .playlist-shell {
   position: relative;
-  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), transparent 38%),
+  background: radial-gradient(circle at top left, #ffffffeb, transparent 38%),
     linear-gradient(180deg, #fff6fb 0%, #fff0f7 42%, #fdf5ff 100%);
   color: #6e4b62;
 }
@@ -125,7 +125,7 @@ const closePlaylist = () => {
   right: 20px;
   width: 140px;
   height: 140px;
-  background: rgba(255, 196, 222, 0.55);
+  background: #ffc4de8c;
 }
 
 .playlist-glow--bottom {
@@ -133,7 +133,7 @@ const closePlaylist = () => {
   left: -24px;
   width: 160px;
   height: 160px;
-  background: rgba(211, 197, 255, 0.45);
+  background: #d3c5ff73;
 }
 
 .playlist-hero {
@@ -145,13 +145,13 @@ const closePlaylist = () => {
   display: block;
   border: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
+  background: #ffffffc7;
   padding: 8px 14px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #8b6079;
-  box-shadow: 0 8px 18px rgba(229, 177, 203, 0.24);
+  box-shadow: 0 8px 18px #e5b1cb3d;
 }
 
 .playlist-kicker {
@@ -180,13 +180,13 @@ const closePlaylist = () => {
 
 .playlist-now-card {
   margin-top: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid #ffffffe6;
   border-radius: 28px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 244, 250, 0.82));
+  background: linear-gradient(180deg, #fffffff2, #fff4fad1);
   padding: 18px;
   box-shadow:
-    0 20px 40px rgba(226, 181, 202, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    0 20px 40px #e2b5ca38,
+    inset 0 1px 0 #fffffff2;
 }
 
 .playlist-now-badge {
@@ -224,7 +224,7 @@ const closePlaylist = () => {
 
 .playlist-pill {
   border-radius: 999px;
-  background: rgba(255, 238, 246, 0.9);
+  background: #ffeef6e6;
   padding: 7px 11px;
   font-size: 11px;
   font-weight: 700;
@@ -233,7 +233,7 @@ const closePlaylist = () => {
 
 .playlist-list-wrap {
   min-height: 0;
-  background: rgba(255, 255, 255, 0.58);
+  background: #ffffff94;
   backdrop-filter: blur(8px);
 }
 
@@ -269,12 +269,12 @@ const closePlaylist = () => {
   grid-template-columns: 40px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.88);
+  border: 1px solid #ffffffe0;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.82);
+  background: #ffffffd1;
   padding: 14px 12px;
   text-align: left;
-  box-shadow: 0 14px 26px rgba(230, 196, 216, 0.18);
+  box-shadow: 0 14px 26px #e6c4d82e;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -286,9 +286,9 @@ const closePlaylist = () => {
 }
 
 .playlist-item--active {
-  border-color: rgba(244, 171, 209, 0.92);
-  background: linear-gradient(135deg, rgba(255, 245, 250, 0.98), rgba(247, 240, 255, 0.96));
-  box-shadow: 0 18px 30px rgba(220, 172, 211, 0.24);
+  border-color: #f4abd1eb;
+  background: linear-gradient(135deg, #fff5fafa, #f7f0fff5);
+  box-shadow: 0 18px 30px #dcacd33d;
 }
 
 .playlist-item-index {
@@ -330,7 +330,7 @@ const closePlaylist = () => {
 
 .playlist-item-state {
   border-radius: 999px;
-  background: rgba(255, 238, 245, 0.95);
+  background: #ffeef5f2;
   padding: 8px 11px;
   font-size: 11px;
   font-weight: 800;
