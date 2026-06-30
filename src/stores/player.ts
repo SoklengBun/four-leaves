@@ -137,10 +137,8 @@ export const usePlayer = defineStore('player', () => {
     console.log('YT Player initialized', player.value);
   };
 
-  const selectSong = async (song: Lyrics, coverId?: string, selectedPlaylist?: Playlist | null) => {
-    console.log('selectSong called with:', song);
-
-    const selectedId = coverId ?? song.videoId;
+  const selectSong = async (song: PlaylistItem, coverId?: string, selectedPlaylist?: Playlist | null) => {
+    const selectedId = coverId || song.defaultCoverId || song.videoId;
 
     if (selectedPlaylist !== undefined) {
       playlist.value = selectedPlaylist;
@@ -151,8 +149,8 @@ export const usePlayer = defineStore('player', () => {
     videoId.value = selectedId;
     current.value = song;
 
-    if (coverId) {
-      const cover = song.covers?.find((c) => c.id === coverId);
+    if (coverId || song.defaultCoverId) {
+      const cover = song.covers?.find((c) => c.id === selectedId);
       artists.value = cover?.artists ?? [];
     } else {
       artists.value = song.artists;

@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
-import { getLyricsTitleLabel, getLyricsArtistsLabel } from '~/utils/lyrics';
+import { getLyricsTitleLabel, getCoverArtistsLabel } from '~/utils/lyrics';
 
 withDefaults(
   defineProps<{
@@ -21,6 +22,13 @@ const emit = defineEmits<{
 
 const onSelect = (song: PlaylistItem) => {
   emit('select', song);
+};
+
+const getThumbnailId = (song: PlaylistItem) => {
+  if (!song.defaultCoverId) return song.videoId;
+
+  const cover = song.covers?.find((item) => item.id === song.defaultCoverId);
+  return cover?.id || song.videoId;
 };
 </script>
 
@@ -47,17 +55,12 @@ const onSelect = (song: PlaylistItem) => {
         @click="onSelect(song)"
       >
         <div class="relative aspect-square overflow-hidden rounded-[18px] bg-[#f6d8e8]">
-          <YoutubeThumbnail :id="song.videoId" />
+          <YoutubeThumbnail :id="getThumbnailId(song)" />
         </div>
 
         <div class="mt-3 min-w-0">
           <MarqueeText :text="getLyricsTitleLabel(song)" class="text-sm font-semibold text-[#2b1f28] md:text-base" :gap="28" />
-          <MarqueeText
-            :text="getLyricsArtistsLabel(song.artists) || 'Unknown artist'"
-            class="mt-1 text-xs text-[#816776] md:text-sm"
-            :gap="24"
-            :speed="32"
-          />
+          <MarqueeText :text="getCoverArtistsLabel(song) || 'Unknown artist'" class="mt-1 text-xs text-[#816776] md:text-sm" :gap="24" :speed="32" />
         </div>
       </button>
     </div>

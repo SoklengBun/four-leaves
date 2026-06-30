@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { debouncedRef } from '@vueuse/core';
+import { storeToRefs } from 'pinia';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import LyricsSongShelf from './components/LyricsSongShelf.vue';
 import useAppFetch from '~/services';
 import { useAppSetting } from '~/stores/app-setting';
 import { usePlayer } from '~/stores/player';
+import { usePlaylistStore } from '~/stores/usePlaylistStore';
 import { getTodayStorageDate, useHomeStorage } from '~/utils/home-storage';
 import { getLyricsArtistsLabel, normalizePlaylistItems } from '~/utils/lyrics';
 
@@ -17,6 +19,8 @@ const containerRef = ref<HTMLDivElement | null>(null);
 const appSetting = useAppSetting();
 const player = usePlayer();
 const homeStorage = useHomeStorage();
+const playlistStore = usePlaylistStore();
+const { playlists: userPlaylists } = storeToRefs(playlistStore);
 
 const isFetching = ref(false);
 const isSearching = ref(false);
@@ -33,7 +37,7 @@ const todaySelection = computed({
   },
 });
 
-const playlists = computed({
+const featuredPlaylists = computed({
   get: () => homeStorage.value.playlists ?? [],
   set: (value: Playlist[]) => {
     homeStorage.value = {
@@ -88,7 +92,9 @@ const fetchLyrics = async () => {
     const payload = data.value.data ?? {};
     todaySelection.value = Array.isArray(payload.songs) ? (payload.songs as Lyrics[]) : [];
 
-    playlists.value = Array.isArray(payload.playlists) ? payload.playlists.map((playlist: RawPlaylist) => normalizePlaylistItems(playlist)) : [];
+    featuredPlaylists.value = Array.isArray(payload.playlists)
+      ? payload.playlists.map((playlist: RawPlaylist) => normalizePlaylistItems(playlist))
+      : [];
     homeStorage.value = {
       ...homeStorage.value,
       date: getTodayStorageDate(),
@@ -136,7 +142,8 @@ const searchSongs = async (query: string) => {
 };
 
 onMounted(async () => {
-  const hasHomeCacheForToday = homeStorage.value.date === getTodayStorageDate() && (todaySelection.value.length > 0 || playlists.value.length > 0);
+  const hasHomeCacheForToday =
+    homeStorage.value.date === getTodayStorageDate() && (todaySelection.value.length > 0 || featuredPlaylists.value.length > 0);
 
   if (!hasHomeCacheForToday) {
     await fetchLyrics();
@@ -170,7 +177,7 @@ onBeforeUnmount(() => {
   appSetting.setScrollPosition('lyric', containerRef.value.scrollTop);
 });
 
-const onClick = (lyrics: Lyrics, selectedPlaylist: Playlist | null = null) => {
+const onClick = (lyrics: PlaylistItem, selectedPlaylist: Playlist | null = null) => {
   router.push({ name: 'lyrics-detail', params: { id: lyrics.videoId } });
   player.selectSong(lyrics, undefined, selectedPlaylist);
 };
@@ -202,7 +209,7 @@ const onClear = async () => {
           </div>
           <div class="hero-chip">
             <span class="hero-chip__label">Playlists</span>
-            <!-- <span class="hero-chip__value">{{ playlistSections.length }}</span> -->
+            <span class="hero-chip__value">{{ userPlaylists.length }}</span>
           </div>
           <button type="button" class="hero-chip hero-chip--button" :disabled="isFetching" @click="fetchLyrics">
             <span class="hero-chip__label">{{ isFetching ? 'Refreshing' : 'Refresh Home' }}</span>
@@ -244,6 +251,16 @@ const onClear = async () => {
 
       <template v-else>
         <LyricsSongShelf
+          v-for="playlist in userPlaylists"
+          :key="`mine-${playlist.id}`"
+          :title="playlist.name"
+          :description="playlist.description"
+          :songs="playlist.items"
+          layout="grid"
+          @select="(song) => onClick(song, playlist)"
+        />
+
+        <LyricsSongShelf
           v-if="todaySelection.length"
           title="Today selection"
           description="10 songs from the home feed"
@@ -253,7 +270,7 @@ const onClear = async () => {
         />
 
         <LyricsSongShelf
-          v-for="playlist in playlists"
+          v-for="playlist in featuredPlaylists"
           :key="playlist.id"
           :title="playlist.name"
           :description="playlist.description"

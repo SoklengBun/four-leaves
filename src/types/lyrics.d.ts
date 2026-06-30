@@ -28,6 +28,7 @@ type Lyrics = Base & {
 };
 
 type PlaylistItem = Lyrics & {
+  playlistItemId?: number;
   note?: string;
   defaultCoverId?: string;
 };
@@ -41,6 +42,7 @@ type Playlist = Base & {
 };
 
 type RawPlaylistItem = {
+  id: number;
   note?: string;
   defaultCoverId?: string;
   song: Lyrics;

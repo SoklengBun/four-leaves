@@ -32,10 +32,10 @@ const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 const displayArtist = computed(() => getLyricsArtistsLabel(artists.value));
 const lyricsContent = computed(() => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content ?? '');
 
-const fetchLyricsDetail = async (id: string) => {
+const fetchLyricsDetail = async (id: string, force = false) => {
   isLoading.value = true;
   try {
-    const song = await getLyricsById(id);
+    const song = await getLyricsById(id, force);
     if (!song) return null;
     current.value = song;
     return song;
@@ -80,6 +80,11 @@ const togglePlay = () => {
   } else {
     player.play();
   }
+};
+
+const refreshCurrentLyrics = () => {
+  if (!videoId.value) return;
+  void fetchLyricsDetail(videoId.value, true);
 };
 </script>
 
@@ -168,6 +173,6 @@ const togglePlay = () => {
       </p>
     </div>
 
-    <LyricsDetailMoreOptions v-model:show="showMore" />
+    <LyricsDetailMoreOptions v-model:show="showMore" @refresh="refreshCurrentLyrics" />
   </div>
 </template>
