@@ -80,8 +80,8 @@ export const usePlaylist = defineStore('playlist', () => {
       }
 
       const playlist = normalizePlaylistItems(data.value.data as RawPlaylist);
-      lists.value = [playlist, ...lists.value.filter((item) => item.id !== playlist.id)];
-      list.value = playlist;
+
+      await getPlaylists(true);
       closeFormPopup();
 
       showToast({ message: `Created ${playlist.name}`, type: 'success' });
@@ -125,6 +125,9 @@ export const usePlaylist = defineStore('playlist', () => {
         showToast({ message: data.value?.message || 'Failed to add song to playlist', type: 'error' });
         return;
       }
+
+      const idx = lists.value.findIndex((e) => e.id === playlistId);
+      if (idx) lists.value[idx] = normalizePlaylistItems(data.value.data);
 
       showToast({ message: `Added Successfully`, type: 'success' });
     } finally {
