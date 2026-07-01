@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { showToast } from 'vant';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
+import CustomPopup from '~/components/shares/CustomPopup.vue';
 
 const shakeCount = ref(0);
 
@@ -87,28 +88,26 @@ watch(shakeCount, () => {
 </script>
 <template>
   <div class="flex h-[50vh] flex-1 items-center justify-center">
-    <van-popup
+    <CustomPopup
       v-model:show="permissionDialog"
-      :style="{ background: 'transparent' }"
+      desktop-position="center"
+      mobile-position="center"
+      eyebrow="Permission"
+      title="Request for device permission"
+      description="Please turn on permission to play the game."
     >
-      <div class="flex h-[200px] w-[300px] flex-col rounded-xl bg-white">
-        <div class="flex flex-1 flex-col justify-center p-3 text-center">
-          <div class="font-bold text-blue-500">
-            Request for device permission
-          </div>
-          <div class="my-auto">Please turn on permission to play the game.</div>
-        </div>
-        <div class="flex h-[50px] w-full items-center text-blue-500">
-          <button class="w-1/2" @click="permissionDialog = false">
+      <div class="pt-2">
+        <div class="flex items-center text-blue-500">
+          <button class="h-[50px] w-1/2 rounded-l-[18px] bg-[#ffffffc9]" @click="permissionDialog = false">
             Cancel
           </button>
-          <div class="h-1/2 w-px bg-red-500/20" />
-          <button class="w-1/2" @click="requestPermission">
+          <div class="h-[50px] w-px bg-red-500/20" />
+          <button class="h-[50px] w-1/2 rounded-r-[18px] bg-[#ffffffc9]" @click="requestPermission">
             Turn on Permission
           </button>
         </div>
       </div>
-    </van-popup>
+    </CustomPopup>
 
     <div
       class="fixed left-1/2 top-1/2 flex h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-red-500 text-white transition-all duration-500"

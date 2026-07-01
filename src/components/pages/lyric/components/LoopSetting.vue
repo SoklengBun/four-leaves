@@ -2,6 +2,7 @@
 import { onClickOutside, useMediaQuery } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
+import CustomPopup from '~/components/shares/CustomPopup.vue';
 import LoopSettingImage from '~/assets/images/player/loop-setting.png';
 import { usePlayer } from '~/stores/player';
 
@@ -250,18 +251,17 @@ onClickOutside(
       <p v-if="!hasValidLoopRange" class="mt-2 text-[11px] text-[#d14d7f]">Set A first, then set B at a later time.</p>
     </div>
 
-    <van-popup
+    <CustomPopup
       v-if="isMobile"
       v-model:show="isOpen"
-      position="bottom"
-      round
-      :style="{ background: 'linear-gradient(to bottom, #fff9fd, #ffffff)', paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }"
+      mobile-position="bottom"
+      eyebrow="Player tools"
+      title="Loop A/B"
+      description="Set two time points and repeat that part of the track."
+      @close="closePanel"
     >
-      <div ref="panelRef" class="p-4">
-        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[#ffc5e4]"></div>
-
+      <div ref="panelRef" class="bg-[linear-gradient(to_bottom,_#fff9fd,_#ffffff)] p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <div class="mb-2 flex items-center justify-between">
-          <p class="text-base font-semibold text-[#ff4f9b]">Loop A/B</p>
           <span
             class="rounded-full px-2 py-[2px] text-[11px] font-semibold"
             :class="loopEnabled ? 'bg-[#d7ffe7] text-[#0f9151]' : 'bg-[#f3f4f6] text-[#6b7280]'"
@@ -339,7 +339,7 @@ onClickOutside(
         <p v-if="inputError" class="mt-2 text-xs text-[#d14d7f]">{{ inputError }}</p>
         <p v-if="!hasValidLoopRange && !inputError" class="mt-2 text-xs text-[#d14d7f]">Set A first, then set B at a later time.</p>
       </div>
-    </van-popup>
+    </CustomPopup>
   </div>
 </template>
 

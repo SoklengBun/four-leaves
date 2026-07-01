@@ -1,0 +1,105 @@
+<script setup lang="ts">
+import { useMediaQuery } from '@vueuse/core';
+import { computed, useAttrs } from 'vue';
+
+type PopupPosition = 'center' | 'top' | 'right' | 'bottom' | 'left';
+
+const props = withDefaults(
+  defineProps<{
+    desktopPosition?: PopupPosition;
+    mobilePosition?: PopupPosition;
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    showClose?: boolean;
+  }>(),
+  {
+    desktopPosition: 'center',
+    mobilePosition: 'bottom',
+    eyebrow: '',
+    title: '',
+    description: '',
+    showClose: true,
+  },
+);
+
+const show = defineModel<boolean>('show', { required: true });
+const emit = defineEmits<{ close: [] }>();
+
+const attrs = useAttrs();
+const isDesktop = useMediaQuery('(min-width: 768px)');
+
+const currentPosition = computed(() => (isDesktop.value ? props.desktopPosition : props.mobilePosition));
+const currentRound = computed(() => {
+  if (currentPosition.value === 'right' || currentPosition.value === 'left') return false;
+  if (currentPosition.value === 'center') return false;
+  return true;
+});
+
+const currentStyle = computed(() => {
+  if (currentPosition.value === 'right' || currentPosition.value === 'left') {
+    return {
+      background: 'transparent',
+      width: 'min(88vw, 360px)',
+      height: '100%',
+    };
+  }
+
+  if (currentPosition.value === 'center') {
+    return {
+      background: 'transparent',
+      width: 'min(92vw, 460px)',
+    };
+  }
+
+  return {
+    background: 'transparent',
+    width: '100%',
+    maxHeight: '90vh',
+  };
+});
+
+const hasHeader = computed(() => !!props.eyebrow || !!props.title || !!props.description);
+const isSidePopup = computed(() => currentPosition.value === 'right' || currentPosition.value === 'left');
+
+const closePopup = () => {
+  show.value = false;
+  emit('close');
+};
+</script>
+
+<template>
+  <van-popup v-model:show="show" v-bind="attrs" :position="currentPosition" :round="currentRound" :style="currentStyle" class="bg-transparent">
+    <div
+      class="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_#ffffffeb,_transparent_40%),linear-gradient(180deg,_#fff8fc_0%,_#fff0f7_48%,_#fef7ff_100%)] text-[#6e4b62] shadow-[0_24px_60px_#d89bb942,inset_0_1px_0_#ffffffd9]"
+      :class="isSidePopup ? 'h-full rounded-none' : 'rounded-t-[30px] md:rounded-[32px]'"
+    >
+      <div class="pointer-events-none absolute -top-[18px] right-4 h-[140px] w-[140px] rounded-full bg-[#ffc7df8c] opacity-90 blur-[16px]"></div>
+      <div class="pointer-events-none absolute -bottom-[18px] -left-5 h-[150px] w-[150px] rounded-full bg-[#dfcfff73] opacity-90 blur-[16px]"></div>
+
+      <div class="relative z-[1] flex h-full min-h-0 flex-col px-[18px] pb-[18px] pt-[22px]">
+        <div v-if="hasHeader || showClose" class="flex items-start justify-between gap-3">
+          <div v-if="hasHeader" class="min-w-0">
+            <p v-if="eyebrow" class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#d488ab]">{{ eyebrow }}</p>
+            <h2 v-if="title" class="m-0 text-[28px] font-extrabold leading-[1.05] text-[#7d4e6b]">{{ title }}</h2>
+            <p v-if="description" class="mt-[10px] text-[13px] leading-[1.55] text-[#9d7890]">{{ description }}</p>
+          </div>
+
+          <button
+            v-if="showClose"
+            type="button"
+            class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-0 bg-[#ffffffd4] text-[24px] leading-none text-[#966783] shadow-[0_10px_20px_#ebbcd229]"
+            aria-label="Close"
+            @click="closePopup"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="min-h-0 flex-1" :class="{ 'mt-[18px]': hasHeader || showClose }">
+          <slot />
+        </div>
+      </div>
+    </div>
+  </van-popup>
+</template>

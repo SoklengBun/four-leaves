@@ -5,13 +5,12 @@ import router from '~/router';
 import { pxToRem } from '~/utils/helper';
 import { usePlayer } from '~/stores/player';
 import { useAuth } from '~/stores/auth';
-import { usePlaylistStore } from '~/stores/usePlaylistStore';
+import { usePlaylist } from '~/stores/playlist';
 
 const player = usePlayer();
-const auth = useAuth();
-const playlistStore = usePlaylistStore();
+const playlist = usePlaylist();
 
-onMounted(() => {
+onMounted(async () => {
   player.init('yt-player');
 
   const html = document.getElementById('anella-container');
@@ -19,20 +18,9 @@ onMounted(() => {
   if (html) {
     html.style.overflow = 'hidden';
   }
+
+  await playlist.getPlaylists();
 });
-
-watch(
-  () => auth.user?.id ?? null,
-  async (userId) => {
-    if (!auth.isLoggedIn || !userId) {
-      playlistStore.clearPlaylists();
-      return;
-    }
-
-    await playlistStore.fetchMine();
-  },
-  { immediate: true },
-);
 
 onUnmounted(() => {
   const html = document.getElementById('anella-container');
@@ -65,6 +53,7 @@ const menus = [
       </div>
     </div>
   </div>
+
   <!-- <div class="h-[calc(var(--body-height))] overflow-hidden bg-blue-100 dark:bg-[#0c102f]" :style="{ '--nav-height': pxToRem(60) }">
     <CloudNavBar />
     <RouterView />

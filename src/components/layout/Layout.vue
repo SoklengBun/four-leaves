@@ -4,6 +4,7 @@ import FloatingEdgeMenu from './FloatingEdgeMenu.vue';
 import NavBar from './header/NavBar.vue';
 import MusicPlayer from '../music/MusicPlayer.vue';
 import MusicPlaylist from '../music/MusicPlaylist.vue';
+import CreatePlaylist from '../music/CreatePlaylist.vue';
 </script>
 
 <template>
@@ -14,6 +15,7 @@ import MusicPlaylist from '../music/MusicPlaylist.vue';
   <FloatingEdgeMenu />
   <MusicPlayer />
   <MusicPlaylist />
+  <CreatePlaylist />
 
   <!-- <FooterBar /> -->
 </template>

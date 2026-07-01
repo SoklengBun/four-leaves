@@ -18,6 +18,7 @@ import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
 import LyricsLoadingState from './components/LyricsLoadingState.vue';
 import LoopSetting from './components/LoopSetting.vue';
 import SongCoverList from './components/SongCoverList.vue';
+import CreatePlaylist from '~/components/music/CreatePlaylist.vue';
 import { getLyricsById } from '~/services/lyrics.js';
 import LyricsDetailMoreOptions from './components/LyricsDetailMoreOptions.vue';
 
@@ -37,7 +38,7 @@ const fetchLyricsDetail = async (id: string, force = false) => {
   try {
     const song = await getLyricsById(id, force);
     if (!song) return null;
-    current.value = song;
+    current.value = { ...current.value, ...song };
     return song;
   } finally {
     isLoading.value = false;
@@ -174,5 +175,6 @@ const refreshCurrentLyrics = () => {
     </div>
 
     <LyricsDetailMoreOptions v-model:show="showMore" @refresh="refreshCurrentLyrics" />
+    <CreatePlaylist />
   </div>
 </template>

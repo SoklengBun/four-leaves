@@ -1,6 +1,7 @@
 import { computed, ref, shallowRef, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
+import { usePlaylist } from './playlist';
 
 let ytApiPromise: Promise<void> | null = null;
 
@@ -29,7 +30,8 @@ const loadYoutubeApi = () => {
 };
 
 export const usePlayer = defineStore('player', () => {
-  const current = ref<Lyrics | null>(null);
+  const playlist = usePlaylist();
+  const current = ref<PlaylistItem | null>(null);
   const videoId = ref<string>('');
   const artists = ref<LyricsArtist[]>([]);
 
@@ -50,7 +52,6 @@ export const usePlayer = defineStore('player', () => {
   const repeatOne = ref(false);
 
   const showPlaylist = ref(false);
-  const playlist = ref<Playlist | null>(null);
   const router = useRouter();
 
   let timer: number | null = null;
@@ -137,11 +138,19 @@ export const usePlayer = defineStore('player', () => {
     console.log('YT Player initialized', player.value);
   };
 
+  const play = () => player.value?.playVideo();
+
+  const pause = () => player.value?.pauseVideo();
+
+  const seekTo = (time: number) => {
+    player.value?.seekTo(Math.max(0, time), true);
+  };
+
   const selectSong = async (song: PlaylistItem, coverId?: string, selectedPlaylist?: Playlist | null) => {
     const selectedId = coverId || song.defaultCoverId || song.videoId;
 
-    if (selectedPlaylist !== undefined) {
-      playlist.value = selectedPlaylist;
+    if (selectedPlaylist) {
+      playlist.list = selectedPlaylist;
     }
 
     if (videoId.value === selectedId) return;
@@ -157,21 +166,13 @@ export const usePlayer = defineStore('player', () => {
     }
 
     if (!videoId.value || !player.value || !isReady.value) return;
-
+    pause();
     player.value.loadVideoById(videoId.value);
-    player.value.playVideo();
+    play();
 
     if (mode.value === 'off') mode.value = 'full';
 
     clearLoopRange();
-  };
-
-  const play = () => player.value?.playVideo();
-
-  const pause = () => player.value?.pauseVideo();
-
-  const seekTo = (time: number) => {
-    player.value?.seekTo(Math.max(0, time), true);
   };
 
   const destroy = () => {
@@ -242,7 +243,7 @@ export const usePlayer = defineStore('player', () => {
   };
 
   const playNext = (fromSongEnd = false) => {
-    const lyricsList = playlist.value?.items ?? [];
+    const lyricsList = playlist.list?.items ?? [];
     if (!lyricsList.length || !current.value) return;
     const currentIndex = lyricsList.findIndex((s) => s.id === current.value?.id);
 
@@ -281,7 +282,7 @@ export const usePlayer = defineStore('player', () => {
   };
 
   const playPrevious = () => {
-    const lyricsList = playlist.value?.items ?? [];
+    const lyricsList = playlist.list?.items ?? [];
     if (!lyricsList.length || !current.value) return;
     const currentIndex = lyricsList.findIndex((s) => s.id === current.value?.id);
 
@@ -347,6 +348,5 @@ export const usePlayer = defineStore('player', () => {
     clearLoopRange,
     toggleLoopEnabled,
     showPlaylist,
-    playlist,
   };
 });
