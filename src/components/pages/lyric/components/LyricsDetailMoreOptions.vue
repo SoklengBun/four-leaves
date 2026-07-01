@@ -65,21 +65,21 @@ const onAddToPlaylist = async (playlistId: number) => {
   addingPlaylistId.value = playlistId;
 
   try {
-    await playlist.add(playlistId, [current.value.id]);
+    await playlist.addItems(playlistId, [current.value.id]);
     onClose();
   } finally {
     addingPlaylistId.value = null;
   }
 };
 
-const removeFromPlaylist = async () => {
+const onRemoveFromPlaylist = async () => {
   if (!current.value?.playlistItemId) return;
   if (isRemovingFromPlaylist.value) return;
 
   isRemovingFromPlaylist.value = true;
 
   try {
-    await playlist.remove(current.value.playlistItemId);
+    await playlist.removeItem(current.value.playlistItemId);
     player.playNext();
     onClose();
   } finally {
@@ -175,7 +175,7 @@ const isAddingToPlaylist = (playlistId: number) => addingPlaylistId.value === pl
         type="button"
         class="flex w-full items-center gap-3 rounded-[20px] border border-[#ffd7e9f2] bg-[#ffffffdb] p-[14px] text-left text-[#9a6782] shadow-[0_12px_24px_#ebbcd229] disabled:cursor-wait disabled:opacity-80"
         :disabled="isRemovingFromPlaylist || addingPlaylistId !== null"
-        @click="removeFromPlaylist"
+        @click="onRemoveFromPlaylist"
       >
         <span
           class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,_#fff7fb_0%,_#ffe8f3_100%)] text-[18px] leading-none"

@@ -6,9 +6,7 @@ import { getLyricsTitleLabel, getCoverArtistsLabel } from '~/utils/lyrics';
 
 withDefaults(
   defineProps<{
-    title: string;
-    description?: string;
-    songs: PlaylistItem[];
+    playlist: Playlist;
     layout?: 'row' | 'grid';
   }>(),
   {
@@ -33,18 +31,18 @@ const getThumbnailId = (song: PlaylistItem) => {
 </script>
 
 <template>
-  <section v-if="songs.length" class="space-y-3">
+  <section v-if="playlist.items.length" class="space-y-3">
     <div class="flex items-end justify-between gap-3">
       <div class="min-w-0">
-        <h2 class="text-lg font-semibold text-[#2b1f28] md:text-xl">{{ title }}</h2>
-        <p v-if="description" class="mt-1 text-xs text-[#7f6675] md:text-sm">{{ description }}</p>
+        <h2 class="text-lg font-semibold text-[#2b1f28] md:text-xl">{{ playlist.name }}</h2>
+        <p v-if="playlist.description" class="mt-1 text-xs text-[#7f6675] md:text-sm">{{ playlist.description }}</p>
       </div>
-      <p class="shrink-0 text-xs font-medium uppercase tracking-[0.24em] text-[#d184ad]">{{ songs.length }} songs</p>
+      <p class="shrink-0 text-xs font-medium uppercase tracking-[0.24em] text-[#d184ad]">{{ playlist.items.length }} songs</p>
     </div>
 
     <div :class="layout === 'grid' ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4' : 'flex gap-3 overflow-x-auto pb-2'">
       <button
-        v-for="song in songs"
+        v-for="song in playlist.items"
         :key="song.id"
         type="button"
         :class="
