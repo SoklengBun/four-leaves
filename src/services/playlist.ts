@@ -1,38 +1,33 @@
 import useAppFetch from '.';
 
-export type CreatePlaylistPayload = {
-  name: string;
-  description: string;
-  isPublic: boolean;
-  lyricsIds: number[];
-};
-
-export type AddPlaylistItemsPayload = {
-  lyricsIds: number[];
-};
-
-export const createPlaylist = async (payload: CreatePlaylistPayload) => {
-  return useAppFetch('playlist/add').post(payload).json();
-};
-
-export const getMyPlaylists = async () => {
+export const getUserPlaylists = async () => {
   return useAppFetch('playlist/mine').get().json();
 };
 
-export const addItemsToPlaylist = async (playlistId: number, payload: AddPlaylistItemsPayload) => {
-  return useAppFetch(`playlist/${encodeURIComponent(String(playlistId))}/items`)
+export const createPlaylist = async (payload: CreatePlaylist) => {
+  return useAppFetch('playlist/add').post(payload).json();
+};
+
+export const updatePlaylist = (id: number, payload: UpdatePlaylist) => {
+  return useAppFetch(`playlist/${encodeURIComponent(id)}`)
+    .put(payload)
+    .json();
+};
+
+export const addToPlaylist = async (id: number, payload: AddToPlaylist) => {
+  return useAppFetch(`playlist/${encodeURIComponent(id)}/items`)
     .post(payload)
     .json();
 };
 
-export const removePlaylistItem = async (playlistId: number, itemId: number) => {
-  return useAppFetch(`playlist/${encodeURIComponent(String(playlistId))}/items/${encodeURIComponent(String(itemId))}`)
+export const removeFromPlaylist = async (id: number, itemId: number) => {
+  return useAppFetch(`playlist/${encodeURIComponent(id)}/items/${encodeURIComponent(itemId)}`)
     .delete()
     .json();
 };
 
-export const updatePlaylistItem = async (itemId: number, payload: { defaultCoverId: string }) => {
-  return useAppFetch(`playlist/items/${encodeURIComponent(String(itemId))}`)
+export const updatePlaylistItem = async (itemId: number, payload: UpdatePlaylistItem) => {
+  return useAppFetch(`playlist/items/${encodeURIComponent(itemId)}`)
     .put(payload)
     .json();
 };

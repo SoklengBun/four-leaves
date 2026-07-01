@@ -11,11 +11,14 @@ import PlayerSeekBar from './PlayerSeekBar.vue';
 import YoutubeThumbnail from './YoutubeThumbnail.vue';
 import { useRouter } from 'vue-router';
 import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics.js';
+import { usePlaylist } from '~/stores/playlist.js';
 
 const router = useRouter();
 
 const player = usePlayer();
-const { mode, current, videoId, artists, isPlaying, showPlaylist, playlist } = storeToRefs(player);
+const { mode, current, videoId, artists, isPlaying, showPlaylist } = storeToRefs(player);
+
+const playlist = usePlaylist();
 
 const togglePlay = () => {
   if (mode.value === 'off') return;
@@ -81,7 +84,7 @@ const togglePlaylist = () => {
         </div>
         <div class="h-0 w-full">
           <div
-            v-if="playlist?.items?.length"
+            v-if="playlist?.list?.items?.length"
             class="liquid absolute right-0 top-1/2 flex h-10 w-[18px] -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-[#efefef] bg-red-100 md:hidden"
             @click="togglePlaylist"
           >

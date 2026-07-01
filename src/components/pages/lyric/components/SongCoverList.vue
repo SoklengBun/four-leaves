@@ -2,18 +2,17 @@
 import { onClickOutside, useMediaQuery } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
+import CustomPopup from '~/components/shares/CustomPopup.vue';
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
-import { updatePlaylistItem } from '~/services/playlist';
+
 import { usePlayer } from '~/stores/player';
-import { usePlaylistStore } from '~/stores/usePlaylistStore';
+import { usePlaylist } from '~/stores/playlist';
 import { useHomeStorage } from '~/utils/home-storage';
 import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
-import showToast from '~/utils/toast';
 
 const player = usePlayer();
-const playlistStore = usePlaylistStore();
-const homeStorage = useHomeStorage();
-const { current, videoId, playlist } = storeToRefs(player);
+const playlist = usePlaylist();
+const { current, videoId } = storeToRefs(player);
 
 const isMobile = useMediaQuery('(max-width: 767px)');
 const isOpen = ref(false);
@@ -35,10 +34,10 @@ const versions = computed(() => {
 const hasVersions = computed(() => versions.value.length > 1);
 const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 const currentPlaylistItem = computed(() => {
-  if (!playlist.value || !current.value) return null;
-  return playlist.value.items.find((item) => item.id === current.value?.id || item.videoId === current.value?.videoId) ?? null;
+  if (!playlist.list || !current.value) return null;
+  return playlist.list.items.find((item) => item.id === current.value?.id || item.videoId === current.value?.videoId) ?? null;
 });
-const canSetDefaultCover = computed(() => !!playlist.value && playlist.value.id !== 0 && !!currentPlaylistItem.value?.playlistItemId);
+const canSetDefaultCover = computed(() => !!playlist.list && playlist.list.id !== 0 && !!currentPlaylistItem.value?.playlistItemId);
 const defaultCoverId = computed(() => currentPlaylistItem.value?.defaultCoverId || currentPlaylistItem.value?.videoId || '');
 
 const selectVersion = (id: string) => {
@@ -50,40 +49,10 @@ const selectVersion = (id: string) => {
 const isDefaultCover = (coverId: string) => canSetDefaultCover.value && defaultCoverId.value === coverId;
 
 const setDefaultCover = async (coverId: string) => {
-  if (!canSetDefaultCover.value || !playlist.value || !currentPlaylistItem.value?.playlistItemId) return;
+  if (!canSetDefaultCover.value || !playlist.list || !currentPlaylistItem.value?.playlistItemId) return;
   if (defaultCoverId.value === coverId) return;
-
-  isSavingDefault.value = true;
-  try {
-    const { data } = await updatePlaylistItem(currentPlaylistItem.value.playlistItemId, { defaultCoverId: coverId });
-    if (data.value?.code !== 0) {
-      showToast({ message: data.value?.message || 'Failed to update default cover', type: 'error' });
-      return;
-    }
-
-    const nextItems = playlist.value.items.map((item) =>
-      item.playlistItemId === currentPlaylistItem.value?.playlistItemId ? { ...item, defaultCoverId: coverId } : item,
-    );
-    const nextPlaylist = {
-      ...playlist.value,
-      items: nextItems,
-    };
-    playlist.value = nextPlaylist;
-    playlistStore.replacePlaylist(nextPlaylist);
-
-    if ((homeStorage.value.playlists ?? []).some((item) => item.id === nextPlaylist.id)) {
-      homeStorage.value = {
-        ...homeStorage.value,
-        playlists: (homeStorage.value.playlists ?? []).map((item) => (item.id === nextPlaylist.id ? nextPlaylist : item)),
-      };
-    }
-
-    showToast({ message: 'Default cover updated', type: 'success' });
-  } catch {
-    showToast({ message: 'Network error while updating default cover', type: 'error' });
-  } finally {
-    isSavingDefault.value = false;
-  }
+  if (!current.value?.playlistItemId) return;
+  playlist.updateItem(current.value?.playlistItemId, { defaultCoverId: coverId });
 };
 
 const togglePanel = () => {
@@ -166,20 +135,16 @@ onClickOutside(
     </div>
 
     <!-- Mobile van-popup bottom sheet -->
-    <van-popup
+    <CustomPopup
       v-if="isMobile"
       v-model:show="isOpen"
-      position="bottom"
-      round
-      :style="{
-        background: 'linear-gradient(to bottom, #fff9fd, #ffffff)',
-        maxHeight: '70vh',
-      }"
+      mobile-position="bottom"
+      eyebrow="Versions"
+      :title="displayTitle"
+      :description="`${versions.length} version${versions.length === 1 ? '' : 's'} available for this song.`"
+      @close="closePanel"
     >
-      <div class="flex h-full max-h-[70vh] flex-col p-4">
-        {{ playlist?.id }}
-        <div class="mx-auto mb-3 h-1.5 w-12 rounded-full bg-[#ffc5e4]"></div>
-        <p class="mb-3 text-sm font-semibold text-[#ff4f9b]">Covers ({{ versions.length }})</p>
+      <div class="flex h-full max-h-[70vh] flex-col bg-[linear-gradient(to_bottom,_#fff9fd,_#ffffff)] p-4">
         <ul class="min-h-0 flex-1 space-y-2 overflow-y-auto">
           <li
             v-for="(item, i) in versions"
@@ -216,6 +181,6 @@ onClickOutside(
           </li>
         </ul>
       </div>
-    </van-popup>
+    </CustomPopup>
   </div>
 </template>

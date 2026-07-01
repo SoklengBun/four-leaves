@@ -7,7 +7,7 @@ import LyricsSongShelf from './components/LyricsSongShelf.vue';
 import useAppFetch from '~/services';
 import { useAppSetting } from '~/stores/app-setting';
 import { usePlayer } from '~/stores/player';
-import { usePlaylistStore } from '~/stores/usePlaylistStore';
+import { usePlaylist } from '~/stores/playlist.js';
 import { getTodayStorageDate, useHomeStorage } from '~/utils/home-storage';
 import { getLyricsArtistsLabel, normalizePlaylistItems } from '~/utils/lyrics';
 
@@ -19,8 +19,8 @@ const containerRef = ref<HTMLDivElement | null>(null);
 const appSetting = useAppSetting();
 const player = usePlayer();
 const homeStorage = useHomeStorage();
-const playlistStore = usePlaylistStore();
-const { playlists: userPlaylists } = storeToRefs(playlistStore);
+const playlist = usePlaylist();
+const { lists } = storeToRefs(playlist);
 
 const isFetching = ref(false);
 const isSearching = ref(false);
@@ -209,7 +209,7 @@ const onClear = async () => {
           </div>
           <div class="hero-chip">
             <span class="hero-chip__label">Playlists</span>
-            <span class="hero-chip__value">{{ userPlaylists.length }}</span>
+            <span class="hero-chip__value">{{ lists.length }}</span>
           </div>
           <button type="button" class="hero-chip hero-chip--button" :disabled="isFetching" @click="fetchLyrics">
             <span class="hero-chip__label">{{ isFetching ? 'Refreshing' : 'Refresh Home' }}</span>
@@ -251,7 +251,7 @@ const onClear = async () => {
 
       <template v-else>
         <LyricsSongShelf
-          v-for="playlist in userPlaylists"
+          v-for="playlist in lists"
           :key="`mine-${playlist.id}`"
           :title="playlist.name"
           :description="playlist.description"

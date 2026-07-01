@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import CustomPopup from '~/components/shares/CustomPopup.vue';
 import { usePlayer } from '~/stores/player';
 import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
 import { useRouter } from 'vue-router';
+import { usePlaylist } from '~/stores/playlist';
 
 const router = useRouter();
 const player = usePlayer();
-const { mode, current, videoId, artists, isPlaying, showPlaylist, playlist } = storeToRefs(player);
+const { current, videoId, isPlaying, showPlaylist } = storeToRefs(player);
 
-const playlistItems = computed(() => playlist.value?.items ?? []);
-const currentIndex = computed(() => playlistItems.value.findIndex((song) => song.id === current.value?.id));
-const currentPlaylistTitle = computed(() => playlist.value?.name || 'Soft Cloud Mix');
-const currentPlaylistDescription = computed(() => playlist.value?.description || 'A fluffy little queue for your current listening session.');
-const currentSongArtists = computed(() =>
-  artists.value?.length ? getLyricsArtistsLabel(artists.value) : getLyricsArtistsLabel(current.value?.artists),
-);
+const playlist = usePlaylist();
+
+const playlistItems = computed(() => playlist.list?.items ?? []);
+const currentPlaylistTitle = computed(() => playlist.list?.name || 'Soft Cloud Mix');
+const currentPlaylistDescription = computed(() => playlist.list?.description || 'A fluffy little queue for your current listening session.');
 
 const selectSong = (song: PlaylistItem) => {
-  player.selectSong(song, undefined, playlist.value);
+  player.selectSong(song, undefined, playlist.list);
   router.replace({ name: 'lyrics-detail', params: { id: song.id } });
 };
 
@@ -28,31 +28,19 @@ const closePlaylist = () => {
 </script>
 
 <template>
-  <van-popup
-    v-if="playlist?.items?.length"
+  <CustomPopup
+    v-if="playlist?.list?.items?.length"
     v-model:show="showPlaylist"
-    position="right"
-    :style="{
-      width: '340px',
-      height: '100%',
-    }"
+    desktop-position="right"
+    mobile-position="bottom"
+    eyebrow="Now playing"
+    :title="currentPlaylistTitle"
+    :description="currentPlaylistDescription"
+    @close="closePlaylist"
     class="playlist-popup"
   >
     <div class="playlist-shell h-full w-full overflow-hidden">
-      <div class="playlist-glow playlist-glow--top"></div>
-      <div class="playlist-glow playlist-glow--bottom"></div>
-
       <div class="playlist-content flex h-full flex-col">
-        <div class="playlist-hero">
-          <button type="button" class="playlist-close" @click="closePlaylist">Close</button>
-
-          <p class="playlist-kicker">Now playing</p>
-          <h2 class="playlist-title">{{ currentPlaylistTitle }}</h2>
-          <p class="playlist-description">
-            {{ currentPlaylistDescription }}
-          </p>
-        </div>
-
         <div class="playlist-list-wrap flex flex-1 flex-col rounded-t-2xl px-3 pt-3">
           <div class="playlist-list-header">
             <p class="playlist-list-title">Playlist queue</p>
@@ -92,7 +80,7 @@ const closePlaylist = () => {
         </div>
       </div>
     </div>
-  </van-popup>
+  </CustomPopup>
 </template>
 
 <style scoped>
@@ -102,80 +90,13 @@ const closePlaylist = () => {
 
 .playlist-shell {
   position: relative;
-  background: radial-gradient(circle at top left, #ffffffeb, transparent 38%),
-    linear-gradient(180deg, #fff6fb 0%, #fff0f7 42%, #fdf5ff 100%);
+  background: radial-gradient(circle at top left, #ffffffeb, transparent 38%), linear-gradient(180deg, #fff6fb 0%, #fff0f7 42%, #fdf5ff 100%);
   color: #6e4b62;
 }
 
 .playlist-content {
   position: relative;
   z-index: 1;
-}
-
-.playlist-glow {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(12px);
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-.playlist-glow--top {
-  top: 28px;
-  right: 20px;
-  width: 140px;
-  height: 140px;
-  background: #ffc4de8c;
-}
-
-.playlist-glow--bottom {
-  bottom: 48px;
-  left: -24px;
-  width: 160px;
-  height: 160px;
-  background: #d3c5ff73;
-}
-
-.playlist-hero {
-  padding: 20px 18px 18px;
-}
-
-.playlist-close {
-  margin-left: auto;
-  display: block;
-  border: 0;
-  border-radius: 999px;
-  background: #ffffffc7;
-  padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #8b6079;
-  box-shadow: 0 8px 18px #e5b1cb3d;
-}
-
-.playlist-kicker {
-  margin: 10px 0 6px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #d48cae;
-}
-
-.playlist-title {
-  margin: 0;
-  font-size: 28px;
-  line-height: 1.05;
-  font-weight: 800;
-  color: #7b4c69;
-}
-
-.playlist-description {
-  margin: 10px 0 0;
-  font-size: 13px;
-  line-height: 1.55;
-  color: #9d7890;
 }
 
 .playlist-now-card {
