@@ -134,6 +134,9 @@ export const usePlaylist = defineStore('playlist', () => {
       const item = lists.value.find((e) => e.id === playlistId);
 
       lists.value = lists.value.filter((e) => e.id !== playlistId);
+      if (list.value?.id === playlistId) {
+        list.value = undefined;
+      }
 
       showToast({ message: `Delete ${item?.name}`, type: 'success' });
     } finally {
@@ -207,6 +210,7 @@ export const usePlaylist = defineStore('playlist', () => {
     openUpdatePopup,
     create,
     update,
+    remove,
     addItems,
     removeItem,
     updateItem,

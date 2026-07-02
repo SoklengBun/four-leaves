@@ -15,7 +15,7 @@ export const updatePlaylist = (id: number, payload: UpdatePlaylist) => {
 };
 
 export const removePlaylist = (id: number) => {
-  return useAppFetch(`playlist/${encodeURIComponent(id)}}`)
+  return useAppFetch(`playlist/${encodeURIComponent(id)}`)
     .delete()
     .json();
 };
