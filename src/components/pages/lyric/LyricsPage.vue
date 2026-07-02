@@ -64,22 +64,26 @@ const searchResult = computed(() => {
   return filterLocalSongs(searchDebounce.value);
 });
 
-const createTodaySelectionTemplate = (): Playlist => ({
-  id: 0,
-  name: 'Today selection',
-  description: '10 songs from the home feed',
-  isPublic: false,
-  items: todaySelection.value.map((song) => ({
-    ...song,
-  })),
+const toadySelectionPlaylist = computed<Playlist>(() => {
+  return {
+    id: 0,
+    name: 'Today selection',
+    description: '10 songs from the home feed',
+    isPublic: false,
+    items: todaySelection.value.map((song) => ({
+      ...song,
+    })),
+  };
 });
 
-const searchDescription = computed(() => {
-  if (!searchText.value) return '';
-  if (isSearching.value) return `Searching songs for "${searchText.value}"...`;
-  if (searchError.value) return searchError.value;
-  if (!searchResult.value.length) return 'No songs matched your search yet.';
-  return `Matches for "${searchText.value}"`;
+const searchPlaylist = computed(() => {
+  return {
+    id: 0,
+    name: 'Search Result',
+    description: `Keyword  "${searchText.value}"`,
+    isPublic: false,
+    items: searchResult.value,
+  };
 });
 
 const fetchLyrics = async () => {
@@ -240,41 +244,28 @@ const onClear = async () => {
     </div>
 
     <div class="mt-5 flex w-full flex-col gap-6">
-      <LyricsSongShelf
-        v-if="searchText"
-        title="Search Results"
-        :description="searchDescription"
-        :songs="searchResult"
-        layout="grid"
-        @select="(song) => onClick(song, null)"
-      />
+      <LyricsSongShelf v-if="searchText" :playlist="searchPlaylist" layout="grid" @select="(song) => onClick(song, null)" />
 
       <template v-else>
         <LyricsSongShelf
           v-for="playlist in lists"
           :key="`mine-${playlist.id}`"
-          :title="playlist.name"
-          :description="playlist.description"
-          :songs="playlist.items"
+          :playlist="playlist"
           layout="grid"
           @select="(song) => onClick(song, playlist)"
         />
 
         <LyricsSongShelf
-          v-if="todaySelection.length"
-          title="Today selection"
-          description="10 songs from the home feed"
-          :songs="todaySelection"
+          v-if="toadySelectionPlaylist.items.length"
+          :playlist="toadySelectionPlaylist"
           layout="grid"
-          @select="(song) => onClick(song, createTodaySelectionTemplate())"
+          @select="(song) => onClick(song, toadySelectionPlaylist)"
         />
 
         <LyricsSongShelf
           v-for="playlist in featuredPlaylists"
           :key="playlist.id"
-          :title="playlist.name"
-          :description="playlist.description"
-          :songs="playlist.items"
+          :playlist="playlist"
           layout="grid"
           @select="(song) => onClick(song, playlist)"
         />

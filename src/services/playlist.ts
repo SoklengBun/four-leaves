@@ -14,6 +14,12 @@ export const updatePlaylist = (id: number, payload: UpdatePlaylist) => {
     .json();
 };
 
+export const removePlaylist = (id: number) => {
+  return useAppFetch(`playlist/${encodeURIComponent(id)}`)
+    .delete()
+    .json();
+};
+
 export const addToPlaylist = async (id: number, payload: AddToPlaylist) => {
   return useAppFetch(`playlist/${encodeURIComponent(id)}/items`)
     .post(payload)

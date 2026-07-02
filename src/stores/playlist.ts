@@ -1,6 +1,14 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { addToPlaylist, createPlaylist, getUserPlaylists, removeFromPlaylist, updatePlaylist, updatePlaylistItem } from '~/services/playlist';
+import {
+  addToPlaylist,
+  createPlaylist,
+  getUserPlaylists,
+  removeFromPlaylist,
+  removePlaylist,
+  updatePlaylist,
+  updatePlaylistItem,
+} from '~/services/playlist';
 import { useAuth } from '~/stores/auth';
 import { normalizePlaylistItems } from '~/utils/lyrics';
 import { useStorage } from '@vueuse/core';
@@ -115,7 +123,27 @@ export const usePlaylist = defineStore('playlist', () => {
     }
   };
 
-  const add = async (playlistId: number, songIds: number[]) => {
+  const remove = async (playlistId: number) => {
+    if (!auth.isLoggedIn) return;
+    try {
+      const { data } = await removePlaylist(playlistId);
+      if (data.value?.code !== 0) {
+        showToast({ message: data.value?.message || 'Failed to delete playlist', type: 'error' });
+        return;
+      }
+      const item = lists.value.find((e) => e.id === playlistId);
+
+      lists.value = lists.value.filter((e) => e.id !== playlistId);
+      if (list.value?.id === playlistId) {
+        list.value = undefined;
+      }
+
+      showToast({ message: `Delete ${item?.name}`, type: 'success' });
+    } finally {
+    }
+  };
+
+  const addItems = async (playlistId: number, songIds: number[]) => {
     if (!auth.isLoggedIn) return;
     if (!playlistId) return;
 
@@ -134,7 +162,7 @@ export const usePlaylist = defineStore('playlist', () => {
     }
   };
 
-  const remove = async (itemId: number) => {
+  const removeItem = async (itemId: number) => {
     console.log('=>>>list', list.value);
     if (!auth.isLoggedIn) return;
     if (!list.value?.id) return;
@@ -182,8 +210,9 @@ export const usePlaylist = defineStore('playlist', () => {
     openUpdatePopup,
     create,
     update,
-    add,
     remove,
+    addItems,
+    removeItem,
     updateItem,
   };
 });
