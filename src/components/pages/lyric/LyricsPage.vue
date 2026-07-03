@@ -218,6 +218,9 @@ const onClear = async () => {
           <button type="button" class="hero-chip hero-chip--button" :disabled="isFetching" @click="fetchLyrics">
             <span class="hero-chip__label">{{ isFetching ? 'Refreshing' : 'Refresh Home' }}</span>
           </button>
+          <button type="button" class="hero-chip hero-chip--button" @click="router.push({ name: 'lyrics-all' })">
+            <span class="hero-chip__label">Browse All</span>
+          </button>
           <div v-if="isSearching" class="hero-chip">
             <span class="hero-chip__label">Searching</span>
           </div>

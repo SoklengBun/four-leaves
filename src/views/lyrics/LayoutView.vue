@@ -32,6 +32,7 @@ onUnmounted(() => {
 
 const menus = [
   { name: 'lyrics', label: 'Home', icon: '' },
+  { name: 'lyrics-all', label: 'All Lyrics', icon: '' },
   { name: 'lyrics-mine', label: 'My Lyrics', icon: '', auth: true },
   { name: 'lyrics-add', label: 'Add Lyrics', icon: '', auth: true },
 ];
