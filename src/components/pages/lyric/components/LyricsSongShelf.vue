@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
-import ConfirmDialog from '~/components/shares/ConfirmDialog.vue';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
-import { useAuth } from '~/stores/auth';
-import { usePlaylist } from '~/stores/playlist';
 import { getLyricsTitleLabel, getCoverArtistsLabel } from '~/utils/lyrics';
 
 const props = withDefaults(
   defineProps<{
     playlist: Playlist;
     layout?: 'row' | 'grid';
+    maxItems?: number;
+    enableViewMore?: boolean;
   }>(),
   {
     layout: 'row',
+    maxItems: 4,
+    enableViewMore: true,
   },
 );
 
@@ -22,52 +23,23 @@ const emit = defineEmits<{
   select: [song: PlaylistItem];
 }>();
 
-const auth = useAuth();
-const playlistStore = usePlaylist();
-const { list } = storeToRefs(playlistStore);
+const router = useRouter();
 
-const showRemoveConfirm = ref(false);
-const isRemovingPlaylist = ref(false);
-
-const canRemovePlaylist = computed(() => {
-  return !!props.playlist.id && props.playlist.createdById === auth.user?.id;
+const visibleItems = computed(() => {
+  if (props.maxItems <= 0) return props.playlist.items;
+  return props.playlist.items.slice(0, props.maxItems);
 });
 
-const playlistDescription = computed(() => {
-  if (props.playlist.description) return props.playlist.description;
-
-  return 'A playlist from your personal library.';
+const shouldShowViewMore = computed(() => {
+  return props.enableViewMore && props.playlist.id > 0;
 });
 
 const onSelect = (song: PlaylistItem) => {
   emit('select', song);
 };
 
-const openRemoveConfirm = () => {
-  if (!canRemovePlaylist.value || isRemovingPlaylist.value) return;
-  showRemoveConfirm.value = true;
-};
-
-const closeRemoveConfirm = () => {
-  if (isRemovingPlaylist.value) return;
-  showRemoveConfirm.value = false;
-};
-
-const onRemovePlaylist = async () => {
-  if (!canRemovePlaylist.value || isRemovingPlaylist.value) return;
-
-  isRemovingPlaylist.value = true;
-
-  try {
-    if (list.value?.id === props.playlist.id) {
-      list.value = props.playlist;
-    }
-
-    await playlistStore.remove(props.playlist.id);
-    showRemoveConfirm.value = false;
-  } finally {
-    isRemovingPlaylist.value = false;
-  }
+const onViewMore = () => {
+  router.push({ name: 'lyrics-playlist', params: { playlistId: props.playlist.id } });
 };
 
 const getThumbnailId = (song: PlaylistItem) => {
@@ -88,28 +60,20 @@ const getThumbnailId = (song: PlaylistItem) => {
 
       <div class="flex shrink-0 items-center gap-2">
         <p class="text-xs font-medium uppercase tracking-[0.24em] text-[#d184ad]">{{ playlist.items.length }} songs</p>
-
         <button
-          v-if="canRemovePlaylist"
+          v-if="shouldShowViewMore"
           type="button"
-          class="inline-flex items-center gap-2 rounded-full border border-[#ffc7dc] bg-[linear-gradient(180deg,_#fffafc_0%,_#fff0f6_100%)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#ca5d8b] shadow-[0_10px_18px_#f7bfd426,inset_0_1px_0_#ffffffd6] transition-[transform,box-shadow,border-color] duration-150 hover:border-[#ffabc9] hover:shadow-[0_12px_22px_#f5a9c926] active:scale-[0.98] disabled:cursor-wait disabled:opacity-70"
-          :disabled="isRemovingPlaylist"
-          @click="openRemoveConfirm"
+          class="rounded-full border border-[#ffd7e8] bg-[#fff7fb] px-3 py-1.5 text-xs font-semibold text-[#c76a97] transition-colors hover:bg-[#ffeaf4]"
+          @click="onViewMore"
         >
-          <span
-            v-if="isRemovingPlaylist"
-            class="h-3.5 w-3.5 animate-spin rounded-full border-[1.5px] border-current border-t-transparent"
-            aria-hidden="true"
-          />
-          <span v-else class="text-sm leading-none">−</span>
-          {{ isRemovingPlaylist ? 'Removing' : 'Remove playlist' }}
+          View more
         </button>
       </div>
     </div>
 
     <div :class="layout === 'grid' ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4' : 'flex gap-3 overflow-x-auto pb-2'">
       <button
-        v-for="song in playlist.items"
+        v-for="song in visibleItems"
         :key="song.id"
         type="button"
         :class="
@@ -129,23 +93,6 @@ const getThumbnailId = (song: PlaylistItem) => {
         </div>
       </button>
     </div>
-
-    <ConfirmDialog
-      v-model:show="showRemoveConfirm"
-      eyebrow="Remove playlist"
-      :title="`Delete ${playlist.name}?`"
-      :description="`This will remove the playlist and its ${playlist.items.length} song${playlist.items.length === 1 ? '' : 's'} from your library.`"
-      confirm-text="Delete playlist"
-      cancel-text="Keep playlist"
-      :loading="isRemovingPlaylist"
-      @cancel="closeRemoveConfirm"
-      @confirm="onRemovePlaylist"
-    >
-      <div class="rounded-[22px] border border-[#ffd6e4] bg-[#fff8fb] p-4 text-sm text-[#8d6278] shadow-[inset_0_1px_0_#ffffffd9]">
-        <p class="font-semibold text-[#a6547a]">{{ playlist.name }}</p>
-        <p class="mt-1 leading-[1.55]">{{ playlistDescription }}</p>
-      </div>
-    </ConfirmDialog>
   </section>
 </template>
 

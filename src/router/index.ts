@@ -8,6 +8,8 @@ import LyricsListView from '../views/lyrics/ListView.vue';
 import LyricsDetailView from '../views/lyrics/DetailView.vue';
 import LyricsAddView from '../views/lyrics/AddView.vue';
 import MyLyricsView from '../views/lyrics/MineView.vue';
+import LyricsPlaylistView from '../views/lyrics/PlaylistView.vue';
+import LyricsAllView from '../views/lyrics/AllView.vue';
 
 import NotFound from '../views/PageNotFoundView.vue';
 
@@ -48,6 +50,11 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
+          path: 'all',
+          name: 'lyrics-all',
+          component: LyricsAllView,
+        },
+        {
           path: 'edit/:id',
           name: 'lyrics-edit',
           component: LyricsAddView,
@@ -58,6 +65,11 @@ const router = createRouter({
           name: 'lyrics-add',
           component: LyricsAddView,
           meta: { requiresAuth: true },
+        },
+        {
+          path: 'playlist/:playlistId',
+          name: 'lyrics-playlist',
+          component: LyricsPlaylistView,
         },
         {
           path: '/lyrics/:id',

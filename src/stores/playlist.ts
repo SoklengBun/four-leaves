@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import {
   addToPlaylist,
   createPlaylist,
+  getPlaylistDetail,
   getUserPlaylists,
   removeFromPlaylist,
   removePlaylist,
@@ -76,6 +77,40 @@ export const usePlaylist = defineStore('playlist', () => {
     }
   };
 
+  const getPlaylist = async (playlistId: number | string, force = false) => {
+    if (!playlistId) return;
+
+    const normalizedId = Number(playlistId);
+    const cachedPlaylist = lists.value.find((item) => item.id === normalizedId);
+
+    if (!force && cachedPlaylist) {
+      list.value = cachedPlaylist;
+      return cachedPlaylist;
+    }
+
+    isLoading.value = true;
+    try {
+      const { data } = await getPlaylistDetail(playlistId);
+
+      if (data.value?.code !== 0) {
+        showToast({ message: data.value?.message || 'Failed to fetch playlist', type: 'error' });
+        return;
+      }
+
+      const playlist = normalizePlaylistItems(data.value.data as RawPlaylist);
+      list.value = playlist;
+
+      const index = lists.value.findIndex((item) => item.id === playlist.id);
+      if (index >= 0) {
+        lists.value[index] = playlist;
+      }
+
+      return playlist;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   const create = async (payload: CreatePlaylist) => {
     if (!auth.isLoggedIn) return;
 
@@ -129,7 +164,7 @@ export const usePlaylist = defineStore('playlist', () => {
       const { data } = await removePlaylist(playlistId);
       if (data.value?.code !== 0) {
         showToast({ message: data.value?.message || 'Failed to delete playlist', type: 'error' });
-        return;
+        return false;
       }
       const item = lists.value.find((e) => e.id === playlistId);
 
@@ -139,6 +174,7 @@ export const usePlaylist = defineStore('playlist', () => {
       }
 
       showToast({ message: `Delete ${item?.name}`, type: 'success' });
+      return true;
     } finally {
     }
   };
@@ -204,6 +240,7 @@ export const usePlaylist = defineStore('playlist', () => {
     formMode,
     formPlaylist,
     formLyricsIds,
+    getPlaylist,
     getPlaylists,
     closeFormPopup,
     openCreatePopup,

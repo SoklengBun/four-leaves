@@ -8,6 +8,12 @@ export const createPlaylist = async (payload: CreatePlaylist) => {
   return useAppFetch('playlist/add').post(payload).json();
 };
 
+export const getPlaylistDetail = async (id: number | string) => {
+  return useAppFetch(`playlist/${encodeURIComponent(id)}`)
+    .get()
+    .json();
+};
+
 export const updatePlaylist = (id: number, payload: UpdatePlaylist) => {
   return useAppFetch(`playlist/${encodeURIComponent(id)}`)
     .put(payload)

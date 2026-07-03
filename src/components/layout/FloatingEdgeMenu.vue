@@ -24,7 +24,7 @@ const route = useRoute();
 const menuItems: MenuItem[] = [
   { label: 'Home', path: '/', icon: menuHomeIcon },
   { label: 'Lyrics', path: '/lyrics', icon: menuLyricIcon },
-  { label: 'My Lyrics', path: '/lyrics/mine', icon: menuLyricMineIcon },
+  { label: 'My Lyrics', path: '/lyrics/all', icon: menuLyricMineIcon },
   { label: 'Add Lyrics', path: '/lyrics/add', icon: menuLyricAddIcon },
   { label: 'About', path: '/about', icon: menuDefaultIcon },
 ];
