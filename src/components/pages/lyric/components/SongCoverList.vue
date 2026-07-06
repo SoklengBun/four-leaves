@@ -4,11 +4,12 @@ import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import CustomPopup from '~/components/shares/CustomPopup.vue';
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
+import MarqueeText from '~/components/shares/MarqueeText.vue';
 
 import { usePlayer } from '~/stores/player';
 import { usePlaylist } from '~/stores/playlist';
-import { useHomeStorage } from '~/utils/home-storage';
 import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
+import Loading from '~/components/shares/Loading.vue';
 
 const player = usePlayer();
 const playlist = usePlaylist();
@@ -16,7 +17,7 @@ const { current, videoId } = storeToRefs(player);
 
 const isMobile = useMediaQuery('(max-width: 767px)');
 const isOpen = ref(false);
-const isSavingDefault = ref(false);
+const savingDefaultId = ref('');
 const panelRef = ref<HTMLElement | null>(null);
 const triggerRef = ref<HTMLElement | null>(null);
 
@@ -47,12 +48,20 @@ const selectVersion = (id: string) => {
 };
 
 const isDefaultCover = (coverId: string) => canSetDefaultCover.value && defaultCoverId.value === coverId;
+const isSavingDefault = (coverId: string) => savingDefaultId.value === coverId;
 
 const setDefaultCover = async (coverId: string) => {
   if (!canSetDefaultCover.value || !playlist.list || !currentPlaylistItem.value?.playlistItemId) return;
   if (defaultCoverId.value === coverId) return;
   if (!current.value?.playlistItemId) return;
-  playlist.updateItem(current.value?.playlistItemId, { defaultCoverId: coverId });
+  const currentSong = current.value;
+  savingDefaultId.value = coverId;
+  try {
+    await playlist.updateItem(current.value.playlistItemId, { defaultCoverId: coverId });
+    await player.selectSong(currentSong, coverId);
+  } finally {
+    savingDefaultId.value = '';
+  }
 };
 
 const togglePanel = () => {
@@ -101,7 +110,7 @@ onClickOutside(
         <li
           v-for="(item, i) in versions"
           :key="i"
-          class="flex items-center gap-2.5 px-3 py-2 transition-colors"
+          class="flex items-center gap-1 px-3 py-2 transition-colors"
           :class="{ 'bg-[#fff0f8]': item.id === videoId }"
         >
           <button
@@ -113,19 +122,17 @@ onClickOutside(
               <YoutubeThumbnail :id="item.id" />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="truncate text-xs font-semibold text-[#1f1f1f]">{{ displayTitle }}</p>
-              <p class="truncate text-[11px] text-[#6b7280]">{{ getLyricsArtistsLabel(item.artists) }}</p>
+              <MarqueeText :text="displayTitle" class="w-full min-w-0 text-xs font-semibold text-[#1f1f1f]" :gap="24" :speed="32" />
+              <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-[11px] text-[#6b7280]" :gap="20" :speed="30" />
             </div>
-            <svg v-if="item.id === videoId" class="size-3.5 shrink-0 text-[#ff4f9b]" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-            </svg>
           </button>
+          <Loading class="shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
           <button
             v-if="canSetDefaultCover"
             type="button"
             class="ml-2 shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             :class="isDefaultCover(item.id) ? 'bg-[#ffd5e7] text-[#b93876]' : 'bg-[#fff4fb] text-[#d14d8a]'"
-            :disabled="isSavingDefault || isDefaultCover(item.id)"
+            :disabled="!!savingDefaultId || isDefaultCover(item.id)"
             @click.stop="setDefaultCover(item.id)"
           >
             {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
@@ -149,7 +156,7 @@ onClickOutside(
           <li
             v-for="(item, i) in versions"
             :key="i"
-            class="flex items-center gap-3 rounded-xl p-2 transition-colors"
+            class="flex items-center gap-1 rounded-xl p-2 transition-colors"
             :class="{ 'bg-[#fff0f8]': item.id === videoId }"
           >
             <button
@@ -161,19 +168,17 @@ onClickOutside(
                 <YoutubeThumbnail :id="item.id" />
               </div>
               <div class="min-w-0 flex-1">
-                <p class="truncate text-sm font-semibold text-[#1f1f1f]">{{ displayTitle }}</p>
-                <p class="truncate text-xs text-[#6b7280]">{{ getLyricsArtistsLabel(item.artists) }}</p>
+                <MarqueeText :text="displayTitle" class="w-full min-w-0 text-sm font-semibold text-[#1f1f1f]" :gap="24" :speed="32" />
+                <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-xs text-[#6b7280]" :gap="20" :speed="30" />
               </div>
-              <svg v-if="item.id === videoId" class="size-4 shrink-0 text-[#ff4f9b]" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-              </svg>
             </button>
+            <Loading class="shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
             <button
               v-if="canSetDefaultCover"
               type="button"
               class="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               :class="isDefaultCover(item.id) ? 'bg-[#ffd5e7] text-[#b93876]' : 'bg-[#fff4fb] text-[#d14d8a]'"
-              :disabled="isSavingDefault || isDefaultCover(item.id)"
+              :disabled="!!savingDefaultId || isDefaultCover(item.id)"
               @click.stop="setDefaultCover(item.id)"
             >
               {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}

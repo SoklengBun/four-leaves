@@ -166,9 +166,16 @@ export const usePlayer = defineStore('player', () => {
     }
 
     if (!videoId.value || !player.value || !isReady.value) return;
+
     pause();
     player.value.loadVideoById(videoId.value);
     play();
+
+    const route = router.currentRoute.value;
+    const isDetail = route.name === 'lyrics-detail';
+    if (isDetail && route.params.id !== song.videoId) {
+      router.replace({ params: { id: song.videoId } });
+    }
 
     if (mode.value === 'off') mode.value = 'full';
 

@@ -71,19 +71,19 @@ const getThumbnailId = (song: PlaylistItem) => {
       </div>
     </div>
 
-    <div :class="layout === 'grid' ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4' : 'flex gap-3 overflow-x-auto pb-2'">
+    <div :class="layout === 'grid' ? 'grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3' : 'flex gap-3 overflow-x-auto pb-2'">
       <button
         v-for="song in visibleItems"
         :key="song.id"
         type="button"
         :class="
           layout === 'grid'
-            ? 'lyric-card lyric-card--grid box-cover group w-full rounded-[24px] p-2.5 text-left'
+            ? 'lyric-card lyric-card--grid box-cover box-cover group w-full rounded-xl p-2.5 text-left md:rounded-2xl'
             : 'lyric-card box-cover group w-[132px] shrink-0 rounded-[24px] p-2.5 text-left md:w-[164px]'
         "
         @click="onSelect(song)"
       >
-        <div class="relative aspect-square overflow-hidden rounded-[18px] bg-[#f6d8e8]">
+        <div class="relative aspect-square overflow-hidden rounded-md bg-[#f6d8e8] md:rounded-lg">
           <YoutubeThumbnail :id="getThumbnailId(song)" />
         </div>
 
@@ -98,23 +98,12 @@ const getThumbnailId = (song: PlaylistItem) => {
 
 <style scoped>
 .lyric-card {
+  @apply transition-all duration-300;
   background: linear-gradient(180deg, rgb(255 250 252 / 96%) 0%, rgb(255 240 247 / 98%) 100%);
-  border: 1px solid #ffd7e8;
-  box-shadow:
-    0 12px 30px rgb(255 171 207 / 20%),
-    inset 0 1px 0 rgb(255 255 255 / 80%);
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
 }
 
 .lyric-card:hover {
-  transform: translateY(-2px);
-  border-color: #ffb9d8;
-  box-shadow:
-    0 16px 34px rgb(255 157 198 / 24%),
-    inset 0 1px 0 rgb(255 255 255 / 90%);
+  transform: translateY(-4px);
 }
 
 .lyric-card:active {

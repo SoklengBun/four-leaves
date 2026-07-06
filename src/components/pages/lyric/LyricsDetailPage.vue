@@ -22,7 +22,7 @@ import CreatePlaylist from '~/components/music/CreatePlaylist.vue';
 import { getLyricsById } from '~/services/lyrics.js';
 import LyricsDetailMoreOptions from './components/LyricsDetailMoreOptions.vue';
 import BackButton from '~/components/shares/BackButton.vue';
-import MoreButton from '~/components/shares/MoreButton.vue';
+import RoundButton from '~/components/shares/RoundButton.vue';
 
 const router = useRouter();
 const player = usePlayer();
@@ -90,10 +90,11 @@ const refreshCurrentLyrics = () => {
 <template>
   <div class="flex h-full min-h-[80vh] w-full flex-col items-center px-3 pb-1 pt-3">
     <BackButton />
-    <MoreButton @click="showMore = true" />
+    <RoundButton @click="showMore = true" />
 
     <div class="relative mt-5 size-[150px] shrink-0">
-      <YoutubeThumbnail :id="videoId" class="box-cover overflow-hidden rounded-lg" />
+      <YoutubeThumbnail :id="videoId" class="box-cover rounded-card overflow-hidden" />
+
       <SongCoverList />
     </div>
     <div
@@ -126,7 +127,7 @@ const refreshCurrentLyrics = () => {
 
     <LyricsLoadingState v-if="isLoading" />
 
-    <div v-else class="box-cover mt-5 w-full flex-1 rounded-t-2xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-b-2xl md:pb-6 md:pt-6">
+    <div v-else class="box-cover mt-5 w-full flex-1 rounded-xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-2xl md:pb-6 md:pt-6">
       <p class="h-fit whitespace-pre-line text-center text-base lowercase">
         {{ lyricsContent || 'No lyrics available' }}
       </p>

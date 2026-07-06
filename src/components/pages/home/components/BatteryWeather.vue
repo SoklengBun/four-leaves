@@ -15,7 +15,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="flex items-center justify-evenly rounded-lg bg-card px-3 py-1 text-gray-800">
+  <div class="flex items-center justify-evenly bg-card px-3 py-1 text-gray-800">
     <div class="flex items-center space-x-2">
       <div class="relative h-[18px] w-[30px] rounded border-2 border-gray-500 p-0.5">
         <div class="h-full w-[var(--battery-percent)] rounded-sm bg-primary" :style="`--battery-percent:${batteryPercentage}%`"></div>

@@ -7,7 +7,7 @@ module.exports = {
       container: {
         center: true,
         padding: {
-          DEFAULT: '1rem',
+          DEFAULT: '0.75rem',
         },
       },
       colors: {
@@ -42,6 +42,9 @@ module.exports = {
         nav: 'var(--nav-height)',
         body: 'var(--body-height)',
         player: 'var(--player-height)',
+      },
+      borderRadius: {
+        card: 'var(--rounded-card)',
       },
     },
   },

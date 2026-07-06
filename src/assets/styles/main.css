@@ -39,9 +39,9 @@ body {
 }
 
 .box-cover {
-  @apply rounded-xl border border-primary md:border-2;
+  @apply border-2 border-[#ffcfe7];
   box-shadow:
-    0 0 10px #ffb1ed,
-    0 0 10px #f5fcff,
-    0 0 20px #ffc1f7;
+    0 0 5px #ffc9f2,
+    0 0 7px #f5fcff,
+    0 0 10px #ff9fc9;
 }

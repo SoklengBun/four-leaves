@@ -7,7 +7,7 @@ import LyricsPlaylistMoreOptions from './components/LyricsPlaylistMoreOptions.vu
 import LyricsSongShelf from './components/LyricsSongShelf.vue';
 import BackButton from '~/components/shares/BackButton.vue';
 import CreatePlaylist from '~/components/music/CreatePlaylist.vue';
-import MoreButton from '~/components/shares/MoreButton.vue';
+import RoundButton from '~/components/shares/RoundButton.vue';
 import { useAuth } from '~/stores/auth';
 import { usePlayer } from '~/stores/player';
 import { usePlaylist } from '~/stores/playlist';
@@ -49,7 +49,7 @@ watch(playlistId, (value, previousValue) => {
 <template>
   <div class="flex min-h-[80vh] w-full flex-col px-3 pt-3">
     <BackButton />
-    <MoreButton v-if="isOwner" aria-label="Playlist actions" @click="showMore = true" />
+    <RoundButton v-if="isOwner" @click="showMore = true" />
 
     <div
       class="mt-4 overflow-hidden rounded-[28px] border border-[#ffd7e8] bg-[linear-gradient(145deg,_#fff9fc_0%,_#fff0f7_52%,_#fff8fd_100%)] p-5 shadow-[0_20px_50px_#f5bfd73d] md:p-7"

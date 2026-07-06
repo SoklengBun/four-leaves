@@ -45,13 +45,18 @@
   --color-hero: var(--anella-hero);
 
   --player-mini: 60px;
+  --player-height: 12px;
   --player-full: 100px;
+
+  --rounded-card: 0.5rem;
 }
 
 @media (min-width: 768px) {
   :root {
     --player-mini: 60px;
     --player-full: 140px;
+
+    --rounded-card: 0.75rem;
   }
 }
 
