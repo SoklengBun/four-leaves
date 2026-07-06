@@ -8,15 +8,15 @@ import Weather from './Weather.vue';
   <div class="desktop-container hidden h-body w-full overflow-y-auto overflow-x-hidden overscroll-none p-5 md:block">
     <div class="desktop-background" />
 
-    <div class="container relative z-[2] flex gap-5">
+    <div class="container relative z-[2] flex gap-3">
       <div>
-        <img src="https://redive.estertion.win/card/full/124131.webp" alt="Desktop hero" class="desktop-box-cover" />
+        <img src="https://redive.estertion.win/card/full/124131.webp" alt="Desktop hero" class="box-cover rounded-card" />
       </div>
 
-      <div class="min-w-[355px] max-w-[375px] space-y-5">
-        <Calendar class="desktop-box-cover" />
-        <Battery class="desktop-box-cover" />
-        <Weather class="desktop-box-cover" />
+      <div class="min-w-[355px] max-w-[375px] space-y-3">
+        <Calendar class="box-cover rounded-card" />
+        <Battery class="box-cover rounded-card" />
+        <Weather class="box-cover rounded-card" />
       </div>
     </div>
   </div>
@@ -33,13 +33,5 @@ import Weather from './Weather.vue';
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-}
-
-.desktop-box-cover {
-  @apply relative z-[2] rounded-xl border-2 border-primary;
-  box-shadow:
-    0 0 10px #ffb1ed,
-    0 0 10px #f5fcff,
-    0 0 20px #ffc1f7;
 }
 </style>

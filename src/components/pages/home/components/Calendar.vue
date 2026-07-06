@@ -44,7 +44,7 @@ const tzString = computed(() => {
 </script>
 
 <template>
-  <div class="relative w-full rounded-lg bg-card p-3">
+  <div class="relative w-full bg-card p-3">
     <div class="mb-3 flex items-center justify-between">
       <div class="flex flex-col">
         <div class="text-lg font-bold text-purple-600">{{ monthName }}</div>

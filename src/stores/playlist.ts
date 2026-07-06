@@ -228,7 +228,18 @@ export const usePlaylist = defineStore('playlist', () => {
         return;
       }
 
+      const updateLocalPlaylist = (playlist?: Playlist) => {
+        if (!playlist) return;
+        const item = playlist.items.find((entry) => entry.playlistItemId === itemId);
+        if (!item) return;
+        Object.assign(item, payload);
+      };
+
+      updateLocalPlaylist(list.value);
+      lists.value.forEach((playlist) => updateLocalPlaylist(playlist));
+
       showToast({ message: `Update ${list.value.name}`, type: 'success' });
+      return data.value?.data;
     } finally {
     }
   };

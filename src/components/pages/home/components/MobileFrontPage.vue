@@ -9,10 +9,10 @@ const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home
   <div class="mobile-front-container flex flex-col overflow-y-auto overflow-x-hidden overscroll-none p-3">
     <div class="background-image" />
     <div class="relative z-[2] flex flex-col pb-player">
-      <img src="https://redive.estertion.win/card/full/124131.webp" class="box-cover h-[200px] w-full rounded-lg" />
+      <img src="https://redive.estertion.win/card/full/124131.webp" class="box-cover rounded-card h-[200px] w-full" />
 
-      <BatteryWeather class="box-cover mt-3" />
-      <Calendar class="box-cover mt-3" />
+      <BatteryWeather class="box-cover rounded-card mt-3" />
+      <Calendar class="box-cover rounded-card mt-3" />
     </div>
   </div>
 </template>
@@ -30,13 +30,5 @@ const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home
   background-repeat: no-repeat;
   background-position: top center;
   background-size: auto 100%;
-}
-
-.box-cover {
-  @apply border border-primary;
-  box-shadow:
-    0 0 3px #ffb1ed,
-    0 0 5px #f5fcff,
-    0 0 10px #ffc1f7;
 }
 </style>

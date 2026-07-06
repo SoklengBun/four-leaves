@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { debouncedRef } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import LyricsSongShelf from './components/LyricsSongShelf.vue';
 import useAppFetch from '~/services';
@@ -10,12 +10,12 @@ import { usePlayer } from '~/stores/player';
 import { usePlaylist } from '~/stores/playlist.js';
 import { getTodayStorageDate, useHomeStorage } from '~/utils/home-storage';
 import { getLyricsArtistsLabel, normalizePlaylistItems } from '~/utils/lyrics';
+import Loading from '~/components/shares/Loading.vue';
 
 const route = useRoute();
 const router = useRouter();
 const searchText = ref('');
 const searchDebounce = debouncedRef(searchText);
-const containerRef = ref<HTMLDivElement | null>(null);
 const appSetting = useAppSetting();
 const player = usePlayer();
 const homeStorage = useHomeStorage();
@@ -155,14 +155,6 @@ onMounted(async () => {
 
   const query = route.query.search?.toString();
   if (query) searchText.value = query;
-
-  if (!containerRef.value) return;
-  const position = appSetting.getScrollPosition('lyric');
-
-  containerRef.value.scrollTo({
-    top: position,
-    behavior: 'instant',
-  });
 });
 
 watch(searchDebounce, (value) => {
@@ -174,11 +166,6 @@ watch(searchDebounce, (value) => {
   }
 
   void searchSongs(value);
-});
-
-onBeforeUnmount(() => {
-  if (!containerRef.value) return;
-  appSetting.setScrollPosition('lyric', containerRef.value.scrollTop);
 });
 
 const onClick = (lyrics: PlaylistItem, selectedPlaylist: Playlist | null = null) => {
@@ -194,50 +181,31 @@ const onClear = async () => {
 </script>
 
 <template>
-  <div ref="containerRef" class="container flex w-full flex-col items-center px-3 pb-4 pt-3">
-    <div class="hero-shell box-cover relative w-full overflow-hidden rounded-[28px] border border-[#ffd5e7] p-5 md:p-8">
-      <div class="hero-banner absolute inset-0 opacity-25"></div>
-      <div class="absolute inset-0 bg-[linear-gradient(135deg,_#fffffff2,_#fff0f7eb_48%,_#ffe3eff0)]"></div>
-
-      <div class="relative z-10 max-w-xl">
-        <p class="text-xs font-semibold uppercase tracking-[0.32em] text-[#d17ea8]">Lyrics Home</p>
-        <h1 class="mt-3 text-3xl font-semibold text-[#2b1f28] md:text-5xl">Find a song and jump straight into the lyric view.</h1>
-        <p class="mt-3 max-w-lg text-sm leading-6 text-[#725868] md:text-base">
-          Browse featured playlists from the home API, or search across the full song list.
-        </p>
-
+  <div class="container flex w-full flex-col items-center px-3 pt-3">
+    <div class="box-cover rounded-card relative h-[200px] w-full overflow-hidden bg-black p-3 md:h-[450px] md:p-5">
+      <div class="hero-banner absolute inset-0 w-full opacity-80"></div>
+      <div class="relative z-10 flex size-full max-w-xl flex-col">
         <div class="mt-5 flex flex-wrap gap-3">
-          <div class="hero-chip">
-            <span class="hero-chip__label">Songs</span>
-            <span class="hero-chip__value">{{ todaySelection.length }}</span>
-          </div>
-          <div class="hero-chip">
-            <span class="hero-chip__label">Playlists</span>
-            <span class="hero-chip__value">{{ lists.length }}</span>
-          </div>
           <button type="button" class="hero-chip hero-chip--button" :disabled="isFetching" @click="fetchLyrics">
             <span class="hero-chip__label">{{ isFetching ? 'Refreshing' : 'Refresh Home' }}</span>
           </button>
           <button type="button" class="hero-chip hero-chip--button" @click="router.push({ name: 'lyrics-all' })">
             <span class="hero-chip__label">Browse All</span>
           </button>
-          <div v-if="isSearching" class="hero-chip">
-            <span class="hero-chip__label">Searching</span>
-          </div>
         </div>
 
-        <div
-          class="mt-6 flex max-w-md items-center gap-3 rounded-[22px] border border-white/80 bg-white/85 p-2 shadow-[0_18px_40px_#ffb4d238] backdrop-blur"
-        >
+        <div class="mt-auto flex w-full items-center rounded-md bg-card md:rounded-lg">
           <input
             v-model="searchText"
-            placeholder="Search by title or artist"
-            class="h-11 w-full rounded-2xl bg-transparent px-3 text-sm text-[#2b1f28] outline-none placeholder:text-[#b393a5] md:text-base"
+            placeholder="Search by title or artist or playlist"
+            class="w-full rounded-2xl bg-transparent p-2 text-sm text-[#191919] outline-none placeholder:text-[#d184ad] md:p-3 md:text-base"
           />
+
+          <Loading class="text-base md:text-lg" :class="{ 'opacity-0': !isSearching }" />
           <button
             v-if="searchText"
             type="button"
-            class="rounded-full bg-[#fff0f7] px-3 py-2 text-xs font-semibold text-[#c86496] transition-colors hover:bg-[#ffe4f1]"
+            class="mr-2 rounded-full px-2 py-1 text-xs font-semibold text-[#d184ad] transition-colors hover:bg-[#ffe4f1] md:text-sm"
             @click="onClear"
           >
             Clear
@@ -247,7 +215,13 @@ const onClear = async () => {
     </div>
 
     <div class="mt-5 flex w-full flex-col gap-6">
-      <LyricsSongShelf v-if="searchText" :playlist="searchPlaylist" layout="grid" @select="(song) => onClick(song, null)" />
+      <LyricsSongShelf
+        v-if="searchText"
+        :playlist="searchPlaylist"
+        :max-items="searchPlaylist.items.length"
+        layout="grid"
+        @select="(song) => onClick(song, null)"
+      />
 
       <template v-else>
         <LyricsSongShelf
@@ -262,6 +236,7 @@ const onClear = async () => {
           v-if="toadySelectionPlaylist.items.length"
           :playlist="toadySelectionPlaylist"
           layout="grid"
+          :max-items="10"
           @select="(song) => onClick(song, toadySelectionPlaylist)"
         />
 

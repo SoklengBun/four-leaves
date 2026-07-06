@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core';
 import { computed, useAttrs } from 'vue';
+import MarqueeText from './MarqueeText.vue';
+import RoundButton from './RoundButton.vue';
 
 type PopupPosition = 'center' | 'top' | 'right' | 'bottom' | 'left';
 
@@ -81,19 +83,22 @@ const closePopup = () => {
         <div v-if="hasHeader || showClose" class="flex items-start justify-between gap-3">
           <div v-if="hasHeader" class="min-w-0">
             <p v-if="eyebrow" class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#d488ab]">{{ eyebrow }}</p>
-            <h2 v-if="title" class="m-0 text-[28px] font-extrabold leading-[1.05] text-[#7d4e6b]">{{ title }}</h2>
-            <p v-if="description" class="mt-[10px] text-[13px] leading-[1.55] text-[#9d7890]">{{ description }}</p>
+            <MarqueeText
+              v-if="title"
+              :text="title"
+              :gap="32"
+              :speed="36"
+              class="m-0 w-full min-w-0 text-xl font-extrabold leading-[1.05] text-[#7d4e6b]"
+            />
+            <p v-if="description" class="mt-2 text-sm leading-[1.55] text-[#9d7890]">{{ description }}</p>
           </div>
 
-          <button
-            v-if="showClose"
-            type="button"
-            class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-0 bg-[#ffffffd4] text-[24px] leading-none text-[#966783] shadow-[0_10px_20px_#ebbcd229]"
-            aria-label="Close"
-            @click="closePopup"
-          >
-            ×
-          </button>
+          <RoundButton v-if="showClose" @click="closePopup">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 7L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path d="M17 7L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </RoundButton>
         </div>
 
         <div class="min-h-0 flex-1" :class="{ 'mt-[18px]': hasHeader || showClose }">
