@@ -30,10 +30,20 @@ export const getLyricsList = async (page: number, force = false, all = false) =>
   // force = clear all data and start fresh
   if (force) list.value = {};
 
-  if (list.value[page]) return list.value[page];
+  if (list.value[page]?.length === 10) return list.value[page];
 
   const { data } = await useAppFetch(`lyrics/list?page=${page}`).get().json();
-  list.value[page] = Array.isArray(data.value?.data?.items) ? (data.value.data.items as Lyrics[]) : [];
+
+  const items = data.value.data.items as Lyrics[];
+
+  if (Array.isArray(items) && items.length) {
+    list.value[page] = items;
+  }
 
   return list.value[page];
+};
+
+export const resetLyricList = () => {
+  const list = useStorage<Record<number, Lyrics[]>>(LYRICS_LIST_KEY, {});
+  list.value = {};
 };

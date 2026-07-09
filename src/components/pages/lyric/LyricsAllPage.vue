@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, onActivated, onDeactivated, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import LyricsLoadingState from './components/LyricsLoadingState.vue';
 import LyricsSongShelf from './components/LyricsSongShelf.vue';
-import { getLyricsList } from '~/services/lyrics';
+import { getLyricsList, resetLyricList } from '~/services/lyrics';
 import { usePlayer } from '~/stores/player';
+import { usePlaylist } from '~/stores/playlist';
+import Loading from '~/components/shares/Loading.vue';
+import { sleep } from '~/utils/helper.js';
 
 const router = useRouter();
 const player = usePlayer();
+const playlist = usePlaylist();
 
 const containerRef = ref<HTMLDivElement | null>(null);
 const scrollContainerRef = ref<HTMLElement | null>(null);
@@ -25,7 +29,7 @@ const allLyricsPlaylist = computed<Playlist>(() => {
     name: 'All Lyrics',
     description: 'Every song from the lyrics catalog',
     isPublic: false,
-    items: songs.value.map((song) => ({ ...song })),
+    items: songs.value,
   };
 });
 
@@ -38,9 +42,8 @@ const loadNextPage = async () => {
   try {
     const items = await getLyricsList(page.value);
 
-    if (!items.length) {
+    if (items.length < 10) {
       hasMore.value = false;
-      return;
     }
 
     songs.value = [...songs.value, ...items];
@@ -83,38 +86,67 @@ const onScroll = () => {
   maybeLoadMore();
 };
 
+const bindScrollListener = () => {
+  scrollContainerRef.value?.removeEventListener('scroll', onScroll);
+  scrollContainerRef.value = resolveScrollContainer();
+  scrollContainerRef.value?.addEventListener('scroll', onScroll, { passive: true });
+};
+
 const onSelect = async (song: PlaylistItem) => {
   if (isSelecting.value) return;
 
   isSelecting.value = true;
 
   try {
-    const allLyrics = await getLyricsList(1, false, true);
-    const playlist: Playlist = {
-      id: 0,
-      name: 'All Lyrics',
-      description: 'Every song from the lyrics catalog',
-      isPublic: false,
-      items: allLyrics.map((item) => ({ ...item })),
-    };
+    await Promise.allSettled([
+      router.push({ name: 'lyrics-detail', params: { id: song.videoId } }),
+      player.selectSong(song, undefined, allLyricsPlaylist.value),
+    ]);
 
-    await router.push({ name: 'lyrics-detail', params: { id: song.videoId } });
-    await player.selectSong(song, undefined, playlist);
+    void (async () => {
+      const cachedLyrics = await getLyricsList(1, false, true);
+      if (cachedLyrics.length <= (playlist.list?.items?.length ?? 0)) return;
+
+      playlist.list = {
+        ...allLyricsPlaylist.value,
+        items: cachedLyrics,
+      };
+    })();
   } finally {
     isSelecting.value = false;
   }
 };
 
+const onReset = async () => {
+  if (isLoadingMore.value) return;
+  page.value = 1;
+  hasMore.value = true;
+  resetLyricList();
+  songs.value = [];
+  await sleep(500);
+  loadNextPage();
+};
 onMounted(async () => {
-  scrollContainerRef.value = resolveScrollContainer();
-  scrollContainerRef.value?.addEventListener('scroll', onScroll, { passive: true });
-  await loadNextPage();
+  bindScrollListener();
+
+  if (!songs.value.length) {
+    await loadNextPage();
+    return;
+  }
+
+  await nextTick();
+  maybeLoadMore();
 });
 
-onBeforeUnmount(() => {
+onActivated(async () => {
+  bindScrollListener();
+  await nextTick();
+  maybeLoadMore();
+});
+
+onDeactivated(() => {
   scrollContainerRef.value?.removeEventListener('scroll', onScroll);
 });
-
 </script>
 
 <template>
@@ -129,8 +161,19 @@ onBeforeUnmount(() => {
           </p>
         </div>
 
-        <div class="rounded-full bg-white/85 px-4 py-2 text-sm font-semibold text-[#8a6278] shadow-[0_14px_34px_#ffbfd63d]">
-          <span class="tabular-nums">{{ songs.length }}</span> loaded
+        <div class="flex items-center gap-3">
+          <div class="flex-1 rounded-full bg-white/85 px-4 py-2 text-sm font-semibold text-[#8a6278] shadow-[0_14px_34px_#ffbfd63d]">
+            <span class="tabular-nums">{{ songs.length }}</span> loaded
+          </div>
+
+          <button
+            class="flex w-[80px] items-center justify-center gap-2 rounded-full border border-primary bg-pink-200 py-2 text-[#8a6278] transition-all duration-500 active:bg-green-300"
+            @click="onReset"
+            :disabled="isLoadingMore"
+          >
+            <span> Reset</span>
+            <Loading v-if="isLoadingMore" />
+          </button>
         </div>
       </div>
     </div>
@@ -143,10 +186,7 @@ onBeforeUnmount(() => {
       <LyricsLoadingState />
     </div>
 
-    <div
-      v-else-if="error"
-      class="mt-6 rounded-[24px] border border-dashed border-[#ffd3e6] bg-white/70 px-6 py-8 text-center text-sm text-[#8b6f80]"
-    >
+    <div v-else-if="error" class="mt-6 rounded-[24px] border border-dashed border-[#ffd3e6] bg-white/70 px-6 py-8 text-center text-sm text-[#8b6f80]">
       {{ error }}
     </div>
 
