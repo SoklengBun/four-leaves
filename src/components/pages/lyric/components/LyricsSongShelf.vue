@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
+import LazyRender from '~/components/shares/LazyRender.vue';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
 import { getLyricsTitleLabel, getCoverArtistsLabel } from '~/utils/lyrics';
 
@@ -24,6 +25,7 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+const isGridLayout = computed(() => props.layout === 'grid');
 
 const visibleItems = computed(() => {
   if (props.maxItems <= 0) return props.playlist.items;
@@ -83,14 +85,40 @@ const getThumbnailId = (song: PlaylistItem) => {
         "
         @click="onSelect(song)"
       >
-        <div class="relative aspect-square overflow-hidden rounded-md bg-[#f6d8e8] md:rounded-lg">
-          <YoutubeThumbnail :id="getThumbnailId(song)" />
-        </div>
+        <LazyRender class="block">
+          <div class="relative aspect-square overflow-hidden rounded-md bg-[#f6d8e8] md:rounded-lg">
+            <YoutubeThumbnail :id="getThumbnailId(song)" />
+          </div>
 
-        <div class="mt-3 min-w-0">
-          <MarqueeText :text="getLyricsTitleLabel(song)" class="text-sm font-semibold text-[#2b1f28] md:text-base" :gap="28" />
-          <MarqueeText :text="getCoverArtistsLabel(song) || 'Unknown artist'" class="mt-1 text-xs text-[#816776] md:text-sm" :gap="24" :speed="32" />
-        </div>
+          <div class="mt-3 min-w-0">
+            <p v-if="isGridLayout" class="truncate text-sm font-semibold text-[#2b1f28] md:text-base">
+              {{ getLyricsTitleLabel(song) }}
+            </p>
+            <MarqueeText v-else :text="getLyricsTitleLabel(song)" class="text-sm font-semibold text-[#2b1f28] md:text-base" :gap="28" />
+
+            <p v-if="isGridLayout" class="mt-1 truncate text-xs text-[#816776] md:text-sm">
+              {{ getCoverArtistsLabel(song) || 'Unknown artist' }}
+            </p>
+            <MarqueeText
+              v-else
+              :text="getCoverArtistsLabel(song) || 'Unknown artist'"
+              class="mt-1 text-xs text-[#816776] md:text-sm"
+              :gap="24"
+              :speed="32"
+            />
+          </div>
+
+          <template #placeholder>
+            <div class="relative aspect-square overflow-hidden rounded-md bg-[#f6d8e8] md:rounded-lg">
+              <div class="size-full animate-pulse bg-[linear-gradient(135deg,#f9dce9_0%,#fff4f8_100%)]"></div>
+            </div>
+
+            <div class="mt-3 space-y-2">
+              <div class="h-4 rounded-full bg-[#f5dbe7]"></div>
+              <div class="h-3 w-2/3 rounded-full bg-[#f9e7ef]"></div>
+            </div>
+          </template>
+        </LazyRender>
       </button>
     </div>
   </section>
@@ -112,5 +140,7 @@ const getThumbnailId = (song: PlaylistItem) => {
 
 .lyric-card--grid {
   min-width: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 220px;
 }
 </style>

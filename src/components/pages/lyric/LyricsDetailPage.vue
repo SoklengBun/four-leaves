@@ -34,6 +34,14 @@ const showMore = ref(false);
 const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 const displayArtist = computed(() => getLyricsArtistsLabel(artists.value));
 const lyricsContent = computed(() => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content ?? '');
+const availableLangs = ref<LyricsKeys[]>(['romaji']);
+
+const langKey: { [key: string]: string } = {
+  japanese: '日本語',
+  romaji: 'Romaji',
+  english: 'English',
+};
+const langOrder: LyricsKeys[] = ['japanese', 'romaji', 'english', 'chinese', 'pinyin'];
 
 const fetchLyricsDetail = async (id: string, force = false) => {
   isLoading.value = true;
@@ -41,6 +49,11 @@ const fetchLyricsDetail = async (id: string, force = false) => {
     const song = await getLyricsById(id, force);
     if (!song) return null;
     current.value = { ...current.value, ...song };
+
+    availableLangs.value = ((current.value.contents?.map((e) => e.kind) ?? ['romaji']) as LyricsKeys[]).sort(
+      (a, b) => langOrder.indexOf(a) - langOrder.indexOf(b),
+    );
+
     return song;
   } finally {
     isLoading.value = false;
@@ -93,7 +106,7 @@ const refreshCurrentLyrics = () => {
     <RoundButton @click="showMore = true" />
 
     <div class="relative mt-5 size-[150px] shrink-0">
-      <YoutubeThumbnail :id="videoId" class="box-cover rounded-card overflow-hidden" />
+      <YoutubeThumbnail :id="videoId" class="box-cover overflow-hidden rounded-card" />
 
       <SongCoverList />
     </div>
@@ -128,6 +141,18 @@ const refreshCurrentLyrics = () => {
     <LyricsLoadingState v-if="isLoading" />
 
     <div v-else class="box-cover mt-5 w-full flex-1 rounded-xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-2xl md:pb-6 md:pt-6">
+      <div class="mb-3 flex w-full items-center gap-2 px-3 md:px-6">
+        <button
+          v-for="lang in availableLangs"
+          :key="lang"
+          @click="currentLang = lang"
+          class="p-1 hover:text-[#b960b3]"
+          :class="{ 'text-[#b960b3]': currentLang == lang }"
+          :disabled="currentLang == lang"
+        >
+          {{ langKey[lang] ?? lang }}
+        </button>
+      </div>
       <p class="h-fit whitespace-pre-line text-center text-base lowercase">
         {{ lyricsContent || 'No lyrics available' }}
       </p>

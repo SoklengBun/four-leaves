@@ -126,17 +126,18 @@ onClickOutside(
               <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-[11px] text-[#6b7280]" :gap="20" :speed="30" />
             </div>
           </button>
-          <Loading class="shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
-          <button
-            v-if="canSetDefaultCover"
-            type="button"
-            class="ml-2 shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-            :class="isDefaultCover(item.id) ? 'bg-[#ffd5e7] text-[#b93876]' : 'bg-[#fff4fb] text-[#d14d8a]'"
-            :disabled="!!savingDefaultId || isDefaultCover(item.id)"
-            @click.stop="setDefaultCover(item.id)"
-          >
-            {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
-          </button>
+          <template v-if="canSetDefaultCover">
+            <Loading class="shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
+            <button
+              type="button"
+              class="ml-2 shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              :class="isDefaultCover(item.id) ? 'bg-[#ffd5e7] text-[#b93876]' : 'bg-[#fff4fb] text-[#d14d8a]'"
+              :disabled="!!savingDefaultId || isDefaultCover(item.id)"
+              @click.stop="setDefaultCover(item.id)"
+            >
+              {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
+            </button>
+          </template>
         </li>
       </ul>
     </div>
@@ -172,17 +173,18 @@ onClickOutside(
                 <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-xs text-[#6b7280]" :gap="20" :speed="30" />
               </div>
             </button>
-            <Loading class="shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
-            <button
-              v-if="canSetDefaultCover"
-              type="button"
-              class="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-              :class="isDefaultCover(item.id) ? 'bg-[#ffd5e7] text-[#b93876]' : 'bg-[#fff4fb] text-[#d14d8a]'"
-              :disabled="!!savingDefaultId || isDefaultCover(item.id)"
-              @click.stop="setDefaultCover(item.id)"
-            >
-              {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
-            </button>
+            <template v-if="canSetDefaultCover">
+              <Loading class="shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
+              <button
+                type="button"
+                class="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                :class="isDefaultCover(item.id) ? 'bg-[#ffd5e7] text-[#b93876]' : 'bg-[#fff4fb] text-[#d14d8a]'"
+                :disabled="!!savingDefaultId || isDefaultCover(item.id)"
+                @click.stop="setDefaultCover(item.id)"
+              >
+                {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
+              </button>
+            </template>
           </li>
         </ul>
       </div>

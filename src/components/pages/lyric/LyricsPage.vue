@@ -70,13 +70,11 @@ const toadySelectionPlaylist = computed<Playlist>(() => {
     name: 'Today selection',
     description: '10 songs from the home feed',
     isPublic: false,
-    items: todaySelection.value.map((song) => ({
-      ...song,
-    })),
+    items: todaySelection.value,
   };
 });
 
-const searchPlaylist = computed(() => {
+const searchPlaylist = computed<Playlist>(() => {
   return {
     id: 0,
     name: 'Search Result',
