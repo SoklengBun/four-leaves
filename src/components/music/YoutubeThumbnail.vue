@@ -121,12 +121,36 @@ onBeforeUnmount(() => {
   observer?.disconnect();
   clearScheduledLoad();
 });
+
+const onThumbnailLoad = (e: Event) => {
+  console.log(`Thumbnail loaded: event`, e);
+  const img = e.target as HTMLImageElement;
+  if (!img) return;
+
+  const naturalWidth = img.naturalWidth;
+  const naturalHeight = img.naturalHeight;
+
+  console.log(`Thumbnail loaded: ${naturalWidth}x${naturalHeight}`);
+
+  if (naturalWidth === 120 && naturalHeight === 90) {
+    onThumbnailError();
+  }
+};
 </script>
 
 <template>
   <div ref="containerRef" class="relative size-full bg-[#f8dbe9]">
     <Transition name="thumbnail-fade" appear>
-      <img v-if="src" :src="src" class="size-full object-cover" alt="Video thumbnail" loading="lazy" decoding="async" @error="onThumbnailError" />
+      <img
+        v-if="src"
+        :src="src"
+        class="size-full object-cover"
+        alt="Video thumbnail"
+        loading="lazy"
+        decoding="async"
+        @error="onThumbnailError"
+        @load="onThumbnailLoad"
+      />
     </Transition>
   </div>
 </template>

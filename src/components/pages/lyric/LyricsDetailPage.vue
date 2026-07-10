@@ -33,7 +33,9 @@ const isLoading = ref(false);
 const showMore = ref(false);
 const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 const displayArtist = computed(() => getLyricsArtistsLabel(artists.value));
-const lyricsContent = computed(() => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content ?? '');
+const lyricsContent = computed(
+  () => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content?.replace(/е/g, 'e') ?? '',
+);
 const availableLangs = ref<LyricsKeys[]>(['romaji']);
 
 const langKey: { [key: string]: string } = {
