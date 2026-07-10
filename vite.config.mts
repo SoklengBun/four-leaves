@@ -44,7 +44,23 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{css,js,html}'],
+        globPatterns: ['**/*.{css,js,html,ico,png,jpg,jpeg,svg,gif,webp}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/img\.youtube\.com\/vi\/.*\/(maxresdefault|mqdefault)\.jpg$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'youtube-thumbnails',
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+              expiration: {
+                maxEntries: 300,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+        ],
       },
     }),
   ],

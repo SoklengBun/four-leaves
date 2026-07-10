@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useStorage } from '@vueuse/core';
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import defaultImage from '~/assets/images/Priconne_Kokkoro_hurt.png';
 
@@ -10,31 +9,14 @@ const props = defineProps<{
 type ThumbnailQuality = 'maxresdefault' | 'mqdefault';
 
 const containerRef = ref<HTMLDivElement | null>(null);
-const src = ref();
-const thumbnailBank = useStorage<{ [videoId: string]: string }>('thumbnail-bank', {});
+const src = ref<string | null>(null);
+const quality = ref<ThumbnailQuality>('maxresdefault');
 const hasStartedLoading = ref(false);
 
 let observer: IntersectionObserver | null = null;
 let loadToken = 0;
 let loadTimer: number | null = null;
 let idleHandle: number | null = null;
-
-const blobToDataUrl = (blob: Blob) =>
-  new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        resolve(reader.result);
-        return;
-      }
-
-      reject(new Error('Failed to convert blob to data URL'));
-    };
-
-    reader.onerror = () => reject(reader.error ?? new Error('Failed to read blob'));
-    reader.readAsDataURL(blob);
-  });
 
 const buildThumbnailUrl = (videoId: string, quality: ThumbnailQuality) => {
   return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
@@ -56,41 +38,25 @@ const resetThumbnail = () => {
   clearScheduledLoad();
   loadToken += 1;
   hasStartedLoading.value = false;
-  // src.value = defaultImage;
+  quality.value = 'maxresdefault';
+  src.value = null;
 };
 
-const fetchThumbnail = async (videoId: string, token: number) => {
-  const cachedThumbnail = thumbnailBank.value[videoId];
-  if (cachedThumbnail?.startsWith('data:')) {
-    if (token === loadToken) {
-      src.value = cachedThumbnail;
-    }
+const loadThumbnail = (videoId: string, token: number) => {
+  if (token !== loadToken) return;
+
+  // The service worker caches this URL for offline use in the installed PWA.
+  src.value = buildThumbnailUrl(videoId, quality.value);
+};
+
+const onThumbnailError = () => {
+  if (quality.value === 'maxresdefault' && props.id) {
+    quality.value = 'mqdefault';
+    src.value = buildThumbnailUrl(props.id, quality.value);
     return;
   }
 
-  const urls = [buildThumbnailUrl(videoId, 'maxresdefault'), buildThumbnailUrl(videoId, 'mqdefault')];
-
-  for (const url of urls) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) continue;
-
-      const blob = await res.blob();
-      const dataUrl = await blobToDataUrl(blob);
-
-      if (token !== loadToken) return;
-
-      thumbnailBank.value[videoId] = dataUrl;
-      src.value = dataUrl;
-      return;
-    } catch {
-      continue;
-    }
-  }
-
-  if (token === loadToken) {
-    src.value = defaultImage;
-  }
+  src.value = defaultImage;
 };
 
 const startThumbnailLoad = () => {
@@ -101,7 +67,7 @@ const startThumbnailLoad = () => {
   const run = () => {
     idleHandle = null;
     loadTimer = null;
-    void fetchThumbnail(props.id, token);
+    loadThumbnail(props.id, token);
   };
 
   loadTimer = window.setTimeout(() => {
@@ -160,7 +126,7 @@ onBeforeUnmount(() => {
 <template>
   <div ref="containerRef" class="relative size-full bg-[#f8dbe9]">
     <Transition name="thumbnail-fade" appear>
-      <img v-if="src" :src="src" class="size-full object-cover" alt="Video thumbnail" loading="lazy" decoding="async" />
+      <img v-if="src" :src="src" class="size-full object-cover" alt="Video thumbnail" loading="lazy" decoding="async" @error="onThumbnailError" />
     </Transition>
   </div>
 </template>
