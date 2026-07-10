@@ -261,6 +261,7 @@ const normalizeCoverVideoId = (cover: CoverDraft) => {
 
 const addContent = () => contents.value.push({ kind: '', content: '' });
 const removeContent = (index: number) => contents.value.splice(index, 1);
+const normalizeLyricContent = (value: string) => value.replace(/е/g, 'e');
 
 const normalizeContents = (payload: any): ContentDraft[] => {
   if (Array.isArray(payload?.contents)) {
@@ -568,6 +569,7 @@ onBeforeRouteLeave(() => confirmLeave());
               </div>
               <textarea
                 v-model="content.content"
+                @input="content.content = normalizeLyricContent(content.content)"
                 rows="9"
                 class="mt-3 w-full resize-y rounded-lg border border-pink-300 bg-white px-3 py-2 text-sm leading-6 outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:ring-4 focus:ring-pink-100"
                 placeholder="Paste lyrics here"
