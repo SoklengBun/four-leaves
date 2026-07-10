@@ -29,6 +29,11 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
+    {
+      path: '/storage',
+      name: 'storage',
+      component: () => import('../views/StorageView.vue'),
+    },
     // {
     //   path: '/sokleng',
     //   name: 'sokleng',

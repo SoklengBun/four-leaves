@@ -6,6 +6,7 @@ import menuHomeIcon from '~/assets/images/menus/home.png';
 import menuLyricIcon from '~/assets/images/menus/lyric.png';
 import menuLyricMineIcon from '~/assets/images/menus/lyric-mine.png';
 import menuLyricAddIcon from '~/assets/images/menus/lyric-add.png';
+import menuStorageIcon from '~/assets/images/menus/storage.svg';
 import menuDefaultIcon from '~/assets/images/yunli.png';
 import { pxOfCurrentScreenSize } from '~/utils/helper';
 import IconMenu from '../icons/IconMenu.vue';
@@ -27,6 +28,7 @@ const menuItems: MenuItem[] = [
   { label: 'My Lyrics', path: '/lyrics/all', icon: menuLyricMineIcon },
   { label: 'Add Lyrics', path: '/lyrics/add', icon: menuLyricAddIcon },
   { label: 'About', path: '/about', icon: menuDefaultIcon },
+  { label: 'Storage', path: '/storage', icon: menuStorageIcon },
 ];
 
 const FAB_SIZE = 56;

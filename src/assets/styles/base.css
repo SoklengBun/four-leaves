@@ -85,7 +85,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  overflow: auto;
+  overflow: hidden;
 
   touch-action: none;
   user-select: none;
