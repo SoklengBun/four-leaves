@@ -162,7 +162,9 @@ onDeactivated(() => {
         </div>
 
         <div class="flex items-center gap-3">
-          <div class="flex-1 rounded-full bg-white/85 px-4 py-2 text-sm font-semibold text-[#8a6278] shadow-[0_14px_34px_#ffbfd63d]">
+          <div
+            class="flex-1 whitespace-nowrap rounded-full bg-white/85 px-4 py-2 text-sm font-semibold text-[#8a6278] shadow-[0_14px_34px_#ffbfd63d]"
+          >
             <span class="tabular-nums">{{ songs.length }}</span> loaded
           </div>
 
