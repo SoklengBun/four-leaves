@@ -33,9 +33,7 @@ const isLoading = ref(false);
 const showMore = ref(false);
 const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 const displayArtist = computed(() => getLyricsArtistsLabel(artists.value));
-const lyricsContent = computed(
-  () => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content?.replace(/е/g, 'e') ?? '',
-);
+const lyricsContent = computed(() => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content?.replace(/е/g, 'e') ?? '');
 const availableLangs = ref<LyricsKeys[]>(['romaji']);
 
 const langKey: { [key: string]: string } = {
@@ -148,14 +146,14 @@ const refreshCurrentLyrics = () => {
           v-for="lang in availableLangs"
           :key="lang"
           @click="currentLang = lang"
-          class="p-1 hover:text-[#b960b3]"
+          class="p-1 font-semibold hover:text-[#b960b3] md:text-lg"
           :class="{ 'text-[#b960b3]': currentLang == lang }"
           :disabled="currentLang == lang"
         >
           {{ langKey[lang] ?? lang }}
         </button>
       </div>
-      <p class="h-fit whitespace-pre-line text-center text-base lowercase">
+      <p class="h-fit whitespace-pre-line text-center text-base lowercase md:text-2xl">
         {{ lyricsContent || 'No lyrics available' }}
       </p>
     </div>
