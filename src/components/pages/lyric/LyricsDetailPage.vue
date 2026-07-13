@@ -146,7 +146,7 @@ const refreshCurrentLyrics = () => {
           v-for="lang in availableLangs"
           :key="lang"
           @click="currentLang = lang"
-          class="p-1 hover:text-[#b960b3]"
+          class="p-1 font-semibold hover:text-[#b960b3] md:text-lg"
           :class="{ 'text-[#b960b3]': currentLang == lang }"
           :disabled="currentLang == lang"
         >
