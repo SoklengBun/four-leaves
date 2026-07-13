@@ -153,7 +153,7 @@ const refreshCurrentLyrics = () => {
           {{ langKey[lang] ?? lang }}
         </button>
       </div>
-      <p class="h-fit whitespace-pre-line text-center text-base lowercase md:text-xl">
+      <p class="h-fit whitespace-pre-line text-center text-base lowercase md:text-2xl">
         {{ lyricsContent || 'No lyrics available' }}
       </p>
     </div>
