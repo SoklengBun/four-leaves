@@ -261,6 +261,8 @@ const normalizeCoverVideoId = (cover: CoverDraft) => {
 
 const addContent = () => contents.value.push({ kind: '', content: '' });
 const removeContent = (index: number) => contents.value.splice(index, 1);
+const isContentKindUsed = (kind: string, currentIndex: number) =>
+  contents.value.some((item, index) => index !== currentIndex && item.kind.trim() === kind);
 const normalizeLyricContent = (value: string) => value.replace(/е/g, 'e');
 
 const normalizeContents = (payload: any): ContentDraft[] => {
@@ -383,6 +385,13 @@ const validate = () => {
   const filledContents = contents.value.filter((item) => item.kind.trim() || item.content.trim());
   if (!filledContents.length || filledContents.some((item) => !item.kind.trim() || !item.content.trim())) {
     error.value = 'Each lyric block needs a kind and content';
+    showToast({ message: error.value, type: 'error' });
+    return false;
+  }
+
+  const duplicateKinds = filledContents.map((item) => item.kind.trim()).filter((kind, index, kinds) => kinds.indexOf(kind) !== index);
+  if (duplicateKinds.length) {
+    error.value = `A lyric kind/language can only be used once: ${[...new Set(duplicateKinds)].join(', ')}`;
     showToast({ message: error.value, type: 'error' });
     return false;
   }
@@ -557,7 +566,9 @@ onBeforeRouteLeave(() => confirmLeave());
                   class="h-10 rounded-lg border border-pink-300 bg-white px-3 text-sm outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 sm:w-48"
                 >
                   <option value="">Kind</option>
-                  <option v-for="kind in contentKinds" :key="kind" :value="kind">{{ kind }}</option>
+                  <option v-for="kind in contentKinds" :key="kind" :value="kind" :disabled="isContentKindUsed(kind, index)">
+                    {{ kind }}
+                  </option>
                 </select>
                 <button
                   type="button"
