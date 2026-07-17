@@ -11,7 +11,7 @@ defineProps<{ active?: boolean }>();
 <style scoped>
 .menu-box {
   @apply absolute left-1/2 top-1/2 size-[9px] rounded-[3px] transition-all duration-500 md:size-3;
-  background: linear-gradient(125deg, #f58ce9, #ffbddd);
+  background: linear-gradient(125deg, var(--color-primary), var(--color-secondary));
 
   &:nth-child(1) {
     @apply -translate-x-[9.5px] -translate-y-[9.5px] md:-translate-x-[13px] md:-translate-y-[13px];
@@ -37,15 +37,15 @@ defineProps<{ active?: boolean }>();
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: #fff;
+  background: var(--color-primary);
   box-shadow:
-    0 0 0 1px #ffd2ea,
-    0 0 6px #fff7fc;
+    0 0 0 1px var(--color-primary-soft),
+    0 0 6px color-mix(in srgb, var(--color-primary) 65%, transparent);
 }
 
 .active .menu-box {
   @apply -translate-x-1/2 -translate-y-1/2;
   border-radius: 50%;
-  background: linear-gradient(125deg, #8cc5f5, #bde1ff);
+  background: linear-gradient(125deg, var(--color-accent), var(--color-secondary));
 }
 </style>

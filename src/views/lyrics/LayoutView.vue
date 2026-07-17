@@ -47,10 +47,10 @@ const onClickMenu = (name: string) => {
 <template>
   <div class="flex h-body w-full flex-col overflow-hidden">
     <div class="flex h-full w-full">
-      <div class="hidden h-full w-[300px] bg-red-50 md:block">
-        <button v-for="item in menus" :key="item.name" class="flex w-full items-center space-x-3 border-b px-5 py-2" @click="onClickMenu(item.name)">
-          <div class="size-7 rounded bg-red-300"></div>
-          <span class="text-anella-dark-lavender"> {{ item.label }}</span>
+      <div class="hidden h-full w-[300px] border-r border-border bg-surface md:block">
+        <button v-for="item in menus" :key="item.name" class="flex w-full items-center space-x-3 border-b border-border px-5 py-2 text-foreground" @click="onClickMenu(item.name)">
+          <div class="size-7 rounded bg-primary-soft"></div>
+          <span class="text-primary"> {{ item.label }}</span>
         </button>
       </div>
       <div class="h-full w-full overflow-auto">

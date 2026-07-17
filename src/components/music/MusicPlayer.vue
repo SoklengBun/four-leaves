@@ -50,15 +50,15 @@ const togglePlaylist = () => {
     <Transition>
       <div v-if="mode !== 'off'" class="fixed bottom-0 z-[99] h-player w-full px-3.5 pb-3 pt-2 md:p-5">
         <div
-          class="liquid relative z-10 mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-[#efefef] pb-5 md:rounded-2xl md:pb-0"
+          class="liquid relative z-10 mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-border pb-5 md:rounded-2xl md:pb-0"
         >
           <div class="relative z-10 flex h-fit flex-1 items-center space-x-1 overflow-hidden px-2 md:space-x-3 md:px-4">
-            <div class="size-10 overflow-hidden rounded-lg border border-primary bg-gray-300 md:size-16 md:rounded-xl">
+            <div class="size-10 overflow-hidden rounded-lg border border-primary bg-surface md:size-16 md:rounded-xl">
               <YoutubeThumbnail :id="videoId" @click="goToLyrics" />
             </div>
             <div class="relative z-10 flex h-fit flex-1 flex-col justify-center overflow-hidden px-2 md:px-4">
               <MarqueeText :text="getLyricsTitleLabel(current)" class="w-full min-w-0 text-sm font-semibold md:text-base" :gap="50" />
-              <MarqueeText :text="getLyricsArtistsLabel(artists)" class="w-full min-w-0 text-xs text-gray-500" :gap="50" />
+              <MarqueeText :text="getLyricsArtistsLabel(artists)" class="w-full min-w-0 text-xs text-foreground-muted" :gap="50" />
             </div>
           </div>
 
@@ -66,7 +66,7 @@ const togglePlaylist = () => {
             <PlayerSeekBar time-class="hidden" class="md:hidden" />
           </div>
           <div class="relative z-10 flex flex-col px-2 md:flex-1">
-            <PlayerSeekBar time-class="text-[10px] text-gray-500 md:text-xs" class="hidden md:block" />
+            <PlayerSeekBar time-class="text-[10px] text-foreground-muted md:text-xs" class="hidden md:block" />
 
             <div class="flex items-center justify-center">
               <button class="mx-1 size-6 md:size-8" @click="player.playPrevious()">
@@ -85,10 +85,10 @@ const togglePlaylist = () => {
         <div class="h-0 w-full">
           <div
             v-if="playlist?.list?.items?.length"
-            class="liquid absolute right-0 top-1/2 flex h-10 w-[18px] -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-[#efefef] bg-red-100 md:hidden"
+            class="liquid absolute right-0 top-1/2 flex h-10 w-[18px] -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-border bg-primary-soft md:hidden"
             @click="togglePlaylist"
           >
-            <svg class="h-3.5 w-3.5 text-[#8d60ff]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <svg class="h-3.5 w-3.5 text-secondary" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path d="M6 4.5v11l8-5.5-8-5.5Z" />
             </svg>
           </div>
@@ -102,11 +102,11 @@ const togglePlaylist = () => {
 .liquid {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #ffd6e750 0%, #ffc8dd50 30%, #d8b4fe50 70%, #c4b5fd50 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 25%, transparent) 0%, color-mix(in srgb, var(--color-secondary) 25%, transparent) 100%);
   box-shadow:
-    inset 0 2px 8px #ffffffcc,
-    inset 0 -4px 12px #ffffff33,
-    0 8px 24px #d8b4fe59;
+    inset 0 2px 8px color-mix(in srgb, var(--color-foreground) 18%, transparent),
+    inset 0 -4px 12px color-mix(in srgb, var(--color-background) 28%, transparent),
+    0 8px 24px color-mix(in srgb, var(--color-secondary) 35%, transparent);
 
   backdrop-filter: blur(4px);
 }
@@ -119,7 +119,7 @@ const togglePlaylist = () => {
   left: -40%;
   top: -120%;
 
-  background: #ffffff66;
+  background: color-mix(in srgb, var(--color-foreground) 14%, transparent);
   border-radius: 45%;
 
   animation: liquid-wave 8s linear infinite;
@@ -133,7 +133,7 @@ const togglePlaylist = () => {
   left: -20%;
   top: -100%;
 
-  background: #ffffff33;
+  background: color-mix(in srgb, var(--color-foreground) 8%, transparent);
   border-radius: 40%;
 
   animation: liquid-wave 12s linear infinite reverse;

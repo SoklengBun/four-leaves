@@ -8,6 +8,8 @@ import { usePlayer } from '~/stores/player';
 import { usePlaylist } from '~/stores/playlist';
 import Loading from '~/components/shares/Loading.vue';
 import { sleep } from '~/utils/helper.js';
+import RoundButton from '~/components/shares/RoundButton.vue';
+import IconRefresh from '~/components/icons/IconRefresh.vue';
 
 const router = useRouter();
 const player = usePlayer();
@@ -41,7 +43,6 @@ const loadNextPage = async () => {
 
   try {
     const items = await getLyricsList(page.value);
-
     if (items.length < 10) {
       hasMore.value = false;
     }
@@ -50,6 +51,7 @@ const loadNextPage = async () => {
     page.value += 1;
   } catch {
     error.value = 'Failed to load more lyrics.';
+    console.error('Failed to load more lyrics.');
   } finally {
     isLoadingMore.value = false;
     isInitialLoading.value = false;
@@ -121,10 +123,12 @@ const onReset = async () => {
   if (isLoadingMore.value) return;
   page.value = 1;
   hasMore.value = true;
+  isInitialLoading.value = true;
   resetLyricList();
   songs.value = [];
   await sleep(500);
-  loadNextPage();
+  await loadNextPage();
+  isInitialLoading.value = false;
 };
 onMounted(async () => {
   bindScrollListener();
@@ -151,36 +155,17 @@ onDeactivated(() => {
 
 <template>
   <div ref="containerRef" class="container w-full px-3 pb-6 pt-3">
-    <div class="all-lyrics-shell box-cover rounded-[28px] border border-[#ffd5e7] p-5 md:p-8">
-      <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div class="max-w-2xl">
-          <p class="text-xs font-semibold uppercase tracking-[0.32em] text-[#d17ea8]">Lyrics Catalog</p>
-          <h1 class="mt-3 text-3xl font-semibold text-[#2b1f28] md:text-5xl">Browse every song with endless scroll.</h1>
-          <p class="mt-3 text-sm leading-6 text-[#725868] md:text-base">
-            Open any song to start playback with the full lyrics catalog as the active queue.
-          </p>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div
-            class="flex-1 whitespace-nowrap rounded-full bg-white/85 px-4 py-2 text-sm font-semibold text-[#8a6278] shadow-[0_14px_34px_#ffbfd63d]"
-          >
-            <span class="tabular-nums">{{ songs.length }}</span> loaded
-          </div>
-
-          <button
-            class="flex w-[80px] items-center justify-center gap-2 rounded-full border border-primary bg-pink-200 py-2 text-[#8a6278] transition-all duration-500 active:bg-green-300"
-            @click="onReset"
-            :disabled="isLoadingMore"
-          >
-            <span> Reset</span>
-            <Loading v-if="isLoadingMore" />
-          </button>
-        </div>
-      </div>
+    <div class="all-lyrics-shell box-cover overflow-hidden rounded-xl border border-border md:rounded-2xl">
+      <img
+        src="https://64.media.tumblr.com/10b6161cae7baa32395e40351205f4da/31d798f6f2dab6f4-e7/s1280x1920/f9473d8c9975d05c9cc9c143d4178164dcebcb3e.gif"
+        class="h-full w-full"
+      />
     </div>
+    <RoundButton @click="onReset">
+      <IconRefresh class="size-full" :class="{ 'animate-spin': isInitialLoading }" />
+    </RoundButton>
 
-    <div class="mt-5">
+    <div class="mt-2 md:mt-5">
       <LyricsSongShelf :playlist="allLyricsPlaylist" layout="grid" :max-items="0" :enable-view-more="false" @select="onSelect" />
     </div>
 
@@ -188,7 +173,10 @@ onDeactivated(() => {
       <LyricsLoadingState />
     </div>
 
-    <div v-else-if="error" class="mt-6 rounded-[24px] border border-dashed border-[#ffd3e6] bg-white/70 px-6 py-8 text-center text-sm text-[#8b6f80]">
+    <div
+      v-else-if="error"
+      class="mt-6 rounded-[24px] border border-dashed border-border bg-surface px-6 py-8 text-center text-sm text-foreground-muted"
+    >
       {{ error }}
     </div>
 
@@ -198,14 +186,14 @@ onDeactivated(() => {
 
     <div
       v-else-if="!hasMore && !songs.length"
-      class="mt-6 rounded-[24px] border border-dashed border-[#ffd3e6] bg-white/70 px-6 py-8 text-center text-sm text-[#8b6f80]"
+      class="mt-6 rounded-[24px] border border-dashed border-border bg-surface px-6 py-8 text-center text-sm text-foreground-muted"
     >
       No lyrics found in the catalog.
     </div>
 
     <div
       v-else-if="!hasMore && songs.length"
-      class="mt-6 rounded-[24px] border border-[#ffd7e8] bg-[#fff7fb] px-6 py-4 text-center text-sm text-[#8b6f80]"
+      class="mt-6 rounded-[24px] border border-border bg-primary-soft px-6 py-4 text-center text-sm text-foreground-muted"
     >
       You reached the end of the catalog.
     </div>
@@ -214,7 +202,7 @@ onDeactivated(() => {
 
 <style scoped>
 .all-lyrics-shell {
-  background: radial-gradient(circle at top right, #ffd8e9b3, transparent 30%), linear-gradient(180deg, #fffafc 0%, #fff3f8 100%);
-  box-shadow: 0 20px 45px #ffb2d22e;
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-card);
 }
 </style>

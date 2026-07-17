@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useDark } from '@vueuse/core';
 import { onMounted, onUnmounted, ref } from 'vue';
 import CloudHeader from '~/components/icons/CloudHeader.vue';
 import ThemeToggler from './ThemeToggler.vue';

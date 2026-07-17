@@ -44,7 +44,7 @@ const showSideBar = ref(true);
       ]"
     >
       <div
-        class="flex h-screen w-[300px] flex-col bg-gray-100 dark:bg-gray-800"
+        class="flex h-screen w-[300px] flex-col border-r border-border bg-surface"
       >
         <div class="flex h-20 items-center justify-center">
           <img
@@ -57,9 +57,9 @@ const showSideBar = ref(true);
           :key="item.category"
           :class="[
             'flex h-10 items-center justify-start',
-            'border-b border-light-pink px-5 last:border-0',
+            'border-b border-border px-5 text-foreground last:border-0',
             {
-              'bg-pink-500 text-gray-100':
+              'bg-primary text-primary-foreground':
                 route.query.category === item.category,
             },
           ]"
@@ -73,14 +73,14 @@ const showSideBar = ref(true);
         @click="showSideBar = !showSideBar"
       >
         <IconArrowLeftRight
-          class="h-7 w-7 rotate-90 text-light-pink duration-300 hover:scale-125"
+          class="h-7 w-7 rotate-90 text-primary duration-300 hover:scale-125"
         />
       </button>
     </div>
 
     <!-- Bottom Nav for phone view  -->
     <div
-      class="fixed bottom-0 left-0 grid h-16 w-screen grid-cols-3 overflow-hidden rounded-t-xl border dark:bg-gray-800 md:hidden"
+      class="fixed bottom-0 left-0 grid h-16 w-screen grid-cols-3 overflow-hidden rounded-t-xl border border-border bg-surface md:hidden"
     >
       <RouterLink
         v-for="item in sideBarItems"
@@ -88,7 +88,7 @@ const showSideBar = ref(true);
         :class="[
           'flex h-full items-center justify-center text-center leading-none',
           {
-            'bg-pink-500 text-gray-100': route.query.category === item.category,
+            'bg-primary text-primary-foreground': route.query.category === item.category,
           },
         ]"
         :to="{ name: 'priconne', query: { category: item.category } }"

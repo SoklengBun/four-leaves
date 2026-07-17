@@ -16,7 +16,6 @@ const route = useRoute();
 const router = useRouter();
 const searchText = ref('');
 const searchDebounce = debouncedRef(searchText);
-const appSetting = useAppSetting();
 const player = usePlayer();
 const homeStorage = useHomeStorage();
 const playlist = usePlaylist();
@@ -180,8 +179,10 @@ const onClear = async () => {
 
 <template>
   <div class="container flex w-full flex-col items-center px-3 pt-3">
-    <div class="box-cover rounded-card relative h-[200px] w-full overflow-hidden bg-black p-3 md:h-[450px] md:p-5">
-      <div class="hero-banner absolute inset-0 w-full opacity-80"></div>
+    <div class="box-cover relative h-[200px] w-full overflow-hidden rounded-card bg-black p-3 md:h-[450px] md:p-5">
+      <div class="hero-banner absolute inset-0 w-full opacity-80">
+        <img src="https://i.redd.it/v60t49y990ue1.gif" class="size-full" />
+      </div>
       <div class="relative z-10 flex size-full max-w-xl flex-col">
         <div class="mt-5 flex flex-wrap gap-3">
           <button type="button" class="hero-chip hero-chip--button" :disabled="isFetching" @click="fetchLyrics">
@@ -192,18 +193,18 @@ const onClear = async () => {
           </button>
         </div>
 
-        <div class="mt-auto flex w-full items-center rounded-md bg-card md:rounded-lg">
+        <div class="mt-auto flex w-full items-center rounded-md border border-border bg-card md:rounded-lg">
           <input
             v-model="searchText"
             placeholder="Search by title or artist or playlist"
-            class="w-full rounded-2xl bg-transparent p-2 text-sm text-[#191919] outline-none placeholder:text-[#d184ad] md:p-3 md:text-base"
+            class="w-full rounded-2xl bg-transparent p-2 text-sm text-foreground outline-none placeholder:text-rose-300/40 md:p-3 md:text-base"
           />
 
           <Loading class="text-base md:text-lg" :class="{ 'opacity-0': !isSearching }" />
           <button
             v-if="searchText"
             type="button"
-            class="mr-2 rounded-full px-2 py-1 text-xs font-semibold text-[#d184ad] transition-colors hover:bg-[#ffe4f1] md:text-sm"
+            class="mr-2 rounded-full px-2 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary-soft md:text-sm"
             @click="onClear"
           >
             Clear
@@ -249,14 +250,14 @@ const onClear = async () => {
 
       <div
         v-if="!searchText && !todaySelection.length && !isFetching"
-        class="box-cover rounded-[28px] border border-dashed border-[#ffd3e6] bg-white/70 px-6 py-10 text-center text-sm text-[#8b6f80]"
+        class="box-cover rounded-[28px] border border-dashed border-border bg-surface px-6 py-10 text-center text-sm text-foreground-muted"
       >
         No playlist data yet. Tap refresh to load the home feed.
       </div>
 
       <div
         v-if="searchText && !isSearching && !searchResult.length"
-        class="box-cover rounded-[28px] border border-dashed border-[#ffd3e6] bg-white/70 px-6 py-10 text-center text-sm text-[#8b6f80]"
+        class="box-cover rounded-[28px] border border-dashed border-border bg-surface px-6 py-10 text-center text-sm text-foreground-muted"
       >
         Try another title or artist name.
       </div>
@@ -266,8 +267,8 @@ const onClear = async () => {
 
 <style scoped>
 .hero-shell {
-  background: radial-gradient(circle at top right, #ffd8e9b3, transparent 30%), linear-gradient(180deg, #fffafc 0%, #fff3f8 100%);
-  box-shadow: 0 20px 45px #ffb2d22e;
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .hero-banner {
@@ -282,10 +283,10 @@ const onClear = async () => {
   align-items: center;
   gap: 0.65rem;
   border-radius: 9999px;
-  background: #ffffffbf;
+  background: color-mix(in srgb, var(--color-card) 78%, transparent);
   padding: 0.7rem 0.95rem;
-  color: #805d72;
-  box-shadow: inset 0 0 0 1px #ffd7e8d9;
+  color: var(--color-foreground-muted);
+  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 .hero-chip--button {
@@ -296,7 +297,7 @@ const onClear = async () => {
 
 .hero-chip--button:hover {
   transform: translateY(-1px);
-  background: #fff8fceb;
+  background: var(--color-card-hover);
 }
 
 .hero-chip__label {
@@ -309,6 +310,6 @@ const onClear = async () => {
 .hero-chip__value {
   font-size: 1rem;
   font-weight: 700;
-  color: #2b1f28;
+  color: var(--color-foreground);
 }
 </style>

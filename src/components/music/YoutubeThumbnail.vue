@@ -123,14 +123,11 @@ onBeforeUnmount(() => {
 });
 
 const onThumbnailLoad = (e: Event) => {
-  console.log(`Thumbnail loaded: event`, e);
   const img = e.target as HTMLImageElement;
   if (!img) return;
 
   const naturalWidth = img.naturalWidth;
   const naturalHeight = img.naturalHeight;
-
-  console.log(`Thumbnail loaded: ${naturalWidth}x${naturalHeight}`);
 
   if (naturalWidth === 120 && naturalHeight === 90) {
     onThumbnailError();
@@ -139,7 +136,7 @@ const onThumbnailLoad = (e: Event) => {
 </script>
 
 <template>
-  <div ref="containerRef" class="relative size-full bg-[#f8dbe9]">
+  <div ref="containerRef" class="relative size-full bg-surface-hover">
     <Transition name="thumbnail-fade" appear>
       <img
         v-if="src"

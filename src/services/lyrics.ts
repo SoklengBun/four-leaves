@@ -39,6 +39,7 @@ export const getLyricsList = async (page: number, force = false, all = false) =>
   if (Array.isArray(items) && items.length) {
     list.value[page] = items;
   }
+  if (!items.length) return [];
 
   return list.value[page];
 };

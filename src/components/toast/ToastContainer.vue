@@ -46,8 +46,8 @@ const { list } = toRefs({ list: toasts });
   max-width: 360px;
   padding: 0.6rem 0.8rem;
   border-radius: 8px;
-  color: white;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  color: var(--color-primary-foreground);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
   overflow: hidden;
 }
@@ -60,16 +60,16 @@ const { list } = toRefs({ list: toasts });
 }
 
 .toast-item[data-type='normal'] {
-  background: #333;
+  background: var(--color-surface-hover);
 }
 .toast-item[data-type='success'] {
-  background: #16a34a;
+  background: var(--color-success);
 }
 .toast-item[data-type='warning'] {
-  background: #f59e0b;
+  background: var(--color-warning);
 }
 .toast-item[data-type='error'] {
-  background: #dc2626;
+  background: var(--color-danger);
 }
 
 .toast-content {
@@ -79,7 +79,7 @@ const { list } = toRefs({ list: toasts });
 .toast-close {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-primary-foreground);
   font-weight: 600;
   cursor: pointer;
 }

@@ -27,13 +27,13 @@ onMounted(() => {
     </button>
     <div class="absolute top-0 hidden w-12 group-hover:flex">
       <div
-        class="mt-8 flex w-full flex-col items-start bg-white py-1 shadow-md dark:bg-dark dark:shadow-white/20"
+        class="mt-8 flex w-full flex-col items-start rounded-md border border-border bg-surface py-1 shadow-lg"
       >
         <button
           v-for="item in fontSizeList"
           :key="item"
           type="button"
-          class="flex w-full items-start px-1 text-blue-400 hover:bg-white/20 hover:font-bold hover:text-blue-500"
+          class="flex w-full items-start px-1 text-foreground-muted hover:bg-surface-hover hover:font-bold hover:text-primary"
           :class="{ 'text-active': item === fontSize }"
           :style="{ 'font-size': item }"
           @click="changeFontSize(item)"

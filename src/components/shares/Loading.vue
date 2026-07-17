@@ -15,10 +15,10 @@
 
 .loading-leaf {
   border-radius: 68% 68% 68% 18%;
-  background: linear-gradient(135deg, #9ef4a9 0%, #55c86d 55%, #2e8f47 100%);
+  background: linear-gradient(135deg, var(--color-accent-strong) 0%, var(--color-success) 100%);
   box-shadow:
-    inset 0 0.05em 0.08em #d9ffe0,
-    0 0.14em 0.3em #75d58c66;
+    inset 0 0.05em 0.08em color-mix(in srgb, var(--color-accent-soft) 80%, transparent),
+    0 0.14em 0.3em color-mix(in srgb, var(--color-success) 40%, transparent);
   transform-origin: center;
   /* animation: loading-bloom 1.1s ease-in-out infinite; */
 }
@@ -37,8 +37,8 @@
 
 .loading-core {
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, #fff6c4 0%, #ffd76a 65%, #f3b545 100%);
-  box-shadow: 0 0 0.28em #ffe7a1;
+  background: radial-gradient(circle at 35% 35%, var(--color-primary-hover) 0%, var(--color-warning) 70%, var(--color-primary) 100%);
+  box-shadow: 0 0 0.28em color-mix(in srgb, var(--color-warning) 65%, transparent);
 }
 
 @keyframes loading-bloom {

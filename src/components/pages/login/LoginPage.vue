@@ -96,53 +96,53 @@ onMounted(() => {
 <template>
   <!-- page -->
   <SeasonalFall mode="rain" />
-  <div class="to-surface fixed inset-0 flex select-none items-center justify-center overflow-hidden bg-gradient-to-br from-background via-card">
+  <div class="fixed inset-0 flex select-none items-center justify-center overflow-hidden bg-gradient-to-br from-background via-card to-surface">
     <!-- floating blobs -->
     <div
-      class="blob-float bg-anella-hero dark:bg-anella-dark-lavender pointer-events-none absolute -left-20 -top-20 h-[260px] w-[340px] rounded-full opacity-45 blur-[52px] dark:opacity-35"
+      class="blob-float pointer-events-none absolute -left-20 -top-20 h-[260px] w-[340px] rounded-full bg-secondary opacity-25 blur-[52px]"
       style="animation: float-a 9s ease-in-out infinite"
     />
     <div
-      class="blob-float bg-anella-lavender dark:bg-anella-cloud-purple pointer-events-none absolute -bottom-16 -right-16 h-[220px] w-[280px] rounded-full opacity-45 blur-[52px] dark:opacity-30"
+      class="blob-float pointer-events-none absolute -bottom-16 -right-16 h-[220px] w-[280px] rounded-full bg-accent opacity-20 blur-[52px]"
       style="animation: float-b 11s ease-in-out infinite"
     />
     <div
-      class="blob-float bg-anella-secondary pointer-events-none absolute bottom-[10%] left-[10%] h-[180px] w-[200px] rounded-full opacity-45 blur-[52px] dark:bg-primary dark:opacity-30"
+      class="blob-float pointer-events-none absolute bottom-[10%] left-[10%] h-[180px] w-[200px] rounded-full bg-primary opacity-20 blur-[52px]"
       style="animation: float-a 13s ease-in-out infinite reverse"
     />
 
     <!-- card -->
     <div
-      class="border-border relative z-10 w-[90%] max-w-[420px] rounded-[28px] border bg-gradient-to-br from-[#ebf8ff] via-[#ffffff] to-[#d6ecff] px-2 py-8 text-foreground shadow-[0_20px_60px_#78a0dc2e,0_4px_16px_#a08cdc1a] backdrop-blur-xl dark:border-[#6b59a0] dark:bg-gradient-to-br dark:from-[#271d3d] dark:via-[#33264f] dark:to-[#211833] dark:shadow-[0_24px_70px_#00000066,0_4px_24px_#b9b0f52e]"
+      class="relative z-10 w-[90%] max-w-[420px] rounded-[28px] border border-border bg-gradient-to-br from-card via-surface to-background-elevated px-2 py-8 text-foreground shadow-card backdrop-blur-xl"
     >
       <!-- logo + tabs -->
       <div class="mb-6 flex flex-col items-center gap-4">
         <span
-          class="text-[2.6rem] leading-none drop-shadow-[0_4px_10px_#64a0f059] dark:drop-shadow-[0_4px_12px_#b9b0f566]"
+          class="text-[2.6rem] leading-none drop-shadow-[0_4px_10px_var(--color-primary)]"
           style="animation: float-a 6s ease-in-out infinite"
         >
           ☁️
         </span>
 
         <!-- tab switcher -->
-        <div class="relative flex w-[220px] rounded-full border border-[#e6d9f7] bg-[#f8f2ff] p-1 dark:border-[#6f5aa0] dark:bg-[#2a2142]">
+        <div class="relative flex w-[220px] rounded-full border border-border bg-surface p-1">
           <button
             class="relative z-10 flex-1 rounded-full py-1.5 text-sm font-semibold transition-colors duration-200"
-            :class="isLogin ? 'text-primary dark:text-secondary' : 'text-[#6f6785] dark:text-[#cdc3e2]'"
+            :class="isLogin ? 'text-primary' : 'text-foreground-muted'"
             @click="!isLogin && onClick()"
           >
             Login
           </button>
           <button
             class="relative z-10 flex-1 rounded-full py-1.5 text-sm font-semibold transition-colors duration-200"
-            :class="!isLogin ? 'text-primary dark:text-secondary' : 'text-[#6f6785] dark:text-[#cdc3e2]'"
+            :class="!isLogin ? 'text-primary' : 'text-foreground-muted'"
             @click="isLogin && onClick()"
           >
             Sign Up
           </button>
           <!-- sliding pill -->
           <div
-            class="tab-slider absolute inset-1 w-[calc(50%-4px)] rounded-full border border-[#e4d5f5] bg-white shadow-[0_2px_8px_#78a0dc38] transition-transform duration-300 ease-[cubic-bezier(.4,0,.2,1)] dark:border-[#4d3a72] dark:bg-[#3a2e58] dark:shadow-[0_2px_12px_#00000066]"
+            class="tab-slider absolute inset-1 w-[calc(50%-4px)] rounded-full border border-border bg-card shadow-sm transition-transform duration-300 ease-[cubic-bezier(.4,0,.2,1)]"
             :class="{ 'translate-x-full': !isLogin }"
           />
         </div>
@@ -170,7 +170,7 @@ onMounted(() => {
             </div>
             <button
               type="submit"
-              class="from-anella-cloud-purple to-anella-dark-lavender mt-1.5 w-full cursor-pointer rounded-full border border-[#d8c8f1] bg-gradient-to-br py-2.5 text-[0.95rem] font-bold text-white shadow-[0_0_12px_#b9b0f5aa,0_0_28px_#9a8de866] transition-[box-shadow,opacity,transform] duration-150 hover:shadow-[0_0_18px_#b9b0f5cc,0_0_40px_#9a8de899] active:scale-[0.97] active:opacity-90 dark:border-[#f0e8ff77] dark:shadow-[0_0_14px_#b9b0f5cc,0_0_36px_#9a8de8aa]"
+              class="mt-1.5 w-full cursor-pointer rounded-full border border-border-strong bg-gradient-to-br from-secondary to-primary py-2.5 text-[0.95rem] font-bold text-primary-foreground shadow-primary transition-[box-shadow,opacity,transform] duration-150 hover:shadow-card active:scale-[0.97] active:opacity-90"
             >
               Login ✨
             </button>
@@ -178,7 +178,7 @@ onMounted(() => {
               No account yet?
               <button
                 type="button"
-                class="hover:text-primary-hover font-bold text-primary underline decoration-2 underline-offset-2 dark:text-secondary dark:hover:text-primary"
+                class="font-bold text-primary underline decoration-2 underline-offset-2 hover:text-primary-hover"
                 @click="onClick"
               >
                 Sign up here →
@@ -213,7 +213,7 @@ onMounted(() => {
             </div>
             <button
               type="submit"
-              class="mt-1.5 w-full cursor-pointer rounded-full border border-[#f3b9d1] bg-gradient-to-br from-primary to-secondary py-2.5 text-[0.95rem] font-bold text-white shadow-[0_0_12px_#f99ab8aa,0_0_28px_#ffb6cc66] transition-[box-shadow,opacity,transform] duration-150 hover:shadow-[0_0_18px_#f99ab8cc,0_0_40px_#ffb6cc99] active:scale-[0.97] active:opacity-90 dark:border-[#f0e8ff77] dark:shadow-[0_0_14px_#f99ab8cc,0_0_36px_#ffb6cc99]"
+              class="mt-1.5 w-full cursor-pointer rounded-full border border-border-strong bg-gradient-to-br from-primary to-secondary py-2.5 text-[0.95rem] font-bold text-primary-foreground shadow-primary transition-[box-shadow,opacity,transform] duration-150 hover:shadow-card active:scale-[0.97] active:opacity-90"
             >
               Sign Up 🌷
             </button>
@@ -221,7 +221,7 @@ onMounted(() => {
               Already have an account?
               <button
                 type="button"
-                class="hover:text-primary-hover font-bold text-primary underline decoration-2 underline-offset-2 dark:text-secondary dark:hover:text-primary"
+                class="font-bold text-primary underline decoration-2 underline-offset-2 hover:text-primary-hover"
                 @click="onClick"
               >
                 ← Login here

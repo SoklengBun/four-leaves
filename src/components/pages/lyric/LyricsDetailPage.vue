@@ -114,11 +114,11 @@ const refreshCurrentLyrics = () => {
       class="mt-2 flex h-[50px] w-full max-w-[340px] shrink-0 flex-col items-center justify-center space-y-1 overflow-hidden px-2 md:max-w-[450px]"
     >
       <MarqueeText :text="displayTitle" class="w-full min-w-0 shrink-0 text-center text-lg font-bold" :gap="50" />
-      <MarqueeText :text="displayArtist" class="w-full min-w-0 shrink-0 text-center text-sm font-bold text-gray-500" :gap="50" />
+      <MarqueeText :text="displayArtist" class="w-full min-w-0 shrink-0 text-center text-sm font-bold text-foreground-muted" :gap="50" />
     </div>
 
     <div class="mt-3 w-[340px] md:w-[450px]">
-      <PlayerSeekBar time-class="text-xs text-gray-500" />
+      <PlayerSeekBar time-class="text-xs text-foreground-muted" />
 
       <div class="flex w-full items-center justify-center">
         <div class="flex flex-1"></div>
@@ -140,14 +140,14 @@ const refreshCurrentLyrics = () => {
 
     <LyricsLoadingState v-if="isLoading" />
 
-    <div v-else class="box-cover mt-5 w-full flex-1 rounded-xl bg-white pb-4 pt-4 md:max-w-[700px] md:rounded-2xl md:pb-6 md:pt-6">
+    <div v-else class="box-cover mt-5 w-full flex-1 rounded-xl bg-card pb-4 pt-4 md:max-w-[700px] md:rounded-2xl md:pb-6 md:pt-6">
       <div class="mb-3 flex w-full items-center gap-2 px-3 md:px-6">
         <button
           v-for="lang in availableLangs"
           :key="lang"
           @click="currentLang = lang"
-          class="p-1 font-semibold hover:text-[#b960b3] md:text-lg"
-          :class="{ 'text-[#b960b3]': currentLang == lang }"
+          class="p-1 font-semibold hover:text-primary md:text-lg"
+          :class="{ 'text-primary': currentLang == lang }"
           :disabled="currentLang == lang"
         >
           {{ langKey[lang] ?? lang }}

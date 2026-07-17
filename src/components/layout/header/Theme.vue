@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useDark } from '@vueuse/core';
+import { useAppTheme } from '~/composables/useAppTheme';
 import { requireImage } from '@/utils/helper';
-const isDark = useDark();
+const isDark = useAppTheme();
 </script>
 
 <template>
-  <van-switch v-model="isDark" size="20px" class="border border-gray-400" active-color="#555" inactive-color="#eee">
+  <van-switch v-model="isDark" size="20px" class="border border-border" active-color="var(--color-primary)" inactive-color="var(--color-surface-hover)">
     <template #node>
       <div class="icon-wrapper">
-        <img :src="requireImage(isDark ? 'moon.svg' : 'sun.svg')" class="icon h-[20px] w-[20px] rounded-full dark:bg-black" />
+        <img :src="requireImage(isDark ? 'moon.svg' : 'sun.svg')" class="icon h-[20px] w-[20px] rounded-full bg-surface" />
       </div>
     </template>
   </van-switch>

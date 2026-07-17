@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
   <header>
     <nav>
       <div
-        class="fixed top-0 z-50 flex h-nav w-full select-none items-center justify-between px-1 md:shadow-md md:backdrop-blur-sm md:dark:bg-transparent"
+        class="fixed top-0 z-50 flex h-nav w-full select-none items-center justify-between border-b border-border bg-background px-1 backdrop-blur-md md:shadow-md"
       >
         <!-- <RouterLink :to="{ name: 'home' }" class="h-full">
           <img :src="requireImage('logo.png')" class="contain h-full" />
@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
           <template v-for="item in menuList" :key="item.name">
             <RouterLink
               :to="{ name: item.name }"
-              class="text-blue-400 transition-all duration-300 hover:scale-125 hover:font-bold hover:text-blue-500"
+              class="text-foreground-muted transition-all duration-300 hover:scale-125 hover:font-bold hover:text-primary"
             >
               {{ item.label }}
             </RouterLink>
@@ -109,7 +109,7 @@ onBeforeUnmount(() => {
 
       <button
         type="button"
-        class="menu-circle fixed right-1 top-1 z-[53] size-11 bg-white/70 md:hidden"
+        class="menu-circle fixed right-1 top-1 z-[53] size-11 bg-surface md:hidden"
         @click="togglePopup"
         :class="{ active: showPopup }"
       >
@@ -119,10 +119,10 @@ onBeforeUnmount(() => {
               <div class="menu-line top" :style="{ height: '1px' }" />
               <div class="menu-line bottom mt-1" :style="{ height: '1px' }" />
             </div>
-            <div class="relative flex items-center justify-center text-[#333]">
+            <div class="relative flex items-center justify-center text-foreground">
               <transition name="fade">
                 <span v-if="!showPopup" class="absolute z-10">MENU</span>
-                <span v-else class="absolute z-10 text-red-400">CLOSE</span>
+                <span v-else class="absolute z-10 text-danger">CLOSE</span>
               </transition>
             </div>
           </div>
@@ -131,8 +131,8 @@ onBeforeUnmount(() => {
 
       <!--Mobile Popup-->
       <div id="popup" class="show fixed right-0 top-0 z-[52] h-body w-full" :class="{ hidden: !showPopup }">
-        <div class="flex flex-col px-5 pt-16 text-blue-500">
-          <div class="darkL grid grid-cols-4 border-t border-[#999] pt-5">
+        <div class="flex flex-col bg-background px-5 pt-16 text-foreground">
+          <div class="darkL grid grid-cols-4 border-t border-border pt-5">
             <RouterLink
               v-for="item in menuList"
               :key="item.name"
@@ -147,7 +147,7 @@ onBeforeUnmount(() => {
             </RouterLink>
           </div>
 
-          <p class="mt-10 w-full border-b border-[#999]">Me?</p>
+          <p class="mt-10 w-full border-b border-border pb-2 text-foreground-muted">Me?</p>
           <div class="mt-2 flex space-x-2">
             <a v-for="item in socialMedia" :key="item.name" :href="item.link" target="_blank">
               <img :src="requireImage(item.src)" class="h-5 w-5" :alt="item.name" />
@@ -162,23 +162,23 @@ onBeforeUnmount(() => {
 <style scoped>
 nav a.router-link-exact-active,
 .text-active:hover {
-  color: red;
+  color: var(--color-primary);
   font-weight: bold;
 }
 
 .menu-circle {
-  @apply flex items-center justify-center rounded-full border border-white md:hidden;
+  @apply flex items-center justify-center rounded-full border border-border md:hidden;
 }
 
 .menu-line {
-  @apply w-5 bg-[#333] transition-all duration-300 ease-linear;
+  @apply w-5 bg-foreground transition-all duration-300 ease-linear;
   transform-origin: 0px 0px;
   transform: rotate(0deg);
 }
 
 .active {
   .menu-line {
-    @apply bg-red-400;
+    @apply bg-danger;
 
     &.top {
       transform: rotate(13.5deg);
@@ -190,16 +190,16 @@ nav a.router-link-exact-active,
   }
 }
 
-.dark nav a.router-link-exact-active {
-  text-shadow: 1px -1px 5px white;
+nav a.router-link-exact-active {
+  text-shadow: 0 0 16px color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
 .show {
   opacity: 1;
   animation: fade-in 0.5s ease-in-out;
-  background-image: url('@/assets/images/bg_cross.png'), linear-gradient(#ff232330, #000eac30);
+  background-image: url('@/assets/images/bg_cross.png');
 
-  background-color: white;
+  background-color: var(--color-background);
   background-size: 35px auto;
   background-repeat: repeat;
 }

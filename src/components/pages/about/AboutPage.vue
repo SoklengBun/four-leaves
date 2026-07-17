@@ -1,3 +1,3 @@
 <template>
-  <div>This is About view</div>
+  <div class="bg-background text-foreground">This is About view</div>
 </template>

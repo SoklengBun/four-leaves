@@ -53,54 +53,54 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#ebf8ff] via-[#ffffff] to-[#d6ecff] p-3 text-[#1a365d]">
-    <div class="cloud cloud-a pointer-events-none absolute -left-3 -top-5 h-12 w-16 rounded-full bg-[#ffffff] opacity-90" />
-    <div class="cloud cloud-b pointer-events-none absolute -top-3 left-8 h-10 w-14 rounded-full bg-[#f5fbff]" />
-    <div class="cloud cloud-c pointer-events-none absolute -right-4 top-3 h-14 w-20 rounded-full bg-[#ffffff] opacity-80" />
+  <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-surface via-card to-accent-soft p-3 text-foreground">
+    <div class="cloud cloud-a pointer-events-none absolute -left-3 -top-5 h-12 w-16 rounded-full bg-foreground opacity-10" />
+    <div class="cloud cloud-b pointer-events-none absolute -top-3 left-8 h-10 w-14 rounded-full bg-card opacity-40" />
+    <div class="cloud cloud-c pointer-events-none absolute -right-4 top-3 h-14 w-20 rounded-full bg-card opacity-30" />
 
     <div class="relative z-[2]">
       <div class="flex items-start justify-between">
         <div>
-          <p class="text-sm font-semibold uppercase tracking-wide text-[#5d7ca3]">Weather</p>
-          <p class="mt-1 max-w-[210px] truncate text-base font-semibold text-[#2c5282]">{{ city }}</p>
+          <p class="text-sm font-semibold uppercase tracking-wide text-foreground-muted">Weather</p>
+          <p class="mt-1 max-w-[210px] truncate text-base font-semibold text-foreground">{{ city }}</p>
         </div>
-        <span class="rounded-full bg-[#ffffff]/70 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-[#5d7ca3]">{{ dayLabel }}</span>
+        <span class="rounded-full bg-card px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-foreground-muted">{{ dayLabel }}</span>
       </div>
 
       <div class="mt-1 flex items-end gap-2">
         <span class="text-6xl leading-none">{{ weatherEmoji }}</span>
-        <p class="text-4xl font-bold tabular-nums leading-none text-[#1a365d]">{{ temperature.toFixed(1) }}<span class="text-2xl">°C</span></p>
-        <span class="mb-1 rounded-full bg-[#ffffff]/80 px-2 py-0.5 text-xs font-semibold text-[#3f6ea3]">{{ comfortLabel }}</span>
+        <p class="text-4xl font-bold tabular-nums leading-none text-foreground">{{ temperature.toFixed(1) }}<span class="text-2xl">°C</span></p>
+        <span class="mb-1 rounded-full bg-card px-2 py-0.5 text-xs font-semibold text-accent-strong">{{ comfortLabel }}</span>
       </div>
 
-      <p class="mt-2 text-base font-semibold text-[#2b6cb0]">{{ weatherDescription }}</p>
-      <p class="mt-1 text-sm text-[#4a6fa1]">{{ weatherMood }}</p>
+      <p class="mt-2 text-base font-semibold text-accent-strong">{{ weatherDescription }}</p>
+      <p class="mt-1 text-sm text-foreground-muted">{{ weatherMood }}</p>
 
       <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
-        <div class="rounded-xl bg-white/70 px-2.5 py-2 text-[#5078a8]">
-          <p class="text-xs uppercase tracking-wide text-[#7a9ac0]">Humidity</p>
+        <div class="rounded-xl bg-card px-2.5 py-2 text-foreground-muted">
+          <p class="text-xs uppercase tracking-wide text-foreground-subtle">Humidity</p>
           <p class="text-sm font-semibold tabular-nums">{{ humidity }}%</p>
         </div>
-        <div class="rounded-xl bg-white/70 px-2.5 py-2 text-[#5078a8]">
-          <p class="text-xs uppercase tracking-wide text-[#7a9ac0]">Wind</p>
+        <div class="rounded-xl bg-card px-2.5 py-2 text-foreground-muted">
+          <p class="text-xs uppercase tracking-wide text-foreground-subtle">Wind</p>
           <p class="text-sm font-semibold tabular-nums">{{ windSpeed.toFixed(1) }} km/h</p>
         </div>
-        <div class="rounded-xl bg-white/70 px-2.5 py-2 text-[#5078a8]">
-          <p class="text-xs uppercase tracking-wide text-[#7a9ac0]">Clouds</p>
+        <div class="rounded-xl bg-card px-2.5 py-2 text-foreground-muted">
+          <p class="text-xs uppercase tracking-wide text-foreground-subtle">Clouds</p>
           <p class="text-sm font-semibold tabular-nums">{{ cloudCover }}%</p>
         </div>
-        <div class="rounded-xl bg-white/70 px-2.5 py-2 text-[#5078a8]">
-          <p class="text-xs uppercase tracking-wide text-[#7a9ac0]">Rain (now)</p>
+        <div class="rounded-xl bg-card px-2.5 py-2 text-foreground-muted">
+          <p class="text-xs uppercase tracking-wide text-foreground-subtle">Rain (now)</p>
           <p class="text-sm font-semibold tabular-nums">{{ precipitation.toFixed(1) }} mm</p>
         </div>
       </div>
 
-      <p class="mt-3 text-xs text-[#6a87ad]">
+      <p class="mt-3 text-xs text-foreground-subtle">
         {{ isWeatherLoading ? 'Fluffy cloud is checking the sky...' : `${refreshedAt} · ${isDay ? 'Sun is up' : 'Moon is up'}` }}
       </p>
 
-      <div v-if="isWeatherLoading" class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#d9ecff]">
-        <div class="loading-wave h-full w-1/3 rounded-full bg-[#97c9ff]" />
+      <div v-if="isWeatherLoading" class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-hover">
+        <div class="loading-wave h-full w-1/3 rounded-full bg-accent" />
       </div>
     </div>
   </section>

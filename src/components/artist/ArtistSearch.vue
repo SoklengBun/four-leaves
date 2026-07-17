@@ -140,9 +140,9 @@ const onInputKey = (e: KeyboardEvent) => {
   <div class="w-full" ref="rootRef">
     <div class="flex flex-wrap gap-2">
       <template v-for="id in selectedIds" :key="id">
-        <span class="inline-flex items-center gap-2 rounded bg-gray-100 px-2 py-1 text-sm">
+        <span class="inline-flex items-center gap-2 rounded bg-surface px-2 py-1 text-sm">
           <span class="text-sm">{{ displayName(id) }}</span>
-          <button type="button" @click="removeId(id)" class="text-muted-foreground">✕</button>
+          <button type="button" @click="removeId(id)" class="text-foreground-muted">✕</button>
         </span>
       </template>
     </div>
@@ -156,14 +156,14 @@ const onInputKey = (e: KeyboardEvent) => {
         class="w-full rounded border px-3 py-2"
       />
 
-      <div class="absolute right-2 top-2 text-sm text-gray-500">
+      <div class="absolute right-2 top-2 text-sm text-foreground-muted">
         <span v-if="waiting">Waiting…</span>
         <span v-else-if="isLoading">Searching…</span>
       </div>
 
-      <div v-if="visibleList" class="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded border bg-white shadow-sm">
-        <div v-if="error" class="p-3 text-sm text-red-600">{{ error }}</div>
-        <div v-else-if="!results.length && !isLoading" class="text-muted-foreground p-3 text-sm">No artists found</div>
+      <div v-if="visibleList" class="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded border border-border bg-card shadow-card">
+        <div v-if="error" class="p-3 text-sm text-danger">{{ error }}</div>
+        <div v-else-if="!results.length && !isLoading" class="p-3 text-sm text-foreground-muted">No artists found</div>
         <template v-else>
           <ul>
             <li
@@ -171,15 +171,15 @@ const onInputKey = (e: KeyboardEvent) => {
               :key="a.id"
               @click="toggleSelect(a)"
               @dblclick.stop="openArtist(a.id)"
-              :class="['cursor-pointer px-3 py-2', highlighted === idx ? 'bg-indigo-50' : '']"
+              :class="['cursor-pointer px-3 py-2', highlighted === idx ? 'bg-surface-hover' : '']"
             >
               <div class="flex items-center justify-between">
                 <div class="text-sm">{{ a.name }}</div>
-                <div class="text-muted-foreground text-xs">{{ a.normalizedName || a.id }}</div>
+                <div class="text-xs text-foreground-muted">{{ a.normalizedName || a.id }}</div>
               </div>
             </li>
           </ul>
-          <div v-if="results.length >= 20" class="text-muted-foreground px-3 py-2 text-center text-sm">More results…</div>
+          <div v-if="results.length >= 20" class="px-3 py-2 text-center text-sm text-foreground-muted">More results…</div>
         </template>
       </div>
     </div>

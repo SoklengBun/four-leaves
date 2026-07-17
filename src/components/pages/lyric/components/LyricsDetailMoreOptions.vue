@@ -104,27 +104,26 @@ const isAddingToPlaylist = (playlistId: number) => addingPlaylistId.value === pl
     eyebrow="Song actions"
     :title="displayTitle || 'Current song'"
     :description="displayArtist || 'Choose what you want to do next.'"
+    :animate-title="false"
     @close="onClose"
   >
     <div class="flex flex-1 flex-col gap-[10px] overflow-y-auto pb-4">
-      <div class="rounded-[20px] border border-[#ffd7e9f2] bg-[#ffffffdb] p-[14px] text-[#9a6782] shadow-[0_12px_24px_#ebbcd229]">
+      <div class="rounded-[20px] border border-border bg-card p-[14px] text-foreground shadow-none">
         <button type="button" class="flex w-full items-center gap-3 text-left" @click="togglePlaylistList">
-          <span
-            class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,_#fff7fb_0%,_#ffe8f3_100%)] text-[18px] leading-none"
-          >
+          <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-[18px] leading-none text-primary">
             +
           </span>
           <span class="flex min-w-0 flex-1 flex-col">
             <strong class="text-sm">Add to playlist</strong>
-            <small class="mt-0.5 text-xs leading-[1.45] text-[#af849a]">Choose one of your playlists or create a new one.</small>
+            <small class="mt-0.5 text-xs leading-[1.45] text-foreground-muted">Choose one of your playlists or create a new one.</small>
           </span>
-          <span class="text-sm text-[#c2799d]">{{ expandPlaylist ? '−' : '+' }}</span>
+          <span class="text-sm text-primary">{{ expandPlaylist ? '−' : '+' }}</span>
         </button>
 
-        <div v-if="expandPlaylist" class="mt-3 border-t border-[#f7d7e6] pt-3">
+        <div v-if="expandPlaylist" class="mt-3 border-t border-border pt-3">
           <button
             type="button"
-            class="flex w-full items-center justify-between rounded-2xl bg-[#fff4fa] px-3 py-3 text-left text-sm font-semibold text-[#b45c88] disabled:cursor-wait disabled:opacity-70"
+            class="flex w-full items-center justify-between rounded-2xl bg-primary-soft px-3 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-surface-hover disabled:cursor-wait disabled:opacity-70"
             :disabled="addingPlaylistId !== null || isRemovingFromPlaylist"
             @click="onCreatePlaylist"
           >
@@ -137,14 +136,14 @@ const isAddingToPlaylist = (playlistId: number) => addingPlaylistId.value === pl
               v-for="item in playlist.lists"
               :key="item.id"
               type="button"
-              class="flex w-full items-start justify-between rounded-2xl border px-3 py-3 text-left disabled:cursor-not-allowed disabled:opacity-100"
-              :class="isSongExist(item) ? 'border-[#ffc6dc] bg-[#fff1f7]' : 'border-[#ffe2ee] bg-[#fffdfd]'"
+              class="flex w-full items-start justify-between rounded-2xl border px-3 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-100"
+              :class="isSongExist(item) ? 'border-border-strong bg-primary-soft' : 'border-border bg-surface hover:bg-card-hover'"
               :disabled="isSongExist(item) || addingPlaylistId !== null || isRemovingFromPlaylist"
               @click="onAddToPlaylist(item.id)"
             >
               <span class="min-w-0">
-                <span class="block truncate text-sm font-semibold text-[#8f5a77]">{{ item.name }}</span>
-                <span class="mt-1 block text-xs text-[#b08a9f]">
+                <span class="block truncate text-sm font-semibold text-foreground">{{ item.name }}</span>
+                <span class="mt-1 block text-xs text-foreground-muted">
                   {{
                     isSongExist(item)
                       ? 'Already in this playlist'
@@ -156,7 +155,7 @@ const isAddingToPlaylist = (playlistId: number) => addingPlaylistId.value === pl
               </span>
               <span
                 class="ml-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em]"
-                :class="isSongExist(item) ? 'text-[#d96a98]' : 'text-[#d583ab]'"
+                :class="isSongExist(item) ? 'text-primary' : 'text-secondary'"
               >
                 <span
                   v-if="isAddingToPlaylist(item.id)"
@@ -173,13 +172,11 @@ const isAddingToPlaylist = (playlistId: number) => addingPlaylistId.value === pl
       <button
         v-if="isCanRemove"
         type="button"
-        class="flex w-full items-center gap-3 rounded-[20px] border border-[#ffd7e9f2] bg-[#ffffffdb] p-[14px] text-left text-[#9a6782] shadow-[0_12px_24px_#ebbcd229] disabled:cursor-wait disabled:opacity-80"
+        class="flex w-full items-center gap-3 rounded-[20px] border border-border bg-card p-[14px] text-left text-foreground shadow-none transition-colors hover:bg-card-hover disabled:cursor-wait disabled:opacity-80"
         :disabled="isRemovingFromPlaylist || addingPlaylistId !== null"
         @click="onRemoveFromPlaylist"
       >
-        <span
-          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,_#fff7fb_0%,_#ffe8f3_100%)] text-[18px] leading-none"
-        >
+        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-[18px] leading-none text-primary">
           <span
             v-if="isRemovingFromPlaylist"
             class="h-4 w-4 animate-spin rounded-full border-[1.5px] border-current border-t-transparent"
@@ -189,7 +186,7 @@ const isAddingToPlaylist = (playlistId: number) => addingPlaylistId.value === pl
         </span>
         <span class="flex flex-col">
           <strong class="text-sm">{{ isRemovingFromPlaylist ? 'Removing from playlist' : 'Remove from playlist' }}</strong>
-          <small class="mt-0.5 text-xs leading-[1.45] text-[#af849a]">
+          <small class="mt-0.5 text-xs leading-[1.45] text-foreground-muted">
             {{ isRemovingFromPlaylist ? 'Removing this song from your playlist...' : 'Take this song out of the playlist you own.' }}
           </small>
         </span>
@@ -197,34 +194,30 @@ const isAddingToPlaylist = (playlistId: number) => addingPlaylistId.value === pl
 
       <button
         type="button"
-        class="flex w-full items-center gap-3 rounded-[20px] border border-[#ffd7e9f2] bg-[#ffffffdb] p-[14px] text-left text-[#9a6782] shadow-[0_12px_24px_#ebbcd229]"
+        class="flex w-full items-center gap-3 rounded-[20px] border border-border bg-card p-[14px] text-left text-foreground shadow-none transition-colors hover:bg-card-hover"
         @click="refresh"
       >
-        <span
-          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,_#fff7fb_0%,_#ffe8f3_100%)] text-[18px] leading-none"
-        >
+        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-[18px] leading-none text-primary">
           ↻
         </span>
         <span class="flex flex-col">
           <strong class="text-sm">Refresh</strong>
-          <small class="mt-0.5 text-xs leading-[1.45] text-[#af849a]">Reload the latest lyric detail for this song.</small>
+          <small class="mt-0.5 text-xs leading-[1.45] text-foreground-muted">Reload the latest lyric detail for this song.</small>
         </span>
       </button>
 
       <button
         v-if="isAdmin"
         type="button"
-        class="flex w-full items-center gap-3 rounded-[20px] border border-[#ffd7e9f2] bg-[#ffffffdb] p-[14px] text-left text-[#825c71] shadow-[0_12px_24px_#ebbcd229]"
+        class="flex w-full items-center gap-3 rounded-[20px] border border-border bg-card p-[14px] text-left text-foreground shadow-none transition-colors hover:bg-card-hover"
         @click="edit"
       >
-        <span
-          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,_#fff7fb_0%,_#ffe8f3_100%)] text-[18px] leading-none"
-        >
+        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-[18px] leading-none text-primary">
           ✎
         </span>
         <span class="flex flex-col">
           <strong class="text-sm">Edit</strong>
-          <small class="mt-0.5 text-xs leading-[1.45] text-[#af849a]">Open the admin editor for this lyric entry.</small>
+          <small class="mt-0.5 text-xs leading-[1.45] text-foreground-muted">Open the admin editor for this lyric entry.</small>
         </span>
       </button>
     </div>

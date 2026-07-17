@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useDark } from '@vueuse/core';
 import { ref, onMounted } from 'vue';
+import { useAppTheme } from '~/composables/useAppTheme';
 
-const isDark = useDark();
+const isDark = useAppTheme();
 
 const pulling = ref(false);
 const startY = ref(0);

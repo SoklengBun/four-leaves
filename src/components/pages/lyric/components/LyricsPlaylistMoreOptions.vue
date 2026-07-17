@@ -50,34 +50,31 @@ const onRemovePlaylist = async () => {
     eyebrow="Playlist actions"
     :title="playlist.name"
     :description="description"
+    :animate-title="false"
     @close="onClose"
   >
     <div class="flex flex-1 flex-col gap-[10px] overflow-y-auto pb-4">
       <button
         type="button"
-        class="flex w-full items-center gap-3 rounded-[20px] border border-[#ffd7e9f2] bg-[#ffffffdb] p-[14px] text-left text-[#9a6782] shadow-[0_12px_24px_#ebbcd229]"
+        class="flex w-full items-center gap-3 rounded-[20px] border border-border bg-card p-[14px] text-left text-foreground shadow-none transition-colors hover:bg-card-hover"
         @click="onEditPlaylist"
       >
-        <span
-          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,_#fff7fb_0%,_#ffe8f3_100%)] text-[18px] leading-none"
-        >
+        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-[18px] leading-none text-primary">
           ✎
         </span>
         <span class="flex flex-col">
           <strong class="text-sm">Edit playlist</strong>
-          <small class="mt-0.5 text-xs leading-[1.45] text-[#af849a]">Update the playlist name, description, or visibility.</small>
+          <small class="mt-0.5 text-xs leading-[1.45] text-foreground-muted">Update the playlist name, description, or visibility.</small>
         </span>
       </button>
 
       <button
         type="button"
-        class="flex w-full items-center gap-3 rounded-[20px] border border-[#ffd7e9f2] bg-[#ffffffdb] p-[14px] text-left text-[#9a6782] shadow-[0_12px_24px_#ebbcd229] disabled:cursor-wait disabled:opacity-80"
+        class="flex w-full items-center gap-3 rounded-[20px] border border-border bg-card p-[14px] text-left text-foreground shadow-none transition-colors hover:bg-card-hover disabled:cursor-wait disabled:opacity-80"
         :disabled="isRemoving"
         @click="onRemovePlaylist"
       >
-        <span
-          class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(180deg,_#fff7fb_0%,_#ffe8f3_100%)] text-[18px] leading-none"
-        >
+        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-[18px] leading-none text-primary">
           <span
             v-if="isRemoving"
             class="h-4 w-4 animate-spin rounded-full border-[1.5px] border-current border-t-transparent"
@@ -87,7 +84,7 @@ const onRemovePlaylist = async () => {
         </span>
         <span class="flex flex-col">
           <strong class="text-sm">{{ isRemoving ? 'Removing playlist' : 'Remove playlist' }}</strong>
-          <small class="mt-0.5 text-xs leading-[1.45] text-[#af849a]">
+          <small class="mt-0.5 text-xs leading-[1.45] text-foreground-muted">
             {{ isRemoving ? 'Removing this playlist from your library...' : 'Delete this playlist and its song list from your library.' }}
           </small>
         </span>
