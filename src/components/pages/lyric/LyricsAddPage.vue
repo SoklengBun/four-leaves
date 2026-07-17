@@ -460,46 +460,46 @@ onBeforeRouteLeave(() => confirmLeave());
 </script>
 
 <template>
-  <div class="min-h-[calc(var(--body-height))] bg-[#fff8fb] text-slate-800">
+  <div class="min-h-[calc(var(--body-height))] bg-background text-foreground">
     <div class="px-3 py-4">
       <form @submit.prevent="onSubmit" class="grid gap-4">
-        <section class="sticky top-4 z-20 rounded-lg border border-pink-300 bg-white p-4 shadow-[0_14px_45px_#f472b61f]">
+        <section class="sticky top-4 z-20 rounded-lg border border-border bg-card p-4 shadow-card">
           <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-pink-500">{{ isEditMode ? 'edit lyric' : 'new lyric' }}</p>
-              <h1 class="mt-1 text-2xl font-bold text-slate-900">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{{ isEditMode ? 'edit lyric' : 'new lyric' }}</p>
+              <h1 class="mt-1 text-2xl font-bold text-foreground">
                 {{ isEditMode ? 'Edit this soft little lyric' : 'Add a soft little lyric' }}
               </h1>
             </div>
             <button
               type="submit"
               :disabled="isSubmitting || isLoading"
-              class="inline-flex h-11 items-center justify-center rounded-lg bg-pink-500 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-60"
+              class="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-primary transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
               {{ isSubmitting ? 'Saving...' : isEditMode ? 'Update lyric' : 'Save lyric' }}
             </button>
           </div>
         </section>
 
-        <section v-if="isLoading" class="rounded-lg border border-pink-300 bg-white p-4 text-sm font-semibold text-slate-500 shadow-sm">
+        <section v-if="isLoading" class="rounded-lg border border-border bg-card p-4 text-sm font-semibold text-foreground-muted shadow-sm">
           Loading lyric...
         </section>
 
-        <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm">
+        <section class="rounded-lg border border-border bg-card p-4 shadow-sm">
           <div class="grid gap-3 md:grid-cols-2">
             <label class="block">
-              <span class="text-sm font-semibold text-slate-700">Video ID</span>
+              <span class="text-sm font-semibold text-foreground">Video ID</span>
               <input
                 v-model="videoId"
-                class="mt-1 h-11 w-full rounded-lg border border-pink-300 bg-pink-50/60 px-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100"
+                class="mt-1 h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary-soft"
                 placeholder="youtube video ID, e.g: 84YBqfpCGW8 or paste the youtube link here"
               />
             </label>
             <label class="block">
-              <span class="text-sm font-semibold text-slate-700">Title</span>
+              <span class="text-sm font-semibold text-foreground">Title</span>
               <input
                 v-model="title"
-                class="mt-1 h-11 w-full rounded-lg border border-pink-300 bg-pink-50/60 px-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100"
+                class="mt-1 h-11 w-full rounded-lg border border-border bg-surface px-3 text-sm outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary-soft"
                 placeholder="Song title"
               />
             </label>
@@ -507,11 +507,11 @@ onBeforeRouteLeave(() => confirmLeave());
 
           <div class="mt-4">
             <div class="flex items-center justify-between gap-3">
-              <span class="text-sm font-semibold text-slate-700">Alt titles</span>
+              <span class="text-sm font-semibold text-foreground">Alt titles</span>
               <button
                 type="button"
                 @click="addAltTitle"
-                class="rounded-lg border border-pink-300 px-3 py-1.5 text-xs font-semibold text-pink-600 hover:bg-pink-50"
+                class="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary-soft"
               >
                 Add
               </button>
@@ -520,7 +520,7 @@ onBeforeRouteLeave(() => confirmLeave());
               <div v-for="(_, index) in altTitles" :key="index" class="flex gap-2">
                 <input
                   v-model="altTitles[index]"
-                  class="h-10 flex-1 rounded-lg border border-pink-300 bg-pink-50/60 px-3 text-sm outline-none focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100"
+                  class="h-10 flex-1 rounded-lg border border-border bg-surface px-3 text-sm outline-none focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary-soft"
                   placeholder="Alternative title"
                 />
                 <button
@@ -535,10 +535,10 @@ onBeforeRouteLeave(() => confirmLeave());
           </div>
         </section>
 
-        <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm">
+        <section class="rounded-lg border border-border bg-card p-4 shadow-sm">
           <div class="flex items-center justify-between gap-3">
-            <h2 class="text-base font-bold text-slate-900">Artists</h2>
-            <span class="rounded-lg bg-pink-50 px-2.5 py-1 text-xs font-semibold text-pink-600">{{ artistIds.length }} selected</span>
+            <h2 class="text-base font-bold text-foreground">Artists</h2>
+            <span class="rounded-lg bg-primary-soft px-2.5 py-1 text-xs font-semibold text-primary">{{ artistIds.length }} selected</span>
           </div>
 
           <div class="mt-3">
@@ -546,9 +546,9 @@ onBeforeRouteLeave(() => confirmLeave());
           </div>
         </section>
 
-        <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm">
+        <section class="rounded-lg border border-border bg-card p-4 shadow-sm">
           <div class="flex items-center justify-between gap-3">
-            <h2 class="text-base font-bold text-slate-900">Lyrics</h2>
+            <h2 class="text-base font-bold text-foreground">Lyrics</h2>
             <button
               type="button"
               @click="addContent"

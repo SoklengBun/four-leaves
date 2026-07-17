@@ -89,34 +89,34 @@ onBeforeUnmount(() => {
         </div>
         <button
           type="button"
-          class="shrink-0 rounded-full border border-[#d8c8f1] bg-surface px-4 py-2 text-sm font-bold text-primary shadow-sm transition hover:-translate-y-0.5 hover:border-primary active:translate-y-0"
+          class="shrink-0 rounded-full border border-border bg-surface px-4 py-2 text-sm font-bold text-primary shadow-sm transition hover:-translate-y-0.5 hover:border-primary active:translate-y-0"
           @click="readStorage"
         >
           Refresh
         </button>
       </header>
 
-      <div v-if="!storageAvailable" class="mb-5 rounded-2xl border border-[#f3b9d1] bg-card px-5 py-4 text-primary shadow-sm">
+      <div v-if="!storageAvailable" class="mb-5 rounded-2xl border border-danger bg-card px-5 py-4 text-danger shadow-sm">
         Local storage is unavailable or access was denied by the browser.
       </div>
 
       <section class="mb-5 grid gap-4 sm:grid-cols-3">
         <div
-          class="rounded-3xl border border-[#f0d8e8] bg-gradient-to-br from-[#ffffff] to-[#fff1f7] p-5 shadow-[0_10px_30px_#c8a3c52e] dark:from-[#2c2242] dark:to-[#251d3a]"
+          class="rounded-3xl border border-border bg-gradient-to-br from-card to-primary-soft p-5 shadow-card"
         >
           <p class="text-sm text-foreground-muted">Estimated usage</p>
           <p class="mt-2 text-3xl font-bold tabular-nums text-foreground">{{ formatBytes(totalBytes) }}</p>
           <p class="mt-1 text-xs text-foreground-muted">{{ totalBytes.toLocaleString() }} bytes</p>
         </div>
         <div
-          class="rounded-3xl border border-[#f0d8e8] bg-gradient-to-br from-[#ffffff] to-[#f7f4ff] p-5 shadow-[0_10px_30px_#c8a3c52e] dark:from-[#2c2242] dark:to-[#251d3a]"
+          class="rounded-3xl border border-border bg-gradient-to-br from-card to-secondary-soft p-5 shadow-card"
         >
           <p class="text-sm text-foreground-muted">Stored keys</p>
           <p class="mt-2 text-3xl font-bold tabular-nums text-foreground">{{ items.length }}</p>
           <p class="mt-1 text-xs text-foreground-muted">Across this origin</p>
         </div>
         <div
-          class="rounded-3xl border border-[#f0d8e8] bg-gradient-to-br from-[#ffffff] to-[#eef8ff] p-5 shadow-[0_10px_30px_#c8a3c52e] dark:from-[#2c2242] dark:to-[#251d3a]"
+          class="rounded-3xl border border-border bg-gradient-to-br from-card to-accent-soft p-5 shadow-card"
         >
           <p class="text-sm text-foreground-muted">Largest key</p>
           <p class="mt-2 truncate text-xl font-bold text-foreground" :title="largestItem?.key || 'None'">
@@ -126,7 +126,7 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <section class="overflow-hidden rounded-3xl border border-[#f0d8e8] bg-surface shadow-[0_10px_30px_#c8a3c52e] dark:border-[#3d2f58]">
+      <section class="overflow-hidden rounded-3xl border border-border bg-surface shadow-card">
         <div class="flex items-center justify-between gap-4 border-b border-border px-5 py-4 md:px-6">
           <div>
             <h2 class="text-xl font-bold text-foreground">Stored data</h2>
@@ -143,12 +143,12 @@ onBeforeUnmount(() => {
                 <p class="mt-2 max-h-12 overflow-hidden break-all text-xs text-foreground-muted">{{ item.value || 'Empty value' }}</p>
               </div>
               <div class="flex shrink-0 items-center gap-2">
-                <span class="rounded-full bg-soft-pink px-3 py-1 text-xs font-bold tabular-nums text-primary">
+                <span class="rounded-full bg-primary-soft px-3 py-1 text-xs font-bold tabular-nums text-primary">
                   {{ formatBytes(item.bytes) }}
                 </span>
                 <button
                   type="button"
-                  class="rounded-full border border-[#f3b9d1] px-3 py-1 text-xs font-bold text-primary transition hover:bg-[#fff1f7] active:scale-95"
+                  class="rounded-full border border-border-strong px-3 py-1 text-xs font-bold text-primary transition hover:bg-primary-soft active:scale-95"
                   :aria-label="`Clear ${item.key}`"
                   @click="clearItem(item.key)"
                 >

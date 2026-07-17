@@ -2,8 +2,8 @@
 defineProps<{ variant: 'primary' | 'secondary' }>();
 
 const classa = {
-  primary: 'text-blue-500',
-  secondary: 'text-red-500',
+  primary: 'text-primary',
+  secondary: 'text-danger',
 };
 </script>
 

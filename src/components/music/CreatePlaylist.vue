@@ -82,38 +82,38 @@ const onSubmit = async () => {
   >
     <div class="flex flex-col gap-[14px]">
       <label class="flex flex-col gap-[7px]">
-        <span class="text-xs font-bold text-[#8f647d]">Playlist name</span>
+        <span class="text-xs font-bold text-foreground-muted">Playlist name</span>
         <input
           v-model="form.name"
           type="text"
           maxlength="100"
           placeholder="Soft Cloud Mix"
           :disabled="isSubmitting"
-          class="w-full rounded-[18px] border border-[#ffdbe9] bg-[#ffffffd9] px-[14px] py-3 text-sm text-[#6d4c60] shadow-[inset_0_1px_0_#ffffffcc] outline-none focus:border-[#ff9bc5] disabled:cursor-wait disabled:opacity-70"
+          class="w-full rounded-[18px] border border-border bg-surface px-[14px] py-3 text-sm text-foreground shadow-inner outline-none focus:border-primary disabled:cursor-wait disabled:opacity-70"
         />
       </label>
 
       <label class="flex flex-col gap-[7px]">
-        <span class="text-xs font-bold text-[#8f647d]">Description</span>
+        <span class="text-xs font-bold text-foreground-muted">Description</span>
         <textarea
           v-model="form.description"
           rows="4"
           maxlength="300"
           placeholder="A calm set of songs for late-night listening."
           :disabled="isSubmitting"
-          class="min-h-[108px] w-full resize-y rounded-[18px] border border-[#ffdbe9] bg-[#ffffffd9] px-[14px] py-3 text-sm text-[#6d4c60] shadow-[inset_0_1px_0_#ffffffcc] outline-none focus:border-[#ff9bc5] disabled:cursor-wait disabled:opacity-70"
+          class="min-h-[108px] w-full resize-y rounded-[18px] border border-border bg-surface px-[14px] py-3 text-sm text-foreground shadow-inner outline-none focus:border-primary disabled:cursor-wait disabled:opacity-70"
         />
       </label>
 
-      <label class="flex items-center justify-between gap-4 rounded-[22px] border border-[#ffe0ec] bg-[#ffffffb8] p-[14px]">
+      <label class="flex items-center justify-between gap-4 rounded-[22px] border border-border bg-card p-[14px]">
         <span>
-          <strong class="block text-sm text-[#7e546e]">Public playlist</strong>
-          <small class="mt-[3px] block text-xs leading-[1.45] text-[#aa859b]">Let other people discover this playlist.</small>
+          <strong class="block text-sm text-foreground">Public playlist</strong>
+          <small class="mt-[3px] block text-xs leading-[1.45] text-foreground-muted">Let other people discover this playlist.</small>
         </span>
-        <input v-model="form.isPublic" :disabled="isSubmitting" type="checkbox" class="h-5 w-5 accent-[#e873aa] disabled:cursor-wait" />
+        <input v-model="form.isPublic" :disabled="isSubmitting" type="checkbox" class="h-5 w-5 accent-primary disabled:cursor-wait" />
       </label>
 
-      <div class="flex flex-wrap justify-between gap-2 rounded-[18px] bg-[#fff7fbcc] px-[14px] py-3 text-xs text-[#ab7f96]">
+      <div class="flex flex-wrap justify-between gap-2 rounded-[18px] bg-primary-soft px-[14px] py-3 text-xs text-foreground-muted">
         <span>{{ songCount }} song{{ songCount === 1 ? '' : 's' }}</span>
         <span>{{ isUpdateMode ? 'Existing songs will stay in this playlist.' : 'Selected songs will be added after creation.' }}</span>
       </div>
@@ -121,7 +121,7 @@ const onSubmit = async () => {
       <div class="mt-1 grid grid-cols-2 gap-[10px]">
         <button
           type="button"
-          class="rounded-[18px] bg-[#ffffffc9] px-[14px] py-3 text-sm font-bold text-[#94677f] disabled:cursor-wait disabled:opacity-70"
+          class="rounded-[18px] bg-surface px-[14px] py-3 text-sm font-bold text-foreground-muted disabled:cursor-wait disabled:opacity-70"
           :disabled="isSubmitting"
           @click="onClose"
         >
@@ -129,7 +129,7 @@ const onSubmit = async () => {
         </button>
         <button
           type="button"
-          class="flex items-center justify-center gap-2 rounded-[18px] bg-[linear-gradient(135deg,_#ff94be_0%,_#ff6ca7_100%)] px-[14px] py-3 text-sm font-bold text-white shadow-[0_12px_24px_#ff7caf38] disabled:cursor-not-allowed disabled:opacity-60"
+          class="flex items-center justify-center gap-2 rounded-[18px] bg-gradient-to-br from-primary to-secondary px-[14px] py-3 text-sm font-bold text-primary-foreground shadow-primary disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="!canSubmit"
           @click="onSubmit"
         >

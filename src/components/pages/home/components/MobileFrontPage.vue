@@ -21,7 +21,7 @@ const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home
 .mobile-front-container {
   @apply relative h-body w-full md:hidden;
 
-  background-color: #030923;
+  background-color: var(--color-background);
 }
 
 .background-image {

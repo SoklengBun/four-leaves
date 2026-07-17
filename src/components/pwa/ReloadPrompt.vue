@@ -27,18 +27,18 @@ const close = () => {
 
 <style lang="scss">
 .pwa-toast {
-  @apply fixed left-1/2 top-5 z-[2000] h-fit w-fit -translate-x-1/2 rounded border border-blue-500 bg-white px-5 py-2.5 text-black transition-all md:bottom-5 md:left-auto md:right-5 md:top-auto md:translate-x-0;
+  @apply fixed left-1/2 top-5 z-[2000] h-fit w-fit -translate-x-1/2 rounded border border-border bg-card px-5 py-2.5 text-foreground shadow-card transition-all md:bottom-5 md:left-auto md:right-5 md:top-auto md:translate-x-0;
 
   .button {
     @apply mt-2 rounded border px-2 py-0.5;
   }
 
   .refresh {
-    @apply mr-2 bg-green-500 text-white;
+    @apply mr-2 bg-success text-primary-foreground;
   }
 
   .close {
-    @apply border-blue-500 text-blue-500;
+    @apply border-border-strong text-foreground-muted;
   }
 }
 </style>

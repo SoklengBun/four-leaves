@@ -47,17 +47,17 @@ const tzString = computed(() => {
   <div class="relative w-full bg-card p-3">
     <div class="mb-3 flex items-center justify-between">
       <div class="flex flex-col">
-        <div class="text-lg font-bold text-purple-600">{{ monthName }}</div>
-        <div class="text-sm text-gray-500">{{ year }}</div>
+        <div class="text-lg font-bold text-secondary">{{ monthName }}</div>
+        <div class="text-sm text-foreground-muted">{{ year }}</div>
       </div>
       <div class="text-right">
-        <div class="text-base font-semibold tabular-nums text-gray-800">{{ timeString }}</div>
-        <div class="text-sm text-gray-400">{{ tzString }}</div>
+        <div class="text-base font-semibold tabular-nums text-foreground">{{ timeString }}</div>
+        <div class="text-sm text-foreground-subtle">{{ tzString }}</div>
       </div>
     </div>
 
     <div class="grid grid-cols-7 gap-2 text-sm font-bold">
-      <div v-for="(d, i) in daysOfWeek" :key="d" :class="['text-center', i === 0 ? 'text-red-500' : i === 6 ? 'text-red-500' : 'text-gray-500']">
+      <div v-for="(d, i) in daysOfWeek" :key="d" :class="['text-center', i === 0 ? 'text-danger' : i === 6 ? 'text-danger' : 'text-foreground-muted']">
         {{ d }}
       </div>
     </div>
@@ -68,12 +68,12 @@ const tzString = computed(() => {
         :key="idx"
         :class="[
           'flex min-h-10 transform items-center justify-center rounded-lg transition-transform',
-          !day ? 'bg-transparent shadow-none' : 'bg-white shadow-sm',
+          !day ? 'bg-transparent shadow-none' : 'bg-surface shadow-sm',
           (() => {
             const weekday = idx % 7;
             if (isToday(day)) return 'active-day';
             if (!day) return '';
-            return weekday === 0 ? 'text-red-500' : weekday === 6 ? 'text-red-500' : 'text-gray-700';
+            return weekday === 0 ? 'text-danger' : weekday === 6 ? 'text-danger' : 'text-foreground';
           })(),
         ]"
       >
@@ -87,10 +87,9 @@ const tzString = computed(() => {
 
 <style scoped>
 .active-day {
-  @apply border-2 border-primary text-xl font-bold text-blue-500;
+  @apply border-2 border-primary text-xl font-bold text-primary;
   box-shadow:
-    0 0 3px #ffb1ed,
-    0 0 5px #f5fcff,
-    0 0 10px #ffc1f7;
+    0 0 3px color-mix(in srgb, var(--color-primary) 55%, transparent),
+    0 0 10px color-mix(in srgb, var(--color-primary) 35%, transparent);
 }
 </style>

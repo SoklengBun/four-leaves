@@ -24,24 +24,116 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #ffeef7;
+  background: var(--color-surface);
   border-radius: 999px;
-  border: 1px solid #ffeef7;
+  border: 1px solid var(--color-border);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ffb7d5, #d9b3ff);
+  background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ff9fc9, #c99bff);
+  background: linear-gradient(180deg, var(--color-primary-hover), var(--color-accent-strong));
 }
 
 .box-cover {
-  @apply border-2 border-[#ffcfe7];
-  box-shadow:
-    0 0 5px #ffc9f2,
-    0 0 7px #f5fcff,
-    0 0 10px #ff9fc9;
+  @apply border-2 border-border;
+  box-shadow: var(--shadow-bordered-card);
+}
+
+/* Transitional bridge for legacy utility classes. It keeps older screens
+   readable in the new night theme while their local styles are migrated. */
+.dark [class~='bg-white'],
+.dark [class*='bg-white/'],
+.dark [class*='bg-[#fff'],
+.dark [class*='bg-[#ffffff'],
+.dark [class*='bg-[linear-gradient'] {
+  background-color: var(--color-card) !important;
+  background-image: none !important;
+}
+
+.dark [class*='bg-pink'],
+.dark [class*='bg-rose'],
+.dark [class*='bg-red-50'],
+.dark [class*='bg-red-100'],
+.dark [class*='bg-[#ffd'],
+.dark [class*='bg-[#ffc'] {
+  background-color: var(--color-primary-soft) !important;
+}
+
+.dark [class*='bg-blue'],
+.dark [class*='bg-gray'],
+.dark [class*='bg-slate'],
+.dark [class*='bg-[#eef'],
+.dark [class*='bg-[#f5'],
+.dark [class*='bg-[#f6'] {
+  background-color: var(--color-surface) !important;
+}
+
+.dark [class*='border-[#'],
+.dark [class*='border-pink'],
+.dark [class*='border-rose'],
+.dark [class*='border-gray'],
+.dark [class*='border-white'],
+.dark [class~='border-white'] {
+  border-color: var(--color-border) !important;
+}
+
+.dark [class*='text-[#'],
+.dark [class*='text-gray'],
+.dark [class*='text-slate'],
+.dark [class*='text-blue'],
+.dark [class*='text-purple'],
+.dark [class*='text-pink'],
+.dark [class*='text-rose'] {
+  color: var(--color-foreground-muted) !important;
+}
+
+/* Legacy light-mode colors now resolve to the clean semantic palette too. */
+:root:not(.dark) [class~='bg-white'],
+:root:not(.dark) [class*='bg-white/'],
+:root:not(.dark) [class*='bg-[#fff'],
+:root:not(.dark) [class*='bg-[#ffffff'],
+:root:not(.dark) [class*='bg-[linear-gradient'] {
+  background-color: var(--color-card) !important;
+  background-image: none !important;
+}
+
+:root:not(.dark) [class*='bg-pink'],
+:root:not(.dark) [class*='bg-rose'],
+:root:not(.dark) [class*='bg-red-50'],
+:root:not(.dark) [class*='bg-red-100'],
+:root:not(.dark) [class*='bg-[#ffd'],
+:root:not(.dark) [class*='bg-[#ffc'] {
+  background-color: var(--color-primary-soft) !important;
+}
+
+:root:not(.dark) [class*='bg-blue'],
+:root:not(.dark) [class*='bg-gray'],
+:root:not(.dark) [class*='bg-slate'],
+:root:not(.dark) [class*='bg-[#eef'],
+:root:not(.dark) [class*='bg-[#f5'],
+:root:not(.dark) [class*='bg-[#f6'] {
+  background-color: var(--color-surface) !important;
+}
+
+:root:not(.dark) [class*='border-[#'],
+:root:not(.dark) [class*='border-pink'],
+:root:not(.dark) [class*='border-rose'],
+:root:not(.dark) [class*='border-gray'],
+:root:not(.dark) [class*='border-white'],
+:root:not(.dark) [class~='border-white'] {
+  border-color: var(--color-border) !important;
+}
+
+:root:not(.dark) [class*='text-[#'],
+:root:not(.dark) [class*='text-gray'],
+:root:not(.dark) [class*='text-slate'],
+:root:not(.dark) [class*='text-blue'],
+:root:not(.dark) [class*='text-purple'],
+:root:not(.dark) [class*='text-pink'],
+:root:not(.dark) [class*='text-rose'] {
+  color: var(--color-foreground-muted) !important;
 }

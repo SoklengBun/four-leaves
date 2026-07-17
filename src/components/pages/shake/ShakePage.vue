@@ -97,12 +97,12 @@ watch(shakeCount, () => {
       description="Please turn on permission to play the game."
     >
       <div class="pt-2">
-        <div class="flex items-center text-blue-500">
-          <button class="h-[50px] w-1/2 rounded-l-[18px] bg-[#ffffffc9]" @click="permissionDialog = false">
+        <div class="flex items-center text-primary">
+          <button class="h-[50px] w-1/2 rounded-l-[18px] bg-surface" @click="permissionDialog = false">
             Cancel
           </button>
-          <div class="h-[50px] w-px bg-red-500/20" />
-          <button class="h-[50px] w-1/2 rounded-r-[18px] bg-[#ffffffc9]" @click="requestPermission">
+          <div class="h-[50px] w-px bg-danger" />
+          <button class="h-[50px] w-1/2 rounded-r-[18px] bg-surface" @click="requestPermission">
             Turn on Permission
           </button>
         </div>
@@ -110,7 +110,7 @@ watch(shakeCount, () => {
     </CustomPopup>
 
     <div
-      class="fixed left-1/2 top-1/2 flex h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-red-500 text-white transition-all duration-500"
+      class="fixed left-1/2 top-1/2 flex h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-danger text-primary-foreground transition-all duration-500"
       :class="{ 'scale-0': shakeCount < 10 }"
       @click="requestPermission"
     >

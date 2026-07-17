@@ -87,7 +87,7 @@ onClickOutside(
     <button
       ref="triggerRef"
       type="button"
-      class="absolute right-1.5 top-1.5 z-20 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm transition-opacity hover:bg-black/70"
+      class="absolute right-1.5 top-1.5 z-20 flex items-center gap-1 rounded-full bg-overlay px-2 py-1 text-xs font-semibold text-primary-foreground backdrop-blur-sm transition-opacity hover:bg-surface-hover"
       aria-label="Show song versions"
       @click="togglePanel"
     >
@@ -103,9 +103,9 @@ onClickOutside(
     <div
       v-if="isOpen && !isMobile"
       ref="panelRef"
-      class="box-cover absolute -top-2 left-[calc(100%+0.5rem)] z-30 mt-2 flex max-h-[70vh] w-[280px] flex-col overflow-hidden rounded-xl bg-white"
+      class="box-cover absolute -top-2 left-[calc(100%+0.5rem)] z-30 mt-2 flex max-h-[70vh] w-[280px] flex-col overflow-hidden rounded-xl bg-card"
     >
-      <p class="border-b border-[#fff0f8] px-3 py-2 text-xs font-semibold text-[#ff4f9b]">Versions ({{ versions.length }})</p>
+      <p class="border-b border-border px-3 py-2 text-xs font-semibold text-primary">Versions ({{ versions.length }})</p>
       <ul class="min-h-0 flex-1 overflow-y-auto">
         <li
           v-for="(item, i) in versions"
@@ -118,12 +118,12 @@ onClickOutside(
             class="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg text-left transition-colors hover:bg-[#fff4fb]"
             @click="selectVersion(item.id)"
           >
-            <div class="relative size-12 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+            <div class="relative size-12 shrink-0 overflow-hidden rounded-lg bg-surface">
               <YoutubeThumbnail :id="item.id" />
             </div>
             <div class="min-w-0 flex-1">
-              <MarqueeText :text="displayTitle" class="w-full min-w-0 text-xs font-semibold text-[#1f1f1f]" :gap="24" :speed="32" />
-              <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-[11px] text-[#6b7280]" :gap="20" :speed="30" />
+              <MarqueeText :text="displayTitle" class="w-full min-w-0 text-xs font-semibold text-foreground" :gap="24" :speed="32" />
+              <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-[11px] text-foreground-muted" :gap="20" :speed="30" />
             </div>
           </button>
           <template v-if="canSetDefaultCover">
@@ -152,7 +152,7 @@ onClickOutside(
       :description="`${versions.length} version${versions.length === 1 ? '' : 's'} available for this song.`"
       @close="closePanel"
     >
-      <div class="flex h-full max-h-[70vh] flex-col bg-[linear-gradient(to_bottom,_#fff9fd,_#ffffff)] p-4">
+      <div class="flex h-full max-h-[70vh] flex-col bg-surface p-4">
         <ul class="min-h-0 flex-1 space-y-2 overflow-y-auto">
           <li
             v-for="(item, i) in versions"
@@ -165,12 +165,12 @@ onClickOutside(
               class="flex min-w-0 flex-1 items-center gap-3 rounded-xl text-left transition-colors active:bg-[#fff0f8]"
               @click="selectVersion(item.id)"
             >
-              <div class="relative size-14 shrink-0 overflow-hidden rounded-xl bg-gray-100">
+              <div class="relative size-14 shrink-0 overflow-hidden rounded-xl bg-surface-hover">
                 <YoutubeThumbnail :id="item.id" />
               </div>
               <div class="min-w-0 flex-1">
-                <MarqueeText :text="displayTitle" class="w-full min-w-0 text-sm font-semibold text-[#1f1f1f]" :gap="24" :speed="32" />
-                <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-xs text-[#6b7280]" :gap="20" :speed="30" />
+                <MarqueeText :text="displayTitle" class="w-full min-w-0 text-sm font-semibold text-foreground" :gap="24" :speed="32" />
+                <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-xs text-foreground-muted" :gap="20" :speed="30" />
               </div>
             </button>
             <template v-if="canSetDefaultCover">

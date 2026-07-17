@@ -2,12 +2,15 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { CSSProperties } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import moonIcon from '~/assets/moon.svg';
+import sunIcon from '~/assets/sun.svg';
 import menuHomeIcon from '~/assets/images/menus/home.png';
 import menuLyricIcon from '~/assets/images/menus/lyric.png';
 import menuLyricMineIcon from '~/assets/images/menus/lyric-mine.png';
 import menuLyricAddIcon from '~/assets/images/menus/lyric-add.png';
 import menuStorageIcon from '~/assets/images/menus/storage.svg';
 import menuDefaultIcon from '~/assets/images/yunli.png';
+import { useAppTheme } from '~/composables/useAppTheme';
 import { pxOfCurrentScreenSize } from '~/utils/helper';
 import IconMenu from '../icons/IconMenu.vue';
 
@@ -17,10 +20,12 @@ type MenuItem = {
   label: string;
   path: string;
   icon: string;
+  action?: 'toggle-theme';
 };
 
 const router = useRouter();
 const route = useRoute();
+const isDark = useAppTheme();
 
 const menuItems: MenuItem[] = [
   { label: 'Home', path: '/', icon: menuHomeIcon },
@@ -29,7 +34,18 @@ const menuItems: MenuItem[] = [
   { label: 'Add Lyrics', path: '/lyrics/add', icon: menuLyricAddIcon },
   { label: 'About', path: '/about', icon: menuDefaultIcon },
   { label: 'Storage', path: '/storage', icon: menuStorageIcon },
+  { label: 'Toggle theme', path: '__toggle-theme__', icon: moonIcon, action: 'toggle-theme' },
 ];
+
+const getItemLabel = (item: MenuItem) => {
+  if (item.action !== 'toggle-theme') return item.label;
+  return isDark.value ? 'Switch to light mode' : 'Switch to dark mode';
+};
+
+const getItemIcon = (item: MenuItem) => {
+  if (item.action !== 'toggle-theme') return item.icon;
+  return isDark.value ? sunIcon : moonIcon;
+};
 
 const FAB_SIZE = 56;
 const MOBILE_FAB_SIZE = 40;
@@ -375,6 +391,13 @@ const itemStyle = (index: number): CSSProperties => {
 
 const navigateTo = async (item: MenuItem, index: number) => {
   activeIndex.value = index;
+
+  if (item.action === 'toggle-theme') {
+    isDark.value = !isDark.value;
+    closeMenu();
+    return;
+  }
+
   if (route.path !== item.path) {
     await router.push(item.path);
   }
@@ -430,7 +453,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="pointer-events-none fixed inset-0 z-[9998]">
+  <div class="pointer-events-none fixed inset-0 z-[1000]">
     <div class="wheel-root fixed" :style="wheelRootStyle">
       <transition name="wheel-fade">
         <div v-if="isMenuOpen" class="wheel-half pointer-events-auto" :class="halfWheelClass" @wheel="onWheelInput" @pointerdown="onWheelDragStart">
@@ -441,17 +464,24 @@ onBeforeUnmount(() => {
             class="wheel-item"
             :class="{ active: index === activeIndex }"
             :style="itemStyle(index)"
-            :title="item.label"
+            :title="getItemLabel(item)"
+            :aria-label="getItemLabel(item)"
             draggable="false"
             @click="navigateTo(item, index)"
           >
-            <img :src="item.icon" :alt="item.label" class="wheel-item-icon" draggable="false" />
+            <img
+              :src="getItemIcon(item)"
+              :alt="getItemLabel(item)"
+              class="wheel-item-icon"
+              :class="{ 'wheel-item-icon--theme': item.action === 'toggle-theme' }"
+              draggable="false"
+            />
           </button>
         </div>
       </transition>
 
       <button
-        class="floating-fab pointer-events-auto fixed flex items-center justify-center rounded-full border border-primary bg-gradient-to-br from-white to-[#dceeff] transition"
+        class="floating-fab pointer-events-auto fixed flex items-center justify-center rounded-full border border-primary bg-gradient-to-br from-card to-surface transition"
         :class="{ 'fab-open': isStuckOpen }"
         :style="fabStyle"
         @pointerdown="onPointerDown"
@@ -475,21 +505,20 @@ onBeforeUnmount(() => {
   touch-action: none;
   user-select: none;
   z-index: 20;
-  border: 2px solid #ffcfe7;
+  border: 2px solid var(--color-border-strong);
   border-radius: 9999px;
-  background: linear-gradient(160deg, #fff9fd 0%, #ffeaf5 100%);
-  color: #ff4f9b;
+  background: var(--gradient-surface);
+  color: var(--color-primary);
   box-shadow:
-    0 4px 10px #ffd9ec,
-    0 0 0 4px #fff4fb inset;
+    0 8px 24px color-mix(in srgb, var(--color-primary) 24%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--color-card) 70%, transparent) inset;
 }
 
 .fab-open {
-  border-color: #4baeff;
+  border-color: var(--color-accent);
   box-shadow:
-    0 0 3px #45a8ff,
-    0 0 6px #b4dcff,
-    0 0 5px #6bbaff;
+    0 0 3px var(--color-accent),
+    0 0 12px color-mix(in srgb, var(--color-accent) 60%, transparent);
 }
 
 .wheel-half {
@@ -522,12 +551,11 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: var(--wheel-ring-inset);
   border-radius: 9999px;
-  border: 1px solid #289aff;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.28) 0%, rgba(117, 188, 255, 0.68) 100%);
+  border: 1px solid var(--color-accent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 18%, transparent) 0%, color-mix(in srgb, var(--color-secondary) 46%, transparent) 100%);
   box-shadow:
-    0 0 3px #45a8ff,
-    0 0 6px #b4dcff,
-    0 0 5px #6bbaff;
+    0 0 3px var(--color-accent),
+    0 0 12px color-mix(in srgb, var(--color-accent) 55%, transparent);
 }
 
 .wheel-item {
@@ -538,11 +566,11 @@ onBeforeUnmount(() => {
   height: var(--wheel-item-size);
   margin-left: var(--wheel-item-offset);
   margin-top: var(--wheel-item-offset);
-  border: 1px solid #c7e4ff;
+  border: 1px solid var(--color-border-strong);
   border-radius: 9999px;
-  background: #ffffff;
+  background: var(--color-card);
   padding: 0;
-  box-shadow: 0 8px 16px #2f5f8f2e;
+  box-shadow: 0 8px 16px color-mix(in srgb, var(--color-background) 80%, transparent);
   transition:
     transform 320ms cubic-bezier(0.2, 0.9, 0.2, 1),
     opacity 320ms ease;
@@ -550,10 +578,10 @@ onBeforeUnmount(() => {
 }
 
 .wheel-item.active {
-  border-color: #4baeff;
+  border-color: var(--color-accent);
   box-shadow:
-    0 10px 18px #2f5f8f33,
-    0 0 0 2px #d8ecff;
+    0 10px 18px color-mix(in srgb, var(--color-background) 85%, transparent),
+    0 0 0 2px var(--color-accent-soft);
 }
 
 .wheel-item-icon {
@@ -564,6 +592,11 @@ onBeforeUnmount(() => {
   -webkit-user-drag: none;
   user-select: none;
   pointer-events: none;
+}
+
+.wheel-item-icon--theme {
+  object-fit: contain;
+  padding: 9px;
 }
 
 .wheel-fade-enter-active,

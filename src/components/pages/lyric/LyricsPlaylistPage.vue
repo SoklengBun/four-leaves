@@ -52,20 +52,20 @@ watch(playlistId, (value, previousValue) => {
     <RoundButton v-if="isOwner" @click="showMore = true" />
 
     <div
-      class="mt-4 overflow-hidden rounded-[28px] border border-[#ffd7e8] bg-[linear-gradient(145deg,_#fff9fc_0%,_#fff0f7_52%,_#fff8fd_100%)] p-5 shadow-[0_20px_50px_#f5bfd73d] md:p-7"
+      class="mt-4 overflow-hidden rounded-[28px] border border-border bg-gradient-to-br from-card via-surface to-primary-soft p-5 shadow-card md:p-7"
     >
       <div v-if="list" class="space-y-3">
-        <p class="text-xs font-semibold uppercase tracking-[0.32em] text-[#cf7ca6]">Playlist</p>
-        <h1 class="text-3xl font-semibold text-[#2b1f28] md:text-4xl">{{ list.name }}</h1>
-        <p v-if="list.description" class="max-w-2xl text-sm leading-6 text-[#755b6b] md:text-base">{{ list.description }}</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.32em] text-primary">Playlist</p>
+        <h1 class="text-3xl font-semibold text-foreground md:text-4xl">{{ list.name }}</h1>
+        <p v-if="list.description" class="max-w-2xl text-sm leading-6 text-foreground-muted md:text-base">{{ list.description }}</p>
 
         <div class="flex flex-wrap gap-3">
-          <div class="rounded-full border border-white/80 bg-white/70 px-4 py-2 text-sm font-medium text-[#8c6177]">
+          <div class="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground-muted">
             <span class="tabular-nums">{{ list.items.length }}</span> songs
           </div>
           <button
             type="button"
-            class="rounded-full border border-[#ffd6e8] bg-white/80 px-4 py-2 text-sm font-semibold text-[#bc648f] transition-colors hover:bg-[#fff1f8]"
+            class="rounded-full border border-border bg-primary-soft px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-card-hover"
             :disabled="isLoading"
             @click="fetchPlaylist(true)"
           >
@@ -75,9 +75,9 @@ watch(playlistId, (value, previousValue) => {
       </div>
 
       <div v-else-if="!isLoading" class="space-y-2">
-        <p class="text-xs font-semibold uppercase tracking-[0.32em] text-[#cf7ca6]">Playlist</p>
-        <h1 class="text-2xl font-semibold text-[#2b1f28] md:text-3xl">Playlist not found</h1>
-        <p class="text-sm text-[#755b6b] md:text-base">We couldn't load that playlist right now.</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.32em] text-primary">Playlist</p>
+        <h1 class="text-2xl font-semibold text-foreground md:text-3xl">Playlist not found</h1>
+        <p class="text-sm text-foreground-muted md:text-base">We couldn't load that playlist right now.</p>
       </div>
     </div>
 
@@ -89,7 +89,7 @@ watch(playlistId, (value, previousValue) => {
 
     <div
       v-else-if="list"
-      class="mt-5 rounded-[24px] border border-dashed border-[#ffd7e8] bg-[#fffafc] px-5 py-10 text-center text-sm text-[#876c7b]"
+      class="mt-5 rounded-[24px] border border-dashed border-border bg-surface px-5 py-10 text-center text-sm text-foreground-muted"
     >
       This playlist does not have any songs yet.
     </div>

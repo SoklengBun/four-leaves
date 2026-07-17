@@ -14,6 +14,7 @@ const props = withDefaults(
     title?: string;
     description?: string;
     showClose?: boolean;
+    animateTitle?: boolean;
   }>(),
   {
     desktopPosition: 'center',
@@ -22,6 +23,7 @@ const props = withDefaults(
     title: '',
     description: '',
     showClose: true,
+    animateTitle: true,
   },
 );
 
@@ -73,24 +75,27 @@ const closePopup = () => {
 <template>
   <van-popup v-model:show="show" v-bind="attrs" :position="currentPosition" :round="currentRound" :style="currentStyle" class="bg-transparent">
     <div
-      class="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_#ffffffeb,_transparent_40%),linear-gradient(180deg,_#fff8fc_0%,_#fff0f7_48%,_#fef7ff_100%)] text-[#6e4b62] shadow-[0_24px_60px_#d89bb942,inset_0_1px_0_#ffffffd9]"
+      class="relative overflow-hidden border border-border bg-surface text-foreground shadow-2xl"
       :class="isSidePopup ? 'h-full rounded-none' : 'rounded-t-[30px] md:rounded-[32px]'"
     >
-      <div class="pointer-events-none absolute -top-[18px] right-4 h-[140px] w-[140px] rounded-full bg-[#ffc7df8c] opacity-90 blur-[16px]"></div>
-      <div class="pointer-events-none absolute -bottom-[18px] -left-5 h-[150px] w-[150px] rounded-full bg-[#dfcfff73] opacity-90 blur-[16px]"></div>
+      <div class="pointer-events-none absolute -top-[18px] right-4 h-[140px] w-[140px] rounded-full bg-primary-soft opacity-90 blur-[16px]"></div>
+      <div class="pointer-events-none absolute -bottom-[18px] -left-5 h-[150px] w-[150px] rounded-full bg-secondary-soft opacity-90 blur-[16px]"></div>
 
       <div class="relative z-[1] flex h-full min-h-0 flex-col px-[18px] pb-[18px] pt-[22px]">
         <div v-if="hasHeader || showClose" class="flex items-start justify-between gap-3">
           <div v-if="hasHeader" class="min-w-0">
-            <p v-if="eyebrow" class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#d488ab]">{{ eyebrow }}</p>
+            <p v-if="eyebrow" class="mb-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-primary">{{ eyebrow }}</p>
             <MarqueeText
-              v-if="title"
+              v-if="title && animateTitle"
               :text="title"
               :gap="32"
               :speed="36"
-              class="m-0 w-full min-w-0 text-xl font-extrabold leading-[1.05] text-[#7d4e6b]"
+              class="m-0 w-full min-w-0 text-xl font-extrabold leading-[1.05] text-foreground"
             />
-            <p v-if="description" class="mt-2 text-sm leading-[1.55] text-[#9d7890]">{{ description }}</p>
+            <p v-else-if="title" class="m-0 w-full truncate text-xl font-extrabold leading-[1.05] text-foreground" :title="title">
+              {{ title }}
+            </p>
+            <p v-if="description" class="mt-2 text-sm leading-[1.55] text-foreground-muted">{{ description }}</p>
           </div>
 
           <RoundButton v-if="showClose" @click="closePopup">

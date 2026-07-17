@@ -56,7 +56,7 @@ const onConfirm = () => {
       <div class="grid grid-cols-2 gap-[10px]">
         <button
           type="button"
-          class="rounded-[18px] bg-[#ffffffc9] px-[14px] py-3 text-sm font-bold text-[#94677f] disabled:cursor-wait disabled:opacity-70"
+          class="rounded-[18px] bg-surface px-[14px] py-3 text-sm font-bold text-foreground-muted disabled:cursor-wait disabled:opacity-70"
           :disabled="loading"
           @click="onCancel"
         >
@@ -65,7 +65,7 @@ const onConfirm = () => {
 
         <button
           type="button"
-          class="flex items-center justify-center gap-2 rounded-[18px] bg-[linear-gradient(135deg,_#ff8ca9_0%,_#ff5a87_100%)] px-[14px] py-3 text-sm font-bold text-white shadow-[0_12px_24px_#ff7a9c38] disabled:cursor-not-allowed disabled:opacity-60"
+          class="flex items-center justify-center gap-2 rounded-[18px] bg-gradient-to-br from-primary to-secondary px-[14px] py-3 text-sm font-bold text-primary-foreground shadow-primary disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="loading"
           @click="onConfirm"
         >

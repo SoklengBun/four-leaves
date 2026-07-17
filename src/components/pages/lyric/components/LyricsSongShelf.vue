@@ -56,16 +56,16 @@ const getThumbnailId = (song: PlaylistItem) => {
   <section v-if="playlist.items.length" class="space-y-3">
     <div class="flex items-end justify-between gap-3">
       <div class="min-w-0">
-        <h2 class="text-lg font-semibold text-[#2b1f28] md:text-xl">{{ playlist.name }}</h2>
-        <p v-if="playlist.description" class="mt-1 text-xs text-[#7f6675] md:text-sm">{{ playlist.description }}</p>
+        <h2 class="text-lg font-semibold text-foreground md:text-xl">{{ playlist.name }}</h2>
+        <p v-if="playlist.description" class="mt-1 text-xs text-foreground-muted md:text-sm">{{ playlist.description }}</p>
       </div>
 
       <div class="flex shrink-0 items-center gap-2">
-        <p class="text-xs font-medium uppercase tracking-[0.24em] text-[#d184ad]">{{ playlist.items.length }} songs</p>
+        <p class="text-xs font-medium uppercase tracking-[0.24em] text-primary">{{ playlist.items.length }} songs</p>
         <button
           v-if="shouldShowViewMore"
           type="button"
-          class="rounded-full border border-[#ffd7e8] bg-[#fff7fb] px-3 py-1.5 text-xs font-semibold text-[#c76a97] transition-colors hover:bg-[#ffeaf4]"
+          class="rounded-full border border-border bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-card-hover"
           @click="onViewMore"
         >
           View more
@@ -86,36 +86,36 @@ const getThumbnailId = (song: PlaylistItem) => {
         @click="onSelect(song)"
       >
         <LazyRender class="block">
-          <div class="relative aspect-square overflow-hidden rounded-md bg-[#f6d8e8] md:rounded-lg">
+          <div class="relative aspect-square overflow-hidden rounded-md bg-surface-hover md:rounded-lg">
             <YoutubeThumbnail :id="getThumbnailId(song)" />
           </div>
 
           <div class="mt-3 min-w-0">
-            <p v-if="isGridLayout" class="truncate text-sm font-semibold text-[#2b1f28] md:text-base">
+            <p v-if="isGridLayout" class="truncate text-sm font-semibold text-foreground md:text-base">
               {{ getLyricsTitleLabel(song) }}
             </p>
-            <MarqueeText v-else :text="getLyricsTitleLabel(song)" class="text-sm font-semibold text-[#2b1f28] md:text-base" :gap="28" />
+            <MarqueeText v-else :text="getLyricsTitleLabel(song)" class="text-sm font-semibold text-foreground md:text-base" :gap="28" />
 
-            <p v-if="isGridLayout" class="mt-1 truncate text-xs text-[#816776] md:text-sm">
+            <p v-if="isGridLayout" class="mt-1 truncate text-xs text-foreground-muted md:text-sm">
               {{ getCoverArtistsLabel(song) || 'Unknown artist' }}
             </p>
             <MarqueeText
               v-else
               :text="getCoverArtistsLabel(song) || 'Unknown artist'"
-              class="mt-1 text-xs text-[#816776] md:text-sm"
+              class="mt-1 text-xs text-foreground-muted md:text-sm"
               :gap="24"
               :speed="32"
             />
           </div>
 
           <template #placeholder>
-            <div class="relative aspect-square overflow-hidden rounded-md bg-[#f6d8e8] md:rounded-lg">
-              <div class="size-full animate-pulse bg-[linear-gradient(135deg,#f9dce9_0%,#fff4f8_100%)]"></div>
+            <div class="relative aspect-square overflow-hidden rounded-md bg-surface-hover md:rounded-lg">
+              <div class="size-full animate-pulse bg-surface"></div>
             </div>
 
             <div class="mt-3 space-y-2">
-              <div class="h-4 rounded-full bg-[#f5dbe7]"></div>
-              <div class="h-3 w-2/3 rounded-full bg-[#f9e7ef]"></div>
+              <div class="h-4 rounded-full bg-surface-hover"></div>
+              <div class="h-3 w-2/3 rounded-full bg-border"></div>
             </div>
           </template>
         </LazyRender>
@@ -127,7 +127,7 @@ const getThumbnailId = (song: PlaylistItem) => {
 <style scoped>
 .lyric-card {
   @apply transition-all duration-300;
-  background: linear-gradient(180deg, rgb(255 250 252 / 96%) 0%, rgb(255 240 247 / 98%) 100%);
+  background: var(--gradient-surface);
 }
 
 .lyric-card:hover {

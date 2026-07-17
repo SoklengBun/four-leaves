@@ -8,7 +8,7 @@ const props = withDefaults(
     timeClass?: string;
   }>(),
   {
-    timeClass: 'text-xs text-gray-500',
+    timeClass: 'text-xs text-foreground-muted',
   },
 );
 

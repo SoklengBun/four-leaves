@@ -24,7 +24,7 @@ import Weather from './Weather.vue';
 
 <style scoped>
 .desktop-container {
-  background-color: #030923;
+  background-color: var(--color-background);
 }
 
 .desktop-background {
