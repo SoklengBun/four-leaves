@@ -52,7 +52,6 @@ export const usePlaylist = defineStore('playlist', () => {
   const getPlaylists = async (force = false) => {
     if (!auth.isLoggedIn) {
       lists.value = [];
-      list.value = undefined;
       return;
     }
 
