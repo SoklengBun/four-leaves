@@ -6,9 +6,23 @@ import { pxToRem } from '~/utils/helper';
 import { usePlayer } from '~/stores/player';
 import { useAuth } from '~/stores/auth';
 import { usePlaylist } from '~/stores/playlist';
+import { getLyricsList } from '~/services/lyrics';
 
 const player = usePlayer();
 const playlist = usePlaylist();
+
+const initPlaylist = async () => {
+  const cachedLyrics = await getLyricsList(1, false, true);
+  if (cachedLyrics.length <= (playlist.list?.items?.length ?? 0)) return;
+
+  playlist.list = {
+    id: 0,
+    name: 'All Lyrics',
+    description: 'Every song from the lyrics catalog',
+    isPublic: false,
+    items: cachedLyrics,
+  };
+};
 
 onMounted(async () => {
   player.init('yt-player');
@@ -20,6 +34,7 @@ onMounted(async () => {
   }
 
   await playlist.getPlaylists();
+  initPlaylist();
 });
 
 onUnmounted(() => {
@@ -48,7 +63,12 @@ const onClickMenu = (name: string) => {
   <div class="flex h-body w-full flex-col overflow-hidden">
     <div class="flex h-full w-full">
       <div class="hidden h-full w-[300px] border-r border-border bg-surface md:block">
-        <button v-for="item in menus" :key="item.name" class="flex w-full items-center space-x-3 border-b border-border px-5 py-2 text-foreground" @click="onClickMenu(item.name)">
+        <button
+          v-for="item in menus"
+          :key="item.name"
+          class="flex w-full items-center space-x-3 border-b border-border px-5 py-2 text-foreground"
+          @click="onClickMenu(item.name)"
+        >
           <div class="size-7 rounded bg-primary-soft"></div>
           <span class="text-primary"> {{ item.label }}</span>
         </button>

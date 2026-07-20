@@ -87,7 +87,7 @@ onClickOutside(
     <button
       ref="triggerRef"
       type="button"
-      class="absolute right-1.5 top-1.5 z-20 flex items-center gap-1 rounded-full bg-overlay px-2 py-1 text-xs font-semibold text-primary-foreground backdrop-blur-sm transition-opacity hover:bg-surface-hover"
+      class="absolute right-1.5 top-1.5 z-20 flex items-center gap-1 rounded-full bg-overlay px-2 py-1 text-xs font-semibold text-primary-foreground backdrop-blur-sm transition-opacity hover:bg-surface-hover dark:text-primary"
       aria-label="Show song versions"
       @click="togglePanel"
     >
@@ -107,38 +107,41 @@ onClickOutside(
     >
       <p class="border-b border-border px-3 py-2 text-xs font-semibold text-primary">Versions ({{ versions.length }})</p>
       <ul class="min-h-0 flex-1 overflow-y-auto">
-        <li
-          v-for="(item, i) in versions"
-          :key="i"
-          class="flex items-center gap-1 px-3 py-2 transition-colors"
-          :class="{ 'bg-[#fff0f8]': item.id === videoId }"
-        >
-          <button
-            type="button"
-            class="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg text-left transition-colors hover:bg-[#fff4fb]"
-            @click="selectVersion(item.id)"
-          >
-            <div class="relative size-12 shrink-0 overflow-hidden rounded-lg bg-surface">
-              <YoutubeThumbnail :id="item.id" />
-            </div>
-            <div class="min-w-0 flex-1">
-              <MarqueeText :text="displayTitle" class="w-full min-w-0 text-xs font-semibold text-foreground" :gap="24" :speed="32" />
-              <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-[11px] text-foreground-muted" :gap="20" :speed="30" />
-            </div>
-          </button>
-          <template v-if="canSetDefaultCover">
-            <Loading class="shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
-            <button
-              type="button"
-              class="ml-2 shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-              :class="isDefaultCover(item.id) ? 'bg-[#ffd5e7] text-[#b93876]' : 'bg-[#fff4fb] text-[#d14d8a]'"
-              :disabled="!!savingDefaultId || isDefaultCover(item.id)"
-              @click.stop="setDefaultCover(item.id)"
-            >
-              {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
+        <template v-for="(item, i) in versions" :key="i">
+          <li class="group relative flex shrink-0 items-center px-3 py-3">
+            <button type="button" class="relative z-10 flex min-w-0 flex-1 items-center text-left" @click="selectVersion(item.id)">
+              <div class="size-10 shrink-0 overflow-hidden rounded-lg md:size-12">
+                <YoutubeThumbnail :id="item.id" />
+              </div>
+              <div class="min-w-0 flex-1 px-2">
+                <MarqueeText :text="displayTitle" class="w-full min-w-0 text-xs font-semibold text-foreground md:text-sm" :gap="24" :speed="32" />
+                <MarqueeText
+                  :text="getLyricsArtistsLabel(item.artists)"
+                  class="w-full min-w-0 text-[11px] text-foreground-muted md:text-xs"
+                  :gap="20"
+                  :speed="30"
+                />
+              </div>
             </button>
-          </template>
-        </li>
+            <template v-if="canSetDefaultCover">
+              <Loading class="relative z-10 shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
+              <button
+                type="button"
+                class="relative z-10 ml-2 shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold text-foreground-muted transition-[background-color,border-color,color,transform] hover:border-primary hover:bg-primary-soft hover:text-primary active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                :class="isDefaultCover(item.id) ? 'border-border-strong bg-primary-soft text-primary' : 'border-border bg-surface'"
+                :disabled="!!savingDefaultId || isDefaultCover(item.id)"
+                @click.stop="setDefaultCover(item.id)"
+              >
+                {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
+              </button>
+            </template>
+            <div
+              class="song-cover-highlight pointer-events-none absolute inset-0 hidden group-hover:!block group-active:!block"
+              :class="{ '!block': item.id === videoId }"
+            ></div>
+          </li>
+          <li aria-hidden="true" class="song-cover-divider h-px w-full shrink-0 bg-border last:hidden"></li>
+        </template>
       </ul>
     </div>
 
@@ -152,42 +155,71 @@ onClickOutside(
       :description="`${versions.length} version${versions.length === 1 ? '' : 's'} available for this song.`"
       @close="closePanel"
     >
-      <div class="flex h-full max-h-[70vh] flex-col bg-surface p-4">
-        <ul class="min-h-0 flex-1 space-y-2 overflow-y-auto">
-          <li
-            v-for="(item, i) in versions"
-            :key="i"
-            class="flex items-center gap-1 rounded-xl p-2 transition-colors"
-            :class="{ 'bg-[#fff0f8]': item.id === videoId }"
-          >
-            <button
-              type="button"
-              class="flex min-w-0 flex-1 items-center gap-3 rounded-xl text-left transition-colors active:bg-[#fff0f8]"
-              @click="selectVersion(item.id)"
-            >
-              <div class="relative size-14 shrink-0 overflow-hidden rounded-xl bg-surface-hover">
-                <YoutubeThumbnail :id="item.id" />
-              </div>
-              <div class="min-w-0 flex-1">
-                <MarqueeText :text="displayTitle" class="w-full min-w-0 text-sm font-semibold text-foreground" :gap="24" :speed="32" />
-                <MarqueeText :text="getLyricsArtistsLabel(item.artists)" class="w-full min-w-0 text-xs text-foreground-muted" :gap="20" :speed="30" />
-              </div>
-            </button>
-            <template v-if="canSetDefaultCover">
-              <Loading class="shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
-              <button
-                type="button"
-                class="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-                :class="isDefaultCover(item.id) ? 'bg-[#ffd5e7] text-[#b93876]' : 'bg-[#fff4fb] text-[#d14d8a]'"
-                :disabled="!!savingDefaultId || isDefaultCover(item.id)"
-                @click.stop="setDefaultCover(item.id)"
-              >
-                {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
+      <div class="flex h-full max-h-[70vh] flex-col">
+        <ul class="min-h-0 flex-1 overflow-y-auto">
+          <template v-for="(item, i) in versions" :key="i">
+            <li class="group relative flex shrink-0 items-center px-1 py-3">
+              <button type="button" class="relative z-10 flex min-w-0 flex-1 items-center text-left" @click="selectVersion(item.id)">
+                <div class="size-10 shrink-0 overflow-hidden rounded-lg md:size-12">
+                  <YoutubeThumbnail :id="item.id" />
+                </div>
+                <div class="min-w-0 flex-1 px-2">
+                  <MarqueeText :text="displayTitle" class="w-full min-w-0 text-sm font-semibold text-foreground" :gap="24" :speed="32" />
+                  <MarqueeText
+                    :text="getLyricsArtistsLabel(item.artists)"
+                    class="w-full min-w-0 text-xs text-foreground-muted"
+                    :gap="20"
+                    :speed="30"
+                  />
+                </div>
               </button>
-            </template>
-          </li>
+              <template v-if="canSetDefaultCover">
+                <Loading class="relative z-10 shrink-0 text-base" :class="{ 'opacity-0': !isSavingDefault(item.id) }" />
+                <button
+                  type="button"
+                  class="relative z-10 ml-2 shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold text-foreground-muted transition-[background-color,border-color,color,transform] hover:border-primary hover:bg-primary-soft hover:text-primary active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  :class="isDefaultCover(item.id) ? 'border-border-strong bg-primary-soft text-primary' : 'border-border bg-surface'"
+                  :disabled="!!savingDefaultId || isDefaultCover(item.id)"
+                  @click.stop="setDefaultCover(item.id)"
+                >
+                  {{ isDefaultCover(item.id) ? 'Default' : 'Set default' }}
+                </button>
+              </template>
+              <div
+                class="song-cover-highlight pointer-events-none absolute inset-0 hidden group-hover:!block group-active:!block"
+                :class="{ '!block': item.id === videoId }"
+              ></div>
+            </li>
+            <li aria-hidden="true" class="song-cover-divider h-px w-full shrink-0 bg-border last:hidden"></li>
+          </template>
         </ul>
       </div>
     </CustomPopup>
   </div>
 </template>
+<style scoped>
+.song-cover-divider {
+  box-shadow: 0px 0px 3px #31018c74;
+}
+
+.dark .song-cover-divider {
+  box-shadow: 0px 0px 3px #0f3e71;
+}
+
+.song-cover-highlight {
+  background: linear-gradient(150deg, transparent 0%, transparent 10%, #b994ff33 50%, transparent 90%, transparent 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: highlight 1s ease-in-out infinite;
+}
+
+@keyframes highlight {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+</style>
