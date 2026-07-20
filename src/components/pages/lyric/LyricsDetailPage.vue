@@ -101,7 +101,7 @@ const refreshCurrentLyrics = () => {
 </script>
 
 <template>
-  <div class="flex h-full min-h-[80vh] w-full flex-col items-center px-3 pb-1 pt-3">
+  <div class="flex h-full min-h-[80vh] w-full flex-col items-center pb-1 pt-3">
     <BackButton />
     <RoundButton @click="showMore = true" />
 
@@ -140,7 +140,7 @@ const refreshCurrentLyrics = () => {
 
     <LyricsLoadingState v-if="isLoading" />
 
-    <div v-else class="box-cover mt-5 w-full flex-1 rounded-xl bg-card pb-4 pt-4 md:max-w-[700px] md:rounded-2xl md:pb-6 md:pt-6">
+    <div v-else class="lyric-content mx-auto mt-5 w-full flex-1 rounded-xl bg-card pb-4 pt-4 md:max-w-[700px] md:rounded-2xl">
       <div class="mb-3 flex w-full items-center gap-2 px-3 md:px-6">
         <button
           v-for="lang in availableLangs"
@@ -162,3 +162,16 @@ const refreshCurrentLyrics = () => {
     <CreatePlaylist />
   </div>
 </template>
+
+<style scoped>
+.lyric-content {
+  box-shadow:
+    inset -5px -5px 10px #b0b0b040,
+    inset 5px 5px 10px #b0b0b040;
+}
+.dark .lyric-content {
+  box-shadow:
+    inset -5px -5px 10px #17275180,
+    inset 5px 5px 10px #1a294580;
+}
+</style>

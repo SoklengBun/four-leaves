@@ -3,6 +3,7 @@ import { useMediaQuery } from '@vueuse/core';
 import { computed, useAttrs } from 'vue';
 import MarqueeText from './MarqueeText.vue';
 import RoundButton from './RoundButton.vue';
+import { pxOfCurrentScreenSize } from '~/utils/helper.js';
 
 type PopupPosition = 'center' | 'top' | 'right' | 'bottom' | 'left';
 
@@ -44,22 +45,29 @@ const currentStyle = computed(() => {
   if (currentPosition.value === 'right' || currentPosition.value === 'left') {
     return {
       background: 'transparent',
-      width: 'min(88vw, 360px)',
+      width: `min(88vw, ${pxOfCurrentScreenSize(360)}px)`,
       height: '100%',
     };
   }
 
   if (currentPosition.value === 'center') {
+    if (isDesktop.value) {
+      return {
+        background: 'transparent',
+        width: 'min(92vw, 460px)',
+        height: '100%',
+      };
+    }
     return {
       background: 'transparent',
-      width: 'min(92vw, 460px)',
+      width: `min(88vw, ${pxOfCurrentScreenSize(360)}px)`,
     };
   }
 
   return {
     background: 'transparent',
     width: '100%',
-    maxHeight: '90vh',
+    maxHeight: '60vh',
   };
 });
 
@@ -79,7 +87,9 @@ const closePopup = () => {
       :class="isSidePopup ? 'h-full rounded-none' : 'rounded-t-[30px] md:rounded-[32px]'"
     >
       <div class="pointer-events-none absolute -top-[18px] right-4 h-[140px] w-[140px] rounded-full bg-primary-soft opacity-90 blur-[16px]"></div>
-      <div class="pointer-events-none absolute -bottom-[18px] -left-5 h-[150px] w-[150px] rounded-full bg-secondary-soft opacity-90 blur-[16px]"></div>
+      <div
+        class="pointer-events-none absolute -bottom-[18px] -left-5 h-[150px] w-[150px] rounded-full bg-secondary-soft opacity-90 blur-[16px]"
+      ></div>
 
       <div class="relative z-[1] flex h-full min-h-0 flex-col px-[18px] pb-[18px] pt-[22px]">
         <div v-if="hasHeader || showClose" class="flex items-start justify-between gap-3">
