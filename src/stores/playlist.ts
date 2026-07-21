@@ -242,6 +242,25 @@ export const usePlaylist = defineStore('playlist', () => {
     } finally {
     }
   };
+
+  const setItemsOrder = (items: PlaylistItem[]) => {
+    if (!list.value) return;
+
+    const reorderedPlaylist = { ...list.value, items: [...items] };
+    list.value = reorderedPlaylist;
+    lists.value = lists.value.map((item) => (item.id === reorderedPlaylist.id ? reorderedPlaylist : item));
+  };
+
+  const reorderItems = (fromIndex: number, toIndex: number) => {
+    if (!list.value || fromIndex === toIndex) return;
+    if (fromIndex < 0 || fromIndex >= list.value.items.length || toIndex < 0 || toIndex >= list.value.items.length) return;
+
+    const reorderedItems = [...list.value.items];
+    const [movedItem] = reorderedItems.splice(fromIndex, 1);
+    reorderedItems.splice(toIndex, 0, movedItem);
+    setItemsOrder(reorderedItems);
+  };
+
   return {
     list,
     lists,
@@ -261,5 +280,7 @@ export const usePlaylist = defineStore('playlist', () => {
     addItems,
     removeItem,
     updateItem,
+    setItemsOrder,
+    reorderItems,
   };
 });
