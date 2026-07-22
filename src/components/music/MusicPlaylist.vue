@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { VueDraggable } from 'vue-draggable-plus';
 import CustomPopup from '~/components/shares/CustomPopup.vue';
+import { useAuth } from '~/stores/auth';
 import { usePlayer } from '~/stores/player';
 import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
 import { usePlaylist } from '~/stores/playlist';
+import { UserRole } from '~/types/user';
 import YoutubeThumbnail from './YoutubeThumbnail.vue';
+
+const auth = useAuth();
 
 const player = usePlayer();
 const { current, videoId, showPlaylist } = storeToRefs(player);
 
 const playlist = usePlaylist();
+const originalOrder = ref<{ playlistId: number; itemIds: number[] } | null>(null);
 
 const playlistItems = computed({
   get: () => playlist.list?.items ?? [],
@@ -24,8 +29,64 @@ const selectSong = (song: PlaylistItem) => {
   player.selectSong(song, undefined, playlist.list);
 };
 
-const closePlaylist = () => {
-  showPlaylist.value = false;
+const getPlaylistItemIds = (items: PlaylistItem[]) => {
+  const itemIds: number[] = [];
+
+  for (const item of items) {
+    if (item.playlistItemId === undefined) return null;
+    itemIds.push(item.playlistItemId);
+  }
+
+  return itemIds;
+};
+
+const checkPlaylistOrderChange = async (originalItemIds: number[]) => {
+  const currentPlaylist = playlist.list;
+  if (!currentPlaylist || currentPlaylist.id === 0 || !auth.isLoggedIn || !auth.user) return;
+
+  const canReorder = currentPlaylist.createdById === auth.user.id || auth.user.role === UserRole.ADMIN;
+  if (!canReorder) return;
+
+  const currentItemIds = getPlaylistItemIds(currentPlaylist.items);
+  if (!currentItemIds) return;
+
+  const hasOrderChanged =
+    originalItemIds.length === currentItemIds.length && currentItemIds.some((itemId, index) => itemId !== originalItemIds[index]);
+
+  if (!hasOrderChanged) return;
+
+  const payload = {
+    itemOrders: currentItemIds.map((itemId, index) => ({
+      itemId,
+      position: index + 1,
+    })),
+  };
+
+  await playlist.updateItemsOrder(payload);
+};
+
+const rememberPlaylistOrder = () => {
+  const currentPlaylist = playlist.list;
+  if (!currentPlaylist) {
+    originalOrder.value = null;
+    return;
+  }
+
+  const itemIds = getPlaylistItemIds(currentPlaylist.items);
+  originalOrder.value = itemIds
+    ? {
+        playlistId: currentPlaylist.id,
+        itemIds,
+      }
+    : null;
+};
+
+const onPlaylistClosed = async () => {
+  const previousOrder = originalOrder.value;
+  originalOrder.value = null;
+
+  if (!previousOrder || playlist.list?.id !== previousOrder.playlistId) return;
+  await checkPlaylistOrderChange(previousOrder.itemIds);
 };
 
 const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
@@ -53,7 +114,8 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
     eyebrow="Now playing"
     :title="currentPlaylistTitle"
     :description="currentPlaylistDescription"
-    @close="closePlaylist"
+    @open="rememberPlaylistOrder"
+    @closed="onPlaylistClosed"
   >
     <div class="flex h-full w-full flex-col overflow-hidden">
       <p class="mb-3 text-base font-semibold text-foreground md:text-lg">Playlist Queue</p>
@@ -62,9 +124,9 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
           v-model="playlistItems"
           class="flex flex-col"
           handle=".playlist-drag-handle"
-          ghost-class="playlist-drag-ghost"
-          chosen-class="playlist-drag-chosen"
-          drag-class="playlist-dragging"
+          ghost-class="!opacity-25"
+          chosen-class="!cursor-grabbing"
+          drag-class="!opacity-90"
           :animation="180"
           :force-fallback="true"
           :fallback-on-body="true"
@@ -93,7 +155,7 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
                 </div>
               </button>
               <div
-                class="playlist-highligh pointer-events-none absolute left-0 top-0 hidden size-full group-hover:!block"
+                class="playlist-highligh pointer-events-none absolute left-0 top-0 hidden size-full bg-[linear-gradient(150deg,transparent_0%,transparent_10%,#b994ff33_50%,transparent_90%,transparent_100%)] bg-[length:200%_100%] bg-no-repeat group-hover:!block"
                 :class="{ '!block': song.id === current?.id || song.videoId === videoId }"
               ></div>
               <button
@@ -112,7 +174,10 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
                 </svg>
               </button>
             </div>
-            <div v-if="index < playlistItems.length - 1" class="playlist-divider h-px w-full shrink-0 bg-border"></div>
+            <div
+              v-if="index < playlistItems.length - 1"
+              class="h-px w-full shrink-0 bg-border shadow-[0_0_3px_#31018c74] dark:shadow-[0_0_3px_#0f3e71]"
+            ></div>
           </div>
         </VueDraggable>
       </div>
@@ -120,30 +185,8 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
   </CustomPopup>
 </template>
 <style scoped>
-.playlist-divider {
-  box-shadow: 0px 0px 3px #31018c74;
-}
-.dark .playlist-divider {
-  box-shadow: 0px 0px 3px #0f3e71;
-}
-
 .playlist-highligh {
-  background: linear-gradient(150deg, transparent 0%, transparent 10%, #b994ff33 50%, transparent 90%, transparent 100%);
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
   animation: highlight 1s ease-in-out infinite;
-}
-
-.playlist-drag-ghost {
-  opacity: 0.25;
-}
-
-.playlist-drag-chosen {
-  cursor: grabbing;
-}
-
-.playlist-dragging {
-  opacity: 0.9;
 }
 
 @keyframes highlight {

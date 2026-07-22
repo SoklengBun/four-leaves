@@ -56,12 +56,8 @@ onUnmounted(() => {
         }"
       >
         <CloudHeader class="w-[240px] min-w-[240px] -translate-y-[10px]" />
-        <div
-          class="relative flex w-[480px] min-w-[480px] items-end justify-end"
-        >
-          <CloudHeader
-            class="absolute -left-[60px] -z-20 h-[65px] -translate-y-[20px] -scale-x-90"
-          />
+        <div class="relative flex w-[480px] min-w-[480px] items-end justify-end">
+          <CloudHeader class="absolute -left-[60px] -z-20 h-[65px] -translate-y-[20px] -scale-x-90" />
           <CloudHeader class="absolute -z-10 h-[90px] -translate-y-[5px]" />
         </div>
       </div>
@@ -74,18 +70,17 @@ onUnmounted(() => {
         }"
       >
         <CloudHeader class="w-[240px] min-w-[240px] -translate-y-[10px]" />
-        <div
-          class="relative flex w-[480px] min-w-[480px] items-end justify-end"
-        >
-          <CloudHeader
-            class="absolute -left-[60px] -z-20 h-[65px] -translate-y-[20px] -scale-x-90"
-          />
+        <div class="relative flex w-[480px] min-w-[480px] items-end justify-end">
+          <CloudHeader class="absolute -left-[60px] -z-20 h-[65px] -translate-y-[20px] -scale-x-90" />
           <CloudHeader class="absolute -z-10 h-[90px] -translate-y-[5px]" />
         </div>
       </div>
     </div>
 
-    <RouterLink to="/" class="sun-moon"></RouterLink>
+    <RouterLink
+      to="/"
+      class="sun-moon fixed right-10 top-3 size-[60px] rounded-full bg-white [--four:#f5ff88] [--one:#ffa217] [--three:#ffd445] [--two:#ffd900] dark:[--four:#aee8ff] dark:[--one:#4f5499] dark:[--three:#d0f9ff] dark:[--two:#84e6ff]"
+    ></RouterLink>
 
     <ThemeToggler />
   </div>
@@ -93,15 +88,6 @@ onUnmounted(() => {
 
 <style scoped>
 .sun-moon {
-  @apply fixed right-10 top-3 size-[60px] rounded-full;
-
-  background-color: #fff;
-
-  --one: #ffa217;
-  --two: #ffd900;
-  --three: #ffd445;
-  --four: #f5ff88;
-
   box-shadow:
     inset 0 0 10px var(--three),
     inset 4px 0 16px var(--two),
@@ -113,14 +99,5 @@ onUnmounted(() => {
     0px 0 150px var(--two),
     0px 0 300px var(--four),
     2px 0 16px var(--one);
-}
-
-.dark {
-  .sun-moon {
-    --one: #4f5499;
-    --two: #84e6ff;
-    --three: #d0f9ff;
-    --four: #aee8ff;
-  }
 }
 </style>

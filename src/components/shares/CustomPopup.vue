@@ -84,7 +84,7 @@ const closePopup = () => {
   <van-popup v-model:show="show" v-bind="attrs" :position="currentPosition" :round="currentRound" :style="currentStyle" class="bg-transparent">
     <div
       class="relative overflow-hidden border border-border bg-surface text-foreground shadow-2xl"
-      :class="isSidePopup ? 'h-full rounded-none' : 'rounded-t-[30px] md:rounded-[32px]'"
+      :class="isSidePopup ? 'h-full rounded-none' : 'rounded-t-xl md:rounded-t-2xl'"
     >
       <div class="pointer-events-none absolute -top-[18px] right-4 h-[140px] w-[140px] rounded-full bg-primary-soft opacity-90 blur-[16px]"></div>
       <div

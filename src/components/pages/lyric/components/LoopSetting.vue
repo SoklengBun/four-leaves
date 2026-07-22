@@ -159,51 +159,52 @@ onClickOutside(
     <button
       ref="triggerRef"
       type="button"
-      class="ml-4 size-4 md:ml-8 md:size-6"
+      class="ml-4 size-4 rounded-md transition-[opacity,transform] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background md:ml-8 md:size-6"
       :class="{ 'opacity-50': !loopEnabled }"
       aria-label="Open A/B loop settings"
+      :aria-expanded="isOpen"
       @click="togglePanel"
     >
-      <img :src="LoopSettingImage" alt="Loop setting" />
+      <img :src="LoopSettingImage" alt="" aria-hidden="true" />
     </button>
 
     <div
       v-if="isOpen && !isMobile"
       ref="panelRef"
-      class="absolute right-0 top-full z-30 mt-2 w-[260px] rounded-xl border border-[#ffd5eb] bg-white p-3 shadow-[0_8px_24px_#ff8bc44d]"
+      class="absolute right-0 top-full z-30 mt-2 w-[260px] rounded-xl border border-border bg-card p-3 text-foreground shadow-card"
     >
       <div class="mb-2 flex items-center justify-between">
-        <p class="text-sm font-semibold text-[#ff4f9b]">Loop A/B</p>
+        <p class="text-sm font-semibold text-primary">Loop A/B</p>
         <span
           class="rounded-full px-2 py-[2px] text-[11px] font-semibold"
-          :class="loopEnabled ? 'bg-[#d7ffe7] text-[#0f9151]' : 'bg-[#f3f4f6] text-[#6b7280]'"
+          :class="loopEnabled ? 'bg-accent-soft text-accent-strong' : 'bg-surface text-foreground-muted'"
         >
           {{ loopEnabled ? 'Active' : 'Off' }}
         </span>
       </div>
 
-      <p class="mb-2 text-xs text-[#6b7280]">
+      <p class="mb-2 text-xs text-foreground-muted">
         Current time: <span class="tabular-nums">{{ currentTimeText }}</span>
       </p>
 
       <div class="grid grid-cols-2 gap-2">
         <button
           type="button"
-          class="rounded-lg border border-[#ffd5eb] bg-[#fff7fc] px-2 py-1.5 text-xs font-semibold text-[#ff4f9b]"
+          class="rounded-lg border border-border bg-surface px-2 py-1.5 text-xs font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           @click="setPointA"
         >
           Set A
         </button>
         <button
           type="button"
-          class="rounded-lg border border-[#ffd5eb] bg-[#fff7fc] px-2 py-1.5 text-xs font-semibold text-[#ff4f9b]"
+          class="rounded-lg border border-border bg-surface px-2 py-1.5 text-xs font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           @click="setPointB"
         >
           Set B
         </button>
       </div>
 
-      <div class="mt-3 rounded-lg bg-[#fff4fb] px-2 py-2 text-xs text-[#5f5f66]">
+      <div class="mt-3 rounded-lg bg-surface px-2 py-2 text-xs text-foreground-muted">
         <p class="tabular-nums">A: {{ pointAText }}</p>
         <p class="mt-1 tabular-nums">B: {{ pointBText }}</p>
       </div>
@@ -214,20 +215,20 @@ onClickOutside(
           type="text"
           inputmode="decimal"
           placeholder="A: 0:10"
-          class="rounded-lg border border-[#ffd5eb] bg-white px-2 py-1.5 text-xs text-[#4b5563] outline-none focus:border-[#ff4f9b]"
+          class="rounded-lg border border-border-strong bg-background-elevated px-2 py-1.5 text-xs text-foreground caret-primary outline-none transition-[border-color,box-shadow,background-color] placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary-soft"
         />
         <input
           v-model="pointBInput"
           type="text"
           inputmode="decimal"
           placeholder="B: 0:30"
-          class="rounded-lg border border-[#ffd5eb] bg-white px-2 py-1.5 text-xs text-[#4b5563] outline-none focus:border-[#ff4f9b]"
+          class="rounded-lg border border-border-strong bg-background-elevated px-2 py-1.5 text-xs text-foreground caret-primary outline-none transition-[border-color,box-shadow,background-color] placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary-soft"
         />
       </div>
 
       <button
         type="button"
-        class="mt-2 w-full rounded-lg border border-[#ffd5eb] bg-white px-2 py-1.5 text-xs font-semibold text-[#ff4f9b]"
+        class="mt-2 w-full rounded-lg border border-border bg-card px-2 py-1.5 text-xs font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         @click="applyInputPoints"
       >
         Apply Typed A/B
@@ -236,19 +237,27 @@ onClickOutside(
       <div class="mt-3 grid grid-cols-2 gap-2">
         <button
           type="button"
-          class="rounded-lg px-2 py-1.5 text-xs font-semibold text-white"
-          :class="hasValidLoopRange ? 'bg-[#ff4f9b]' : 'cursor-not-allowed bg-[#f8b6d8]'"
+          class="rounded-lg px-2 py-1.5 text-xs font-semibold transition-[background-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+          :class="
+            hasValidLoopRange
+              ? 'bg-primary text-primary-foreground shadow-primary hover:bg-primary-hover'
+              : 'cursor-not-allowed bg-surface-hover text-foreground-subtle shadow-none'
+          "
           :disabled="!hasValidLoopRange"
           @click="toggleLoop"
         >
           {{ loopEnabled ? 'Disable Loop' : 'Enable Loop' }}
         </button>
-        <button type="button" class="rounded-lg border border-[#ffd5eb] bg-white px-2 py-1.5 text-xs font-semibold text-[#ff4f9b]" @click="clearLoop">
+        <button
+          type="button"
+          class="rounded-lg border border-border bg-card px-2 py-1.5 text-xs font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          @click="clearLoop"
+        >
           Clear
         </button>
       </div>
-      <p v-if="inputError" class="mt-2 text-[11px] text-[#d14d7f]">{{ inputError }}</p>
-      <p v-if="!hasValidLoopRange" class="mt-2 text-[11px] text-[#d14d7f]">Set A first, then set B at a later time.</p>
+      <p v-if="inputError" class="mt-2 text-[11px] text-danger">{{ inputError }}</p>
+      <p v-if="!hasValidLoopRange" class="mt-2 text-[11px] text-danger">Set A first, then set B at a later time.</p>
     </div>
 
     <CustomPopup
@@ -260,38 +269,38 @@ onClickOutside(
       description="Set two time points and repeat that part of the track."
       @close="closePanel"
     >
-      <div ref="panelRef" class="bg-[linear-gradient(to_bottom,_#fff9fd,_#ffffff)] p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+      <div ref="panelRef" class="pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <div class="mb-2 flex items-center justify-between">
           <span
             class="rounded-full px-2 py-[2px] text-[11px] font-semibold"
-            :class="loopEnabled ? 'bg-[#d7ffe7] text-[#0f9151]' : 'bg-[#f3f4f6] text-[#6b7280]'"
+            :class="loopEnabled ? 'bg-accent-soft text-accent-strong' : 'bg-surface-hover text-foreground-muted'"
           >
             {{ loopEnabled ? 'Active' : 'Off' }}
           </span>
         </div>
 
-        <p class="mb-3 text-sm text-[#6b7280]">
+        <p class="mb-3 text-sm text-foreground-muted">
           Current time: <span class="tabular-nums">{{ currentTimeText }}</span>
         </p>
 
         <div class="grid grid-cols-2 gap-2">
           <button
             type="button"
-            class="rounded-xl border border-[#ffd5eb] bg-[#fff7fc] px-3 py-2 text-sm font-semibold text-[#ff4f9b]"
+            class="rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             @click="setPointA"
           >
             Set A
           </button>
           <button
             type="button"
-            class="rounded-xl border border-[#ffd5eb] bg-[#fff7fc] px-3 py-2 text-sm font-semibold text-[#ff4f9b]"
+            class="rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             @click="setPointB"
           >
             Set B
           </button>
         </div>
 
-        <div class="mt-3 rounded-xl bg-[#fff4fb] px-3 py-2 text-sm text-[#5f5f66]">
+        <div class="mt-3 rounded-xl bg-surface-hover px-3 py-2 text-sm text-foreground-muted">
           <p class="tabular-nums">A: {{ pointAText }}</p>
           <p class="mt-1 tabular-nums">B: {{ pointBText }}</p>
         </div>
@@ -302,20 +311,20 @@ onClickOutside(
             type="text"
             inputmode="decimal"
             placeholder="A: 0:10"
-            class="rounded-xl border border-[#ffd5eb] bg-white px-3 py-2 text-sm text-[#4b5563] outline-none focus:border-[#ff4f9b]"
+            class="rounded-xl border border-border-strong bg-card px-3 py-2 text-sm text-foreground caret-primary outline-none transition-[border-color,box-shadow,background-color] placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary-soft"
           />
           <input
             v-model="pointBInput"
             type="text"
             inputmode="decimal"
             placeholder="B: 0:30"
-            class="rounded-xl border border-[#ffd5eb] bg-white px-3 py-2 text-sm text-[#4b5563] outline-none focus:border-[#ff4f9b]"
+            class="rounded-xl border border-border-strong bg-card px-3 py-2 text-sm text-foreground caret-primary outline-none transition-[border-color,box-shadow,background-color] placeholder:text-foreground-subtle focus:border-primary focus:ring-2 focus:ring-primary-soft"
           />
         </div>
 
         <button
           type="button"
-          class="mt-2 w-full rounded-xl border border-[#ffd5eb] bg-white px-3 py-2 text-sm font-semibold text-[#ff4f9b]"
+          class="mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           @click="applyInputPoints"
         >
           Apply Typed A/B
@@ -324,23 +333,29 @@ onClickOutside(
         <div class="mt-3 grid grid-cols-2 gap-2">
           <button
             type="button"
-            class="rounded-xl px-3 py-2 text-sm font-semibold text-white"
-            :class="hasValidLoopRange ? 'bg-[#ff4f9b]' : 'cursor-not-allowed bg-[#f8b6d8]'"
+            class="rounded-xl px-3 py-2 text-sm font-semibold transition-[background-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            :class="
+              hasValidLoopRange
+                ? 'bg-primary text-primary-foreground shadow-primary hover:bg-primary-hover'
+                : 'cursor-not-allowed bg-surface-hover text-foreground-subtle shadow-none'
+            "
             :disabled="!hasValidLoopRange"
             @click="toggleLoop"
           >
             {{ loopEnabled ? 'Disable Loop' : 'Enable Loop' }}
           </button>
-          <button type="button" class="rounded-xl border border-[#ffd5eb] bg-white px-3 py-2 text-sm font-semibold text-[#ff4f9b]" @click="clearLoop">
+          <button
+            type="button"
+            class="rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            @click="clearLoop"
+          >
             Clear
           </button>
         </div>
 
-        <p v-if="inputError" class="mt-2 text-xs text-[#d14d7f]">{{ inputError }}</p>
-        <p v-if="!hasValidLoopRange && !inputError" class="mt-2 text-xs text-[#d14d7f]">Set A first, then set B at a later time.</p>
+        <p v-if="inputError" class="mt-2 text-xs text-danger">{{ inputError }}</p>
+        <p v-if="!hasValidLoopRange && !inputError" class="mt-2 text-xs text-danger">Set A first, then set B at a later time.</p>
       </div>
     </CustomPopup>
   </div>
 </template>
-
-<style scoped></style>

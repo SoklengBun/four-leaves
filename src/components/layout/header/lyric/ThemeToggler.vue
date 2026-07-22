@@ -71,11 +71,7 @@ const animateBack = () => {
   knobTransform.value = `translateY(${positionY}px) rotate(${angle}rad)`;
   ropeTransform.value = `scaleY(${1 + positionY / 120}) rotate(${angle / 3}rad)`;
 
-  if (
-    Math.abs(positionY) > 0.5 ||
-    Math.abs(velocityY) > 0.5 ||
-    Math.abs(angle) > 0.01
-  ) {
+  if (Math.abs(positionY) > 0.5 || Math.abs(velocityY) > 0.5 || Math.abs(angle) > 0.01) {
     animationFrame = requestAnimationFrame(animateBack);
   } else {
     knobTransform.value = 'translateY(0) rotate(0)';
@@ -92,46 +88,13 @@ onMounted(() => {
 
 <template>
   <div class="fixed -top-5 right-1">
-    <div class="lamp">
-      <div class="rope" :style="{ transform: ropeTransform }"></div>
+    <div class="relative flex h-[220px] w-10 flex-col items-center">
+      <div class="h-[100px] w-[3px] origin-top rounded-sm bg-[#b07d4f]" :style="{ transform: ropeTransform }"></div>
       <div
-        class="knob"
+        class="-mt-2 size-6 cursor-grab touch-none rounded-full bg-[#1b73f7] active:cursor-grabbing active:bg-[#448fff]"
         :style="{ transform: knobTransform }"
         @pointerdown="onPointerDown"
       ></div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.lamp {
-  position: relative;
-  width: 40px;
-  height: 220px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.rope {
-  width: 3px;
-  height: 100px;
-  background: #b07d4f;
-  border-radius: 2px;
-  transform-origin: top center;
-}
-
-.knob {
-  width: 24px;
-  height: 24px;
-  background: #1b73f7;
-  border-radius: 50%;
-  margin-top: -8px;
-  cursor: grab;
-  touch-action: none;
-}
-.knob:active {
-  cursor: grabbing;
-  background: #448fff;
-}
-</style>

@@ -526,7 +526,7 @@ onBeforeRouteLeave(() => confirmLeave());
                 <button
                   type="button"
                   @click="removeAltTitle(index)"
-                  class="rounded-lg border border-rose-200 px-3 text-xs font-semibold text-rose-600 hover:bg-rose-50"
+                  class="rounded-lg border border-danger px-3 text-xs font-semibold text-danger transition hover:bg-surface-hover"
                 >
                   Remove
                 </button>
@@ -552,18 +552,18 @@ onBeforeRouteLeave(() => confirmLeave());
             <button
               type="button"
               @click="addContent"
-              class="rounded-lg border border-pink-300 px-3 py-1.5 text-xs font-semibold text-pink-600 hover:bg-pink-50"
+              class="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary-soft"
             >
               Add block
             </button>
           </div>
 
           <div class="mt-3 space-y-3">
-            <div v-for="(content, index) in contents" :key="index" class="rounded-lg border border-pink-300 bg-pink-50/50 p-3">
+            <div v-for="(content, index) in contents" :key="index" class="rounded-lg border border-border bg-surface p-3">
               <div class="flex items-center gap-2">
                 <select
                   v-model="content.kind"
-                  class="h-10 rounded-lg border border-pink-300 bg-white px-3 text-sm outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100 sm:w-48"
+                  class="h-10 rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary-soft sm:w-48"
                 >
                   <option value="">Kind</option>
                   <option v-for="kind in contentKinds" :key="kind" :value="kind" :disabled="isContentKindUsed(kind, index)">
@@ -573,7 +573,7 @@ onBeforeRouteLeave(() => confirmLeave());
                 <button
                   type="button"
                   @click="removeContent(index)"
-                  class="ml-auto h-10 rounded-lg border border-rose-200 px-3 text-xs font-semibold text-rose-600 hover:bg-rose-50"
+                  class="ml-auto h-10 rounded-lg border border-danger px-3 text-xs font-semibold text-danger transition hover:bg-surface-hover"
                 >
                   Remove
                 </button>
@@ -582,7 +582,7 @@ onBeforeRouteLeave(() => confirmLeave());
                 v-model="content.content"
                 @input="content.content = normalizeLyricContent(content.content)"
                 rows="9"
-                class="mt-3 w-full resize-y rounded-lg border border-pink-300 bg-white px-3 py-2 text-sm leading-6 outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:ring-4 focus:ring-pink-100"
+                class="mt-3 w-full resize-y rounded-lg border border-border bg-card px-3 py-2 text-sm leading-6 text-foreground outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:ring-4 focus:ring-primary-soft"
                 placeholder="Paste lyrics here"
               ></textarea>
             </div>
@@ -590,32 +590,32 @@ onBeforeRouteLeave(() => confirmLeave());
         </section>
 
         <aside class="space-y-4 lg:sticky lg:top-[calc(var(--nav-height)+1rem)] lg:self-start">
-          <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm">
+          <section class="rounded-lg border border-border bg-card p-4 shadow-sm">
             <div class="flex items-center justify-between gap-3">
-              <h2 class="text-base font-bold text-slate-900">Covers</h2>
+              <h2 class="text-base font-bold text-foreground">Covers</h2>
               <button
                 type="button"
                 @click="addCover"
-                class="rounded-lg border border-pink-300 px-3 py-1.5 text-xs font-semibold text-pink-600 hover:bg-pink-50"
+                class="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary-soft"
               >
                 Add
               </button>
             </div>
 
             <div class="mt-3 space-y-3">
-              <p v-if="!covers.length" class="rounded-lg bg-pink-50 px-3 py-3 text-sm text-slate-500">No covers yet.</p>
-              <div v-for="(cover, index) in covers" :key="index" class="rounded-lg border border-gray-300 bg-gray-200/50 p-3">
+              <p v-if="!covers.length" class="rounded-lg bg-surface px-3 py-3 text-sm text-foreground-muted">No covers yet.</p>
+              <div v-for="(cover, index) in covers" :key="index" class="rounded-lg border border-border bg-surface p-3">
                 <div class="flex items-center gap-2">
                   <input
                     v-model="cover.id"
                     @input="normalizeCoverVideoId(cover)"
-                    class="h-10 min-w-0 flex-1 rounded-lg border border-pink-300 bg-white px-3 text-sm outline-none focus:border-pink-300 focus:ring-4 focus:ring-pink-100"
+                    class="h-10 min-w-0 flex-1 rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none transition placeholder:text-foreground-subtle focus:border-primary focus:ring-4 focus:ring-primary-soft"
                     placeholder="Cover youtube video ID or link"
                   />
                   <button
                     type="button"
                     @click="removeCover(index)"
-                    class="h-10 rounded-lg border border-rose-200 px-3 text-xs font-semibold text-rose-600 hover:bg-rose-50"
+                    class="h-10 rounded-lg border border-danger px-3 text-xs font-semibold text-danger transition hover:bg-surface-hover"
                   >
                     Remove
                   </button>
@@ -628,39 +628,39 @@ onBeforeRouteLeave(() => confirmLeave());
             </div>
           </section>
 
-          <section class="rounded-lg border border-pink-300 bg-white p-4 shadow-sm">
-            <h2 class="text-base font-bold text-slate-900">Preview</h2>
+          <section class="rounded-lg border border-border bg-card p-4 shadow-sm">
+            <h2 class="text-base font-bold text-foreground">Preview</h2>
             <dl class="mt-3 space-y-2 text-sm">
               <div class="flex justify-between gap-3">
-                <dt class="text-slate-500">Video</dt>
-                <dd class="truncate font-semibold">{{ videoId || '-' }}</dd>
+                <dt class="text-foreground-muted">Video</dt>
+                <dd class="truncate font-semibold text-foreground">{{ videoId || '-' }}</dd>
               </div>
               <div class="flex justify-between gap-3">
-                <dt class="text-slate-500">Title</dt>
-                <dd class="truncate font-semibold">{{ title || '-' }}</dd>
+                <dt class="text-foreground-muted">Title</dt>
+                <dd class="truncate font-semibold text-foreground">{{ title || '-' }}</dd>
               </div>
               <div class="flex justify-between gap-3">
-                <dt class="text-slate-500">Alt</dt>
-                <dd class="font-semibold">{{ cleanAltTitles.length }}</dd>
+                <dt class="text-foreground-muted">Alt</dt>
+                <dd class="font-semibold text-foreground">{{ cleanAltTitles.length }}</dd>
               </div>
               <div class="flex justify-between gap-3">
-                <dt class="text-slate-500">Artists</dt>
-                <dd class="font-semibold">{{ artistIds.length }}</dd>
+                <dt class="text-foreground-muted">Artists</dt>
+                <dd class="font-semibold text-foreground">{{ artistIds.length }}</dd>
               </div>
               <div class="flex justify-between gap-3">
-                <dt class="text-slate-500">Covers</dt>
-                <dd class="font-semibold">{{ cleanCovers.length }}</dd>
+                <dt class="text-foreground-muted">Covers</dt>
+                <dd class="font-semibold text-foreground">{{ cleanCovers.length }}</dd>
               </div>
               <div class="flex justify-between gap-3">
-                <dt class="text-slate-500">Blocks</dt>
-                <dd class="font-semibold">{{ contents.filter((item) => item.kind && item.content).length }}</dd>
+                <dt class="text-foreground-muted">Blocks</dt>
+                <dd class="font-semibold text-foreground">{{ contents.filter((item) => item.kind && item.content).length }}</dd>
               </div>
               <div class="flex justify-between gap-3">
-                <dt class="text-slate-500">Unsaved</dt>
-                <dd class="font-semibold">{{ isDirty ? 'Yes' : 'No' }}</dd>
+                <dt class="text-foreground-muted">Unsaved</dt>
+                <dd class="font-semibold text-foreground">{{ isDirty ? 'Yes' : 'No' }}</dd>
               </div>
             </dl>
-            <p v-if="error" class="mt-3 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">
+            <p v-if="error" class="mt-3 rounded-lg border border-danger bg-surface px-3 py-2 text-sm font-medium text-danger">
               {{ error }}
             </p>
           </section>

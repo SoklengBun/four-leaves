@@ -137,7 +137,13 @@ const onThumbnailLoad = (e: Event) => {
 
 <template>
   <div ref="containerRef" class="relative size-full bg-surface-hover">
-    <Transition name="thumbnail-fade" appear>
+    <Transition
+      appear
+      enter-active-class="transition-opacity duration-500 ease-in-out"
+      appear-active-class="transition-opacity duration-500 ease-in-out"
+      enter-from-class="opacity-0"
+      appear-from-class="opacity-0"
+    >
       <img
         v-if="src"
         :src="src"
@@ -151,15 +157,3 @@ const onThumbnailLoad = (e: Event) => {
     </Transition>
   </div>
 </template>
-
-<style scoped>
-.thumbnail-fade-enter-active,
-.thumbnail-fade-appear-active {
-  transition: opacity 0.5s ease;
-}
-
-.thumbnail-fade-enter-from,
-.thumbnail-fade-appear-from {
-  opacity: 0;
-}
-</style>

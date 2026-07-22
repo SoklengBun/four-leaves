@@ -39,18 +39,13 @@ const showSideBar = ref(true);
       :class="[
         'fixed top-10 z-10 h-screen w-[350px]',
         'transition-transform duration-200',
-        ' hidden items-start md:flex',
+        'hidden items-start md:flex',
         { 'translate-x-[-300px]': !showSideBar },
       ]"
     >
-      <div
-        class="flex h-screen w-[300px] flex-col border-r border-border bg-surface"
-      >
+      <div class="flex h-screen w-[300px] flex-col border-r border-border bg-surface">
         <div class="flex h-20 items-center justify-center">
-          <img
-            :src="requireImage('images/priconne/logo.png')"
-            class="contain h-full"
-          />
+          <img :src="requireImage('images/priconne/logo.png')" class="contain h-full" />
         </div>
         <RouterLink
           v-for="item in sideBarItems"
@@ -59,8 +54,7 @@ const showSideBar = ref(true);
             'flex h-10 items-center justify-start',
             'border-b border-border px-5 text-foreground last:border-0',
             {
-              'bg-primary text-primary-foreground':
-                route.query.category === item.category,
+              'bg-primary text-primary-foreground': route.query.category === item.category,
             },
           ]"
           :to="{ name: 'priconne', query: { category: item.category } }"
@@ -68,20 +62,13 @@ const showSideBar = ref(true);
           {{ item.label }}
         </RouterLink>
       </div>
-      <button
-        class="flex h-[50px] w-[50px] items-center justify-center"
-        @click="showSideBar = !showSideBar"
-      >
-        <IconArrowLeftRight
-          class="h-7 w-7 rotate-90 text-primary duration-300 hover:scale-125"
-        />
+      <button class="flex h-[50px] w-[50px] items-center justify-center" @click="showSideBar = !showSideBar">
+        <IconArrowLeftRight class="h-7 w-7 rotate-90 text-primary duration-300 hover:scale-125" />
       </button>
     </div>
 
     <!-- Bottom Nav for phone view  -->
-    <div
-      class="fixed bottom-0 left-0 grid h-16 w-screen grid-cols-3 overflow-hidden rounded-t-xl border border-border bg-surface md:hidden"
-    >
+    <div class="fixed bottom-0 left-0 grid h-16 w-screen grid-cols-3 overflow-hidden rounded-t-xl border border-border bg-surface md:hidden">
       <RouterLink
         v-for="item in sideBarItems"
         :key="item.category"
@@ -100,40 +87,16 @@ const showSideBar = ref(true);
     <div class="flex w-screen justify-end pb-20 md:pb-0">
       <div
         :class="[
-          'h-full w-screen ',
+          'h-full w-screen',
           'px-3 py-10 transition-[width] duration-200 md:px-10 md:py-5',
-          { 'full-size': !showSideBar },
-          { 'normal-size md:full-size': showSideBar },
+          showSideBar ? 'md:w-[calc(100vw-300px)]' : 'md:w-screen',
         ]"
       >
         <PriconneCharacterPage v-if="route.query.category === 'character'" />
-        <PriconneUniqueEquipmentPage
-          v-else-if="route.query.category === 'unique-equipment'"
-        />
+        <PriconneUniqueEquipmentPage v-else-if="route.query.category === 'unique-equipment'" />
         <PriconneItemPage v-else-if="route.query.category === 'gear'" />
-        <div
-          v-else
-          class="flex h-full w-full flex-1 items-center justify-center"
-        >
-          Welcome to 「Princess Connect Re:Dive!」 whatever page.
-        </div>
+        <div v-else class="flex h-full w-full flex-1 items-center justify-center">Welcome to 「Princess Connect Re:Dive!」 whatever page.</div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.full-size {
-  width: 100vw;
-}
-
-.normal-size {
-  width: 100vw;
-}
-
-@media (min-width: 768px) {
-  .normal-size {
-    width: calc(100vw - 300px);
-  }
-}
-</style>

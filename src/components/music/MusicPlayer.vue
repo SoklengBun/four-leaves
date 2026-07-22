@@ -50,7 +50,7 @@ const togglePlaylist = () => {
     <Transition>
       <div v-if="mode !== 'off'" class="fixed bottom-0 z-[99] h-player w-full px-3.5 pb-3 pt-2 md:p-5">
         <div
-          class="liquid relative z-10 mx-auto flex h-full w-full max-w-[750px] items-center justify-center rounded-xl border border-border pb-5 md:rounded-2xl md:pb-0"
+          class="liquid relative z-10 mx-auto flex h-full w-full max-w-[750px] items-center justify-center overflow-hidden rounded-xl border border-border pb-5 backdrop-blur-sm md:rounded-2xl md:pb-0"
         >
           <div class="relative z-10 flex h-fit flex-1 items-center space-x-1 overflow-hidden px-2 md:space-x-3 md:px-4">
             <div class="size-10 overflow-hidden rounded-lg border border-primary bg-surface md:size-16 md:rounded-xl">
@@ -85,7 +85,7 @@ const togglePlaylist = () => {
         <div class="h-0 w-full">
           <div
             v-if="playlist?.list?.items?.length"
-            class="liquid absolute right-0 top-1/2 flex h-10 w-[18px] -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-border bg-primary-soft md:hidden"
+            class="liquid absolute right-0 top-1/2 flex h-10 w-[18px] -translate-y-1/2 items-center justify-center overflow-hidden rounded-r-md border border-l-0 border-border bg-primary-soft backdrop-blur-sm md:hidden"
             @click="togglePlaylist"
           >
             <svg class="h-3.5 w-3.5 text-secondary" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -100,15 +100,15 @@ const togglePlaylist = () => {
 
 <style>
 .liquid {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 25%, transparent) 0%, color-mix(in srgb, var(--color-secondary) 25%, transparent) 100%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 25%, transparent) 0%,
+    color-mix(in srgb, var(--color-secondary) 25%, transparent) 100%
+  );
   box-shadow:
     inset 0 2px 8px color-mix(in srgb, var(--color-foreground) 18%, transparent),
     inset 0 -4px 12px color-mix(in srgb, var(--color-background) 28%, transparent),
     0 8px 24px color-mix(in srgb, var(--color-secondary) 35%, transparent);
-
-  backdrop-filter: blur(4px);
 }
 
 .liquid::before {

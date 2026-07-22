@@ -15,7 +15,7 @@ Refresh the app’s visual color system with a premium dark theme while keeping 
 - [x] Make dark mode the first-visit default while preserving an explicitly saved light-mode choice.
 - [x] Polish the playlist popup in both themes: correct modal stacking, soften row surfaces, and stabilize long labels.
 - [x] Polish song and playlist action popups: remove fixed pink card shadows and migrate action states to semantic theme colors.
-- [ ] Remove remaining hard-coded page colors and legacy theme names from active UI styles. A dark-mode compatibility bridge currently covers the older loop/options/editor controls.
+- [ ] Remove remaining hard-coded page colors and legacy theme names from active UI styles. A dark-mode compatibility bridge currently covers the older options/editor controls.
 
 ## Migration stages
 
@@ -23,7 +23,8 @@ Refresh the app’s visual color system with a premium dark theme while keeping 
 - [x] Stage 2 — global chrome and shared components: navigation, menus, popups, buttons, loading, toast, player.
 - [x] Stage 3 — home, login, utility, and secondary pages.
 - [x] Stage 4 — primary lyrics pages, lyric catalog cards, playlist surfaces, and music interactions.
-- [ ] Stage 4 follow-up — migrate remaining local lyric editor/loop/options controls off legacy pastel utility classes and remove the compatibility bridge.
+- [x] Stage 4 follow-up — migrate the loop settings control to semantic theme colors.
+- [ ] Stage 4 follow-up — migrate remaining local lyric editor/options controls off legacy pastel utility classes and remove the compatibility bridge.
 - [x] Stage 5 — run type-check/build, inspect the diff, and verify light/dark behavior at desktop and mobile sizes.
 
 ## Guardrails

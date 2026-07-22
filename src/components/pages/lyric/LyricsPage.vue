@@ -11,9 +11,11 @@ import { usePlaylist } from '~/stores/playlist.js';
 import { getTodayStorageDate, useHomeStorage } from '~/utils/home-storage';
 import { getLyricsArtistsLabel, normalizePlaylistItems } from '~/utils/lyrics';
 import Loading from '~/components/shares/Loading.vue';
+import { useAuth } from '~/stores/auth.js';
 
 const route = useRoute();
 const router = useRouter();
+const auth = useAuth();
 const searchText = ref('');
 const searchDebounce = debouncedRef(searchText);
 const player = usePlayer();
@@ -180,16 +182,25 @@ const onClear = async () => {
 <template>
   <div class="container flex w-full flex-col items-center px-3 pt-3">
     <div class="box-cover relative h-[200px] w-full overflow-hidden rounded-card bg-black p-3 md:h-[450px] md:p-5">
-      <div class="hero-banner absolute inset-0 w-full opacity-80">
+      <div class="absolute inset-0 w-full bg-[url('https://redive.estertion.win/card/full/124131.webp')] bg-cover bg-center bg-no-repeat opacity-80">
         <img src="https://i.redd.it/v60t49y990ue1.gif" class="size-full" />
       </div>
       <div class="relative z-10 flex size-full max-w-xl flex-col">
         <div class="mt-5 flex flex-wrap gap-3">
-          <button type="button" class="hero-chip hero-chip--button" :disabled="isFetching" @click="fetchLyrics">
-            <span class="hero-chip__label">{{ isFetching ? 'Refreshing' : 'Refresh Home' }}</span>
+          <button
+            type="button"
+            class="inline-flex items-center gap-[0.65rem] rounded-full bg-[color-mix(in_srgb,var(--color-card)_78%,transparent)] px-[0.95rem] py-[0.7rem] text-foreground-muted shadow-[inset_0_0_0_1px_var(--color-border)] transition-[transform,background-color] duration-[180ms] hover:-translate-y-px hover:bg-card-hover"
+            :disabled="isFetching"
+            @click="fetchLyrics"
+          >
+            <span class="text-[0.7rem] font-bold uppercase tracking-[0.18em]">{{ isFetching ? 'Refreshing' : 'Refresh Home' }}</span>
           </button>
-          <button type="button" class="hero-chip hero-chip--button" @click="router.push({ name: 'lyrics-all' })">
-            <span class="hero-chip__label">Browse All</span>
+          <button
+            type="button"
+            class="inline-flex items-center gap-[0.65rem] rounded-full bg-[color-mix(in_srgb,var(--color-card)_78%,transparent)] px-[0.95rem] py-[0.7rem] text-foreground-muted shadow-[inset_0_0_0_1px_var(--color-border)] transition-[transform,background-color] duration-[180ms] hover:-translate-y-px hover:bg-card-hover"
+            @click="router.push({ name: 'lyrics-all' })"
+          >
+            <span class="text-[0.7rem] font-bold uppercase tracking-[0.18em]">Browse All</span>
           </button>
         </div>
 
@@ -239,13 +250,14 @@ const onClear = async () => {
           @select="(song) => onClick(song, toadySelectionPlaylist)"
         />
 
-        <LyricsSongShelf
-          v-for="playlist in featuredPlaylists"
-          :key="playlist.id"
-          :playlist="playlist"
-          layout="grid"
-          @select="(song) => onClick(song, playlist)"
-        />
+        <template v-for="playlist in featuredPlaylists" :key="playlist.id">
+          <LyricsSongShelf
+            v-if="playlist.createdById !== auth.user?.id"
+            :playlist="playlist"
+            layout="grid"
+            @select="(song) => onClick(song, playlist)"
+          />
+        </template>
       </template>
 
       <div
@@ -264,52 +276,3 @@ const onClear = async () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.hero-shell {
-  background: var(--gradient-surface);
-  box-shadow: var(--shadow-card);
-}
-
-.hero-banner {
-  background-image: url('https://redive.estertion.win/card/full/124131.webp');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.hero-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--color-card) 78%, transparent);
-  padding: 0.7rem 0.95rem;
-  color: var(--color-foreground-muted);
-  box-shadow: inset 0 0 0 1px var(--color-border);
-}
-
-.hero-chip--button {
-  transition:
-    transform 0.18s ease,
-    background-color 0.18s ease;
-}
-
-.hero-chip--button:hover {
-  transform: translateY(-1px);
-  background: var(--color-card-hover);
-}
-
-.hero-chip__label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.hero-chip__value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-foreground);
-}
-</style>

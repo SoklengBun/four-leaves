@@ -5,46 +5,19 @@ import { getRadomPosition, getRandom } from '~/utils/helper';
   <div
     v-for="star in 25"
     :key="star"
-    :style="[
-      `--destination: ${getRadomPosition(0, 50)}vh ${getRadomPosition(
-        0,
-        50,
-      )}vh`,
-      `--star-size: ${getRandom(10, 30)}px`,
-    ]"
-    class="star-wrapper"
+    :style="[`--destination: ${getRadomPosition(0, 50)}vh ${getRadomPosition(0, 50)}vh`, `--star-size: ${getRandom(10, 30)}px`]"
+    class="star-wrapper pointer-events-none absolute left-1/2 top-1/2 -z-[1] h-[var(--star-size,15px)] w-[var(--star-size,15px)] -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_10px_#fbeb94]"
   >
-    <div class="star"></div>
+    <div class="star size-full bg-[#fafbbb]"></div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .star-wrapper {
-  width: var(--star-size, 15px);
-  height: var(--star-size, 15px);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: -1;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0px 0px 10px #fbeb94);
   animation: floating 2s linear forwards;
-  pointer-events: none;
 
   .star {
-    width: 100%;
-    height: 100%;
-    background: #fafbbb;
-    clip-path: polygon(
-      50% 0%,
-      65% 35%,
-      100% 50%,
-      65% 65%,
-      50% 100%,
-      35% 65%,
-      0% 50%,
-      35% 35%
-    );
+    clip-path: polygon(50% 0%, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0% 50%, 35% 35%);
     animation: spin 3s linear infinite;
   }
 }

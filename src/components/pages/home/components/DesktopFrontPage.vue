@@ -5,8 +5,10 @@ import Weather from './Weather.vue';
 </script>
 
 <template>
-  <div class="desktop-container hidden h-body w-full overflow-y-auto overflow-x-hidden overscroll-none p-5 md:block">
-    <div class="desktop-background" />
+  <div class="hidden h-body w-full overflow-y-auto overflow-x-hidden overscroll-none bg-background p-5 md:block">
+    <div
+      class="absolute left-0 top-0 size-full bg-[url('https://redive.estertion.win/card/full/124131.webp')] bg-cover bg-center bg-no-repeat opacity-50 blur-sm"
+    />
 
     <div class="container relative z-[2] flex gap-3">
       <div>
@@ -21,17 +23,3 @@ import Weather from './Weather.vue';
     </div>
   </div>
 </template>
-
-<style scoped>
-.desktop-container {
-  background-color: var(--color-background);
-}
-
-.desktop-background {
-  @apply absolute left-0 top-0 h-full w-full opacity-50 blur-sm;
-  background-image: url('https://redive.estertion.win/card/full/124131.webp');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-</style>

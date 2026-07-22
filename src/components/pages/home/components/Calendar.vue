@@ -57,7 +57,11 @@ const tzString = computed(() => {
     </div>
 
     <div class="grid grid-cols-7 gap-2 text-sm font-bold">
-      <div v-for="(d, i) in daysOfWeek" :key="d" :class="['text-center', i === 0 ? 'text-danger' : i === 6 ? 'text-danger' : 'text-foreground-muted']">
+      <div
+        v-for="(d, i) in daysOfWeek"
+        :key="d"
+        :class="['text-center', i === 0 ? 'text-danger' : i === 6 ? 'text-danger' : 'text-foreground-muted']"
+      >
         {{ d }}
       </div>
     </div>
@@ -71,7 +75,9 @@ const tzString = computed(() => {
           !day ? 'bg-transparent shadow-none' : 'bg-surface shadow-sm',
           (() => {
             const weekday = idx % 7;
-            if (isToday(day)) return 'active-day';
+            if (isToday(day)) {
+              return 'border-2 border-primary text-xl font-bold text-primary !shadow-[0_0_3px_color-mix(in_srgb,var(--color-primary)_55%,transparent),0_0_10px_color-mix(in_srgb,var(--color-primary)_35%,transparent)]';
+            }
             if (!day) return '';
             return weekday === 0 ? 'text-danger' : weekday === 6 ? 'text-danger' : 'text-foreground';
           })(),
@@ -84,12 +90,3 @@ const tzString = computed(() => {
     <img :src="AnimateImage" class="absolute -bottom-[7px] -right-[15px] size-32" />
   </div>
 </template>
-
-<style scoped>
-.active-day {
-  @apply border-2 border-primary text-xl font-bold text-primary;
-  box-shadow:
-    0 0 3px color-mix(in srgb, var(--color-primary) 55%, transparent),
-    0 0 10px color-mix(in srgb, var(--color-primary) 35%, transparent);
-}
-</style>

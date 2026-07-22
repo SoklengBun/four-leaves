@@ -19,63 +19,27 @@ onMounted(async () => {
 </script>
 <template>
   <Teleport to="body">
-    <div class="background" :class="[loadingCharClass, { hidden: !appSetting.isFirstLoadHomePage }]">
-      <div id="loading_character" :class="loadingCharClass">
-        <div class="character-container char03"></div>
+    <div
+      class="fixed inset-0 z-[10001] size-full transform-gpu bg-[url('@/assets/images/background.gif')] bg-[position:center_top] bg-repeat transition-transform ease-in-out"
+      :class="{
+        hidden: !appSetting.isFirstLoadHomePage,
+        'translate-x-full delay-300 duration-200': loadingCharClass === 'remove',
+        'duration-[330ms]': loadingCharClass !== 'remove',
+      }"
+    >
+      <div
+        id="loading_character"
+        class="absolute top-1/2 z-[9999] -translate-x-1/2 -translate-y-1/2 transition-all duration-[1100ms] ease-in-out"
+        :class="loadingCharClass === 'ready' ? '-left-full' : loadingCharClass === 'remove' ? 'left-[200%]' : 'left-1/2'"
+      >
+        <div class="char03 size-[200px] overflow-hidden bg-[url('@/assets/images/kokkoro.png')] bg-[length:100%] bg-center bg-no-repeat"></div>
       </div>
     </div>
   </Teleport>
 </template>
 
 <style scoped>
-.background {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  z-index: 100;
-  background: url('@/assets/images/background.gif') repeat center top;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  transition: transform 330ms;
-  transition-timing-function: ease-in-out;
-  transform: translate3d(0, 0, 0);
-  z-index: 10001;
-}
-
-.background.remove {
-  transform: translate3d(100%, 0, 0);
-  transition-delay: 300ms;
-  transition-duration: 200ms;
-}
-
-#loading_character {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  transition: all 1100ms;
-  transition-timing-function: ease-in-out;
-}
-
-#loading_character.ready {
-  left: -100%;
-}
-#loading_character.remove {
-  left: 200%;
-}
-
-#loading_character .character-container {
-  width: 200px;
-  height: 200px;
-  overflow: hidden;
-  background: url('@/assets/images/kokkoro.png') no-repeat center;
-  background-size: 100%;
-}
-#loading_character .character-container.char03 {
-  background-image: url('@/assets/images/kokkoro.png');
+.char03 {
   animation: spriteAnime03 700ms steps(19) infinite;
 }
 
