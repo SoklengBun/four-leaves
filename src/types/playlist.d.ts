@@ -15,3 +15,10 @@ type UpdatePlaylistItem = {
   defaultCoverId?: string;
   note?: string;
 };
+
+type ReorderPlaylistItems = {
+  itemOrders: {
+    itemId: number;
+    position: number;
+  }[];
+};

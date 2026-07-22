@@ -168,6 +168,7 @@ export const usePlayer = defineStore('player', () => {
     if (!videoId.value || !player.value || !isReady.value) return;
 
     pause();
+    duration.value = 0;
     player.value.loadVideoById(videoId.value);
     play();
 

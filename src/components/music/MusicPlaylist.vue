@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { VueDraggable } from 'vue-draggable-plus';
 import CustomPopup from '~/components/shares/CustomPopup.vue';
+import { useAuth } from '~/stores/auth';
 import { usePlayer } from '~/stores/player';
 import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
 import { usePlaylist } from '~/stores/playlist';
+import { UserRole } from '~/types/user';
 import YoutubeThumbnail from './YoutubeThumbnail.vue';
+
+const auth = useAuth();
 
 const player = usePlayer();
 const { current, videoId, showPlaylist } = storeToRefs(player);
 
 const playlist = usePlaylist();
+const originalOrder = ref<{ playlistId: number; itemIds: number[] } | null>(null);
 
 const playlistItems = computed({
   get: () => playlist.list?.items ?? [],
@@ -24,8 +29,64 @@ const selectSong = (song: PlaylistItem) => {
   player.selectSong(song, undefined, playlist.list);
 };
 
-const closePlaylist = () => {
-  showPlaylist.value = false;
+const getPlaylistItemIds = (items: PlaylistItem[]) => {
+  const itemIds: number[] = [];
+
+  for (const item of items) {
+    if (item.playlistItemId === undefined) return null;
+    itemIds.push(item.playlistItemId);
+  }
+
+  return itemIds;
+};
+
+const checkPlaylistOrderChange = async (originalItemIds: number[]) => {
+  const currentPlaylist = playlist.list;
+  if (!currentPlaylist || currentPlaylist.id === 0 || !auth.isLoggedIn || !auth.user) return;
+
+  const canReorder = currentPlaylist.createdById === auth.user.id || auth.user.role === UserRole.ADMIN;
+  if (!canReorder) return;
+
+  const currentItemIds = getPlaylistItemIds(currentPlaylist.items);
+  if (!currentItemIds) return;
+
+  const hasOrderChanged =
+    originalItemIds.length === currentItemIds.length && currentItemIds.some((itemId, index) => itemId !== originalItemIds[index]);
+
+  if (!hasOrderChanged) return;
+
+  const payload = {
+    itemOrders: currentItemIds.map((itemId, index) => ({
+      itemId,
+      position: index + 1,
+    })),
+  };
+
+  await playlist.updateItemsOrder(payload);
+};
+
+const rememberPlaylistOrder = () => {
+  const currentPlaylist = playlist.list;
+  if (!currentPlaylist) {
+    originalOrder.value = null;
+    return;
+  }
+
+  const itemIds = getPlaylistItemIds(currentPlaylist.items);
+  originalOrder.value = itemIds
+    ? {
+        playlistId: currentPlaylist.id,
+        itemIds,
+      }
+    : null;
+};
+
+const onPlaylistClosed = async () => {
+  const previousOrder = originalOrder.value;
+  originalOrder.value = null;
+
+  if (!previousOrder || playlist.list?.id !== previousOrder.playlistId) return;
+  await checkPlaylistOrderChange(previousOrder.itemIds);
 };
 
 const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
@@ -53,7 +114,8 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
     eyebrow="Now playing"
     :title="currentPlaylistTitle"
     :description="currentPlaylistDescription"
-    @close="closePlaylist"
+    @open="rememberPlaylistOrder"
+    @closed="onPlaylistClosed"
   >
     <div class="flex h-full w-full flex-col overflow-hidden">
       <p class="mb-3 text-base font-semibold text-foreground md:text-lg">Playlist Queue</p>

@@ -11,9 +11,11 @@ import { usePlaylist } from '~/stores/playlist.js';
 import { getTodayStorageDate, useHomeStorage } from '~/utils/home-storage';
 import { getLyricsArtistsLabel, normalizePlaylistItems } from '~/utils/lyrics';
 import Loading from '~/components/shares/Loading.vue';
+import { useAuth } from '~/stores/auth.js';
 
 const route = useRoute();
 const router = useRouter();
+const auth = useAuth();
 const searchText = ref('');
 const searchDebounce = debouncedRef(searchText);
 const player = usePlayer();
@@ -239,13 +241,14 @@ const onClear = async () => {
           @select="(song) => onClick(song, toadySelectionPlaylist)"
         />
 
-        <LyricsSongShelf
-          v-for="playlist in featuredPlaylists"
-          :key="playlist.id"
-          :playlist="playlist"
-          layout="grid"
-          @select="(song) => onClick(song, playlist)"
-        />
+        <template v-for="playlist in featuredPlaylists" :key="playlist.id">
+          <LyricsSongShelf
+            v-if="playlist.createdById !== auth.user?.id"
+            :playlist="playlist"
+            layout="grid"
+            @select="(song) => onClick(song, playlist)"
+          />
+        </template>
       </template>
 
       <div

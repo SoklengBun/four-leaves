@@ -91,16 +91,9 @@ const getThumbnailId = (song: PlaylistItem) => {
           </div>
 
           <div class="mt-3 min-w-0">
-            <p v-if="isGridLayout" class="truncate text-sm font-semibold text-foreground md:text-base">
-              {{ getLyricsTitleLabel(song) }}
-            </p>
-            <MarqueeText v-else :text="getLyricsTitleLabel(song)" class="text-sm font-semibold text-foreground md:text-base" :gap="28" />
+            <MarqueeText :text="getLyricsTitleLabel(song)" class="text-sm font-semibold text-foreground md:text-base" :gap="28" />
 
-            <p v-if="isGridLayout" class="mt-1 truncate text-xs text-foreground-muted md:text-sm">
-              {{ getCoverArtistsLabel(song) || 'Unknown artist' }}
-            </p>
             <MarqueeText
-              v-else
               :text="getCoverArtistsLabel(song) || 'Unknown artist'"
               class="mt-1 text-xs text-foreground-muted md:text-sm"
               :gap="24"

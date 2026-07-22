@@ -43,3 +43,9 @@ export const updatePlaylistItem = async (itemId: number, payload: UpdatePlaylist
     .put(payload)
     .json();
 };
+
+export const reorderPlaylistItems = async (playlistId: number, payload: ReorderPlaylistItems) => {
+  return useAppFetch(`playlist/${encodeURIComponent(playlistId)}/items/reorder`)
+    .put(payload)
+    .json();
+};

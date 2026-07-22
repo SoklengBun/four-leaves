@@ -140,7 +140,7 @@ const refreshCurrentLyrics = () => {
 
     <LyricsLoadingState v-if="isLoading" />
 
-    <div v-else class="lyric-content mx-auto mt-5 w-full flex-1 rounded-xl bg-card pb-4 pt-4 md:max-w-[700px] md:rounded-2xl">
+    <div v-else class="lyric-content mx-auto mt-5 w-full flex-1 rounded-xl bg-card pb-5 pt-4 md:max-w-[700px] md:rounded-2xl md:pb-10">
       <div class="mb-3 flex w-full items-center gap-2 px-3 md:px-6">
         <button
           v-for="lang in availableLangs"

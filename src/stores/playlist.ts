@@ -7,6 +7,7 @@ import {
   getUserPlaylists,
   removeFromPlaylist,
   removePlaylist,
+  reorderPlaylistItems,
   updatePlaylist,
   updatePlaylistItem,
 } from '~/services/playlist';
@@ -261,6 +262,18 @@ export const usePlaylist = defineStore('playlist', () => {
     setItemsOrder(reorderedItems);
   };
 
+  const updateItemsOrder = async (payload: ReorderPlaylistItems) => {
+    if (!auth.isLoggedIn || !list.value?.id) return;
+
+    const { data } = await reorderPlaylistItems(list.value.id, payload);
+    if (data.value?.code !== 0) {
+      showToast({ message: data.value?.message || 'Failed to reorder playlist', type: 'error' });
+      return;
+    }
+
+    return data.value?.data;
+  };
+
   return {
     list,
     lists,
@@ -282,5 +295,6 @@ export const usePlaylist = defineStore('playlist', () => {
     updateItem,
     setItemsOrder,
     reorderItems,
+    updateItemsOrder,
   };
 });
