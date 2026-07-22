@@ -31,9 +31,7 @@ const sleep = (duration: number) => {
 const spinning = async () => {
   if (active.value === null) return;
   if (sleepDuration.value >= 600 && active.value === finalResult.value) {
-    const elem = document.getElementById(
-      `box-${finalResult.value}`,
-    ) as HTMLDivElement;
+    const elem = document.getElementById(`box-${finalResult.value}`) as HTMLDivElement;
 
     if (elem) {
       resultPosition.value = {
@@ -51,11 +49,7 @@ const spinning = async () => {
     stepDuration.value = 2;
   }
 
-  if (
-    finalResult.value &&
-    finalResult.value > 10 &&
-    finalResult.value - active.value === 10
-  ) {
+  if (finalResult.value && finalResult.value > 10 && finalResult.value - active.value === 10) {
     stepDuration.value += 100;
   }
 
@@ -88,11 +82,9 @@ const onStart = async () => {
 </script>
 
 <template>
-  <div class="slot-machine h-[calc(100vh-50px)] w-full overflow-hidden">
-    <div
-      class="mx-auto flex h-fit w-fit flex-col items-center overflow-hidden rounded-lg border-4 border-red-500 bg-black p-1.5"
-    >
-      <div class="border-red slot-container relative">
+  <div class="h-[calc(100vh-50px)] w-full overflow-hidden [--box-size:min(50px,10vw)]">
+    <div class="mx-auto flex h-fit w-fit flex-col items-center overflow-hidden rounded-lg border-4 border-red-500 bg-black p-1.5">
+      <div class="border-red relative h-[calc(var(--box-size)*6)] w-[calc(var(--box-size)*9)]">
         <div
           class="absolute z-[12]"
           :style="{
@@ -113,58 +105,52 @@ const onStart = async () => {
           <div
             v-for="item in top"
             :id="`box-${item}`"
-            class="box"
+            class="box relative flex h-[var(--box-size)] w-[var(--box-size)] items-center justify-center rounded border-blue-500"
             :class="{
               active: active === item,
             }"
           >
-            <div class="size-[80%] bg-green-300"></div>
+            <div class="relative z-20 size-[80%] bg-green-300"></div>
           </div>
         </div>
 
-        <div
-          class="absolute left-[0px] top-[calc(var(--box-size)*5)] flex flex-row-reverse"
-        >
+        <div class="absolute left-[0px] top-[calc(var(--box-size)*5)] flex flex-row-reverse">
           <div
             v-for="item in bottom"
             :id="`box-${item}`"
-            class="box"
+            class="box relative flex h-[var(--box-size)] w-[var(--box-size)] items-center justify-center rounded border-blue-500"
             :class="{
               active: active === item,
             }"
           >
-            <div class="size-[80%] bg-green-300"></div>
+            <div class="relative z-20 size-[80%] bg-green-300"></div>
           </div>
         </div>
 
-        <div
-          class="absolute left-[calc(var(--box-size)*8)] top-[var(--box-size)] flex flex-col"
-        >
+        <div class="absolute left-[calc(var(--box-size)*8)] top-[var(--box-size)] flex flex-col">
           <div
             v-for="item in right"
             :id="`box-${item}`"
-            class="box"
+            class="box relative flex h-[var(--box-size)] w-[var(--box-size)] items-center justify-center rounded border-blue-500"
             :class="{
               active: active === item,
             }"
           >
-            <div class="size-[80%] bg-green-300"></div>
+            <div class="relative z-20 size-[80%] bg-green-300"></div>
           </div>
         </div>
 
-        <div
-          class="absolute left-[0px] top-[var(--box-size)] flex flex-col-reverse"
-        >
+        <div class="absolute left-[0px] top-[var(--box-size)] flex flex-col-reverse">
           <div
             v-for="item in left"
             :key="item"
             :id="`box-${item}`"
-            class="box"
+            class="box relative flex h-[var(--box-size)] w-[var(--box-size)] items-center justify-center rounded border-blue-500"
             :class="{
               active: active === item,
             }"
           >
-            <div class="size-[80%] bg-green-300"></div>
+            <div class="relative z-20 size-[80%] bg-green-300"></div>
           </div>
         </div>
       </div>
@@ -172,7 +158,7 @@ const onStart = async () => {
 
     <div class="flex flex-1 flex-col items-center overflow-auto">
       <div class="flex w-full items-center justify-center p-5">
-        <button class="start-button" @click="onStart">Start</button>
+        <button class="rounded-lg border border-green-500 px-5 py-1" @click="onStart">Start</button>
         {{ sleepDuration }}
       </div>
 
@@ -189,51 +175,19 @@ const onStart = async () => {
   inherits: false;
 }
 
-.slot-machine {
-  --box-size: min(50px, 10vw);
-  .slot-container {
-    width: calc(var(--box-size) * 9);
-    height: calc(var(--box-size) * 6);
-  }
-
-  .box {
-    @apply relative flex items-center justify-center border-blue-500;
-    width: var(--box-size);
-    height: var(--box-size);
-
-    &.active {
-      @apply rounded;
-      // background-color: red;
-      // border-color: red;
-
-      &::after {
-        @apply absolute left-1/2 top-1/2 z-[1] size-[125%] -translate-x-1/2 -translate-y-1/2 rounded-full;
-        content: '';
-        background-color: red;
-        background: repeating-conic-gradient(
-          from var(--angle, 0deg),
-          #ff0000 0%,
-          #ffff00 5%,
-          #ffff00 10%,
-          #ff0000 20%
-        );
-        filter: blur(5px);
-        animation: 5s spin-shadow linear infinite;
-      }
-    }
-
-    &.result {
-      @apply bg-yellow-300;
-    }
-  }
-
-  .start-button {
-    @apply rounded-lg border border-green-500 px-5 py-1;
-  }
-
-  .bg-green-300 {
-    @apply relative z-[20];
-  }
+.box.active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 125%;
+  height: 125%;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  background: repeating-conic-gradient(from var(--angle, 0deg), #ff0000 0%, #ffff00 5%, #ffff00 10%, #ff0000 20%);
+  filter: blur(5px);
+  animation: 5s spin-shadow linear infinite;
 }
 
 @keyframes spin-shadow {

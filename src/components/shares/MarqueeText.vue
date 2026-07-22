@@ -105,15 +105,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="containerRef" class="marquee-text min-w-0 overflow-hidden">
-    <span ref="measureRef" class="marquee-text__measure">{{ text }}</span>
+  <div ref="containerRef" class="relative min-w-0 overflow-hidden">
+    <span ref="measureRef" class="pointer-events-none invisible absolute whitespace-nowrap">{{ text }}</span>
 
     <p v-if="!isOverflowing" class="truncate whitespace-nowrap">
       {{ text }}
     </p>
 
     <div v-else class="overflow-hidden">
-      <div class="marquee-text__track" :style="trackStyle">
+      <div class="marquee-text__track flex w-max min-w-full items-center will-change-transform" :style="trackStyle">
         <p class="shrink-0 whitespace-nowrap">
           {{ text }}
         </p>
@@ -126,24 +126,8 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.marquee-text {
-  position: relative;
-}
-
-.marquee-text__measure {
-  position: absolute;
-  visibility: hidden;
-  pointer-events: none;
-  white-space: nowrap;
-}
-
 .marquee-text__track {
-  display: flex;
-  width: max-content;
-  min-width: 100%;
-  align-items: center;
   animation: marquee-text-scroll var(--marquee-duration) linear infinite;
-  will-change: transform;
 }
 
 @keyframes marquee-text-scroll {

@@ -80,7 +80,7 @@ watch(
 <template>
   <div class="w-full">
     <input
-      class="player-seek h-1 w-full shrink-0 cursor-pointer appearance-none rounded-full"
+      class="player-seek h-1 w-full shrink-0 cursor-pointer appearance-none rounded-full outline-none [filter:drop-shadow(0_0_2px_#5be8ff)_drop-shadow(0_0_8px_#5be8ff88)]"
       type="range"
       min="0"
       max="100"
@@ -99,11 +99,6 @@ watch(
 </template>
 
 <style scoped>
-.player-seek {
-  outline: none;
-  filter: drop-shadow(0 0 2px #5be8ff) drop-shadow(0 0 8px #5be8ff88);
-}
-
 .player-seek::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 9999px;

@@ -17,15 +17,5 @@ onMounted(() => {
 });
 </script>
 <template>
-  <canvas class="fireworks" />
+  <canvas class="fireworks pointer-events-none fixed left-0 top-0 z-[10000]" />
 </template>
-
-<style scoped>
-canvas.fireworks {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 10000;
-  pointer-events: none;
-}
-</style>

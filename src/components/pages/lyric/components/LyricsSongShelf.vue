@@ -80,8 +80,8 @@ const getThumbnailId = (song: PlaylistItem) => {
         type="button"
         :class="
           layout === 'grid'
-            ? 'lyric-card lyric-card--grid box-cover box-cover group w-full rounded-xl p-2.5 text-left md:rounded-2xl'
-            : 'lyric-card box-cover group w-[132px] shrink-0 rounded-[24px] p-2.5 text-left md:w-[164px]'
+            ? 'box-cover group w-full min-w-0 rounded-xl p-2.5 text-left transition-all duration-300 [background:var(--gradient-surface)] [contain-intrinsic-size:220px] [content-visibility:auto] hover:-translate-y-1 active:scale-[0.985] md:rounded-2xl'
+            : 'box-cover group w-[132px] shrink-0 rounded-[24px] p-2.5 text-left transition-all duration-300 [background:var(--gradient-surface)] hover:-translate-y-1 active:scale-[0.985] md:w-[164px]'
         "
         @click="onSelect(song)"
       >
@@ -116,24 +116,3 @@ const getThumbnailId = (song: PlaylistItem) => {
     </div>
   </section>
 </template>
-
-<style scoped>
-.lyric-card {
-  @apply transition-all duration-300;
-  background: var(--gradient-surface);
-}
-
-.lyric-card:hover {
-  transform: translateY(-4px);
-}
-
-.lyric-card:active {
-  transform: scale(0.985);
-}
-
-.lyric-card--grid {
-  min-width: 0;
-  content-visibility: auto;
-  contain-intrinsic-size: 220px;
-}
-</style>

@@ -155,7 +155,7 @@ onDeactivated(() => {
 
 <template>
   <div ref="containerRef" class="container w-full px-3 pb-6 pt-3">
-    <div class="all-lyrics-shell box-cover overflow-hidden rounded-xl border border-border md:rounded-2xl">
+    <div class="box-cover overflow-hidden rounded-xl border border-border !shadow-card [background:var(--gradient-surface)] md:rounded-2xl">
       <img
         src="https://64.media.tumblr.com/10b6161cae7baa32395e40351205f4da/31d798f6f2dab6f4-e7/s1280x1920/f9473d8c9975d05c9cc9c143d4178164dcebcb3e.gif"
         class="h-full w-full"
@@ -199,10 +199,3 @@ onDeactivated(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.all-lyrics-shell {
-  background: var(--gradient-surface);
-  box-shadow: var(--shadow-card);
-}
-</style>

@@ -109,18 +109,28 @@ onBeforeUnmount(() => {
 
       <button
         type="button"
-        class="menu-circle fixed right-1 top-1 z-[53] size-11 bg-surface md:hidden"
+        class="fixed right-1 top-1 z-[53] flex size-11 items-center justify-center rounded-full border border-border bg-surface md:hidden"
         @click="togglePopup"
-        :class="{ active: showPopup }"
       >
-        <div class="menu-circle size-9">
-          <div class="menu-circle size-8 flex-col text-[10px]">
+        <div class="flex size-9 items-center justify-center rounded-full border border-border md:hidden">
+          <div class="flex size-8 flex-col items-center justify-center rounded-full border border-border text-[10px] md:hidden">
             <div class="h-3 w-5 -translate-y-0.5">
-              <div class="menu-line top" :style="{ height: '1px' }" />
-              <div class="menu-line bottom mt-1" :style="{ height: '1px' }" />
+              <div
+                class="h-px w-5 origin-top-left bg-foreground transition-all duration-300 ease-linear"
+                :class="showPopup ? 'rotate-[13.5deg] bg-danger' : 'rotate-0'"
+              />
+              <div
+                class="mt-1 h-px w-5 origin-top-left bg-foreground transition-all duration-300 ease-linear"
+                :class="showPopup ? 'rotate-[-13.5deg] bg-danger' : 'rotate-0'"
+              />
             </div>
             <div class="relative flex items-center justify-center text-foreground">
-              <transition name="fade">
+              <transition
+                enter-active-class="transition-opacity duration-500 ease-in-out"
+                leave-active-class="transition-opacity duration-500 ease-in-out"
+                enter-from-class="opacity-0"
+                leave-to-class="opacity-0"
+              >
                 <span v-if="!showPopup" class="absolute z-10">MENU</span>
                 <span v-else class="absolute z-10 text-danger">CLOSE</span>
               </transition>
@@ -130,7 +140,11 @@ onBeforeUnmount(() => {
       </button>
 
       <!--Mobile Popup-->
-      <div id="popup" class="show fixed right-0 top-0 z-[52] h-body w-full" :class="{ hidden: !showPopup }">
+      <div
+        id="popup"
+        class="show fixed right-0 top-0 z-[52] h-body w-full bg-background bg-[url('@/assets/images/bg_cross.png')] bg-[length:35px_auto] bg-repeat opacity-100"
+        :class="{ hidden: !showPopup }"
+      >
         <div class="flex flex-col bg-background px-5 pt-16 text-foreground">
           <div class="darkL grid grid-cols-4 border-t border-border pt-5">
             <RouterLink
@@ -166,47 +180,12 @@ nav a.router-link-exact-active,
   font-weight: bold;
 }
 
-.menu-circle {
-  @apply flex items-center justify-center rounded-full border border-border md:hidden;
-}
-
-.menu-line {
-  @apply w-5 bg-foreground transition-all duration-300 ease-linear;
-  transform-origin: 0px 0px;
-  transform: rotate(0deg);
-}
-
-.active {
-  .menu-line {
-    @apply bg-danger;
-
-    &.top {
-      transform: rotate(13.5deg);
-    }
-
-    &.bottom {
-      transform: rotate(-13.5deg);
-    }
-  }
-}
-
 nav a.router-link-exact-active {
   text-shadow: 0 0 16px color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
 .show {
-  opacity: 1;
   animation: fade-in 0.5s ease-in-out;
-  background-image: url('@/assets/images/bg_cross.png');
-
-  background-color: var(--color-background);
-  background-size: 35px auto;
-  background-repeat: repeat;
-}
-
-.hide {
-  opacity: 0;
-  animation: fade-out 0.5s ease-in-out;
 }
 
 @keyframes fade-in {
@@ -216,24 +195,5 @@ nav a.router-link-exact-active {
   100% {
     opacity: 1;
   }
-}
-
-@keyframes fade-out {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

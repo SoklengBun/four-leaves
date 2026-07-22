@@ -6,29 +6,15 @@ const tips = ['Break a leg!', "You've got this!", 'Blow them away!', 'Bring home
 </script>
 
 <template>
-  <div class="mobile-front-container flex flex-col overflow-y-auto overflow-x-hidden overscroll-none p-3">
-    <div class="background-image" />
+  <div class="relative flex h-body w-full flex-col overflow-y-auto overflow-x-hidden overscroll-none bg-background p-3 md:hidden">
+    <div
+      class="absolute left-0 top-0 size-full bg-[url('https://redive.estertion.win/card/full/124131.webp')] bg-[length:auto_100%] bg-top bg-no-repeat opacity-50 blur-sm"
+    />
     <div class="relative z-[2] flex flex-col pb-player">
-      <img src="https://redive.estertion.win/card/full/124131.webp" class="box-cover rounded-card h-[200px] w-full" />
+      <img src="https://redive.estertion.win/card/full/124131.webp" class="box-cover h-[200px] w-full rounded-card" />
 
-      <BatteryWeather class="box-cover rounded-card mt-3" />
-      <Calendar class="box-cover rounded-card mt-3" />
+      <BatteryWeather class="box-cover mt-3 rounded-card" />
+      <Calendar class="box-cover mt-3 rounded-card" />
     </div>
   </div>
 </template>
-
-<style scoped>
-.mobile-front-container {
-  @apply relative h-body w-full md:hidden;
-
-  background-color: var(--color-background);
-}
-
-.background-image {
-  @apply absolute left-0 top-0 h-full w-full opacity-50 blur-sm;
-  background-image: url('https://redive.estertion.win/card/full/124131.webp');
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-size: auto 100%;
-}
-</style>

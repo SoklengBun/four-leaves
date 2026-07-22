@@ -124,9 +124,9 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
           v-model="playlistItems"
           class="flex flex-col"
           handle=".playlist-drag-handle"
-          ghost-class="playlist-drag-ghost"
-          chosen-class="playlist-drag-chosen"
-          drag-class="playlist-dragging"
+          ghost-class="!opacity-25"
+          chosen-class="!cursor-grabbing"
+          drag-class="!opacity-90"
           :animation="180"
           :force-fallback="true"
           :fallback-on-body="true"
@@ -155,7 +155,7 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
                 </div>
               </button>
               <div
-                class="playlist-highligh pointer-events-none absolute left-0 top-0 hidden size-full group-hover:!block"
+                class="playlist-highligh pointer-events-none absolute left-0 top-0 hidden size-full bg-[linear-gradient(150deg,transparent_0%,transparent_10%,#b994ff33_50%,transparent_90%,transparent_100%)] bg-[length:200%_100%] bg-no-repeat group-hover:!block"
                 :class="{ '!block': song.id === current?.id || song.videoId === videoId }"
               ></div>
               <button
@@ -174,7 +174,10 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
                 </svg>
               </button>
             </div>
-            <div v-if="index < playlistItems.length - 1" class="playlist-divider h-px w-full shrink-0 bg-border"></div>
+            <div
+              v-if="index < playlistItems.length - 1"
+              class="h-px w-full shrink-0 bg-border shadow-[0_0_3px_#31018c74] dark:shadow-[0_0_3px_#0f3e71]"
+            ></div>
           </div>
         </VueDraggable>
       </div>
@@ -182,30 +185,8 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
   </CustomPopup>
 </template>
 <style scoped>
-.playlist-divider {
-  box-shadow: 0px 0px 3px #31018c74;
-}
-.dark .playlist-divider {
-  box-shadow: 0px 0px 3px #0f3e71;
-}
-
 .playlist-highligh {
-  background: linear-gradient(150deg, transparent 0%, transparent 10%, #b994ff33 50%, transparent 90%, transparent 100%);
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
   animation: highlight 1s ease-in-out infinite;
-}
-
-.playlist-drag-ghost {
-  opacity: 0.25;
-}
-
-.playlist-drag-chosen {
-  cursor: grabbing;
-}
-
-.playlist-dragging {
-  opacity: 0.9;
 }
 
 @keyframes highlight {

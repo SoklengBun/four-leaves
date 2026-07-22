@@ -54,9 +54,9 @@ onMounted(() => {
 
 <template>
   <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-surface via-card to-accent-soft p-3 text-foreground">
-    <div class="cloud cloud-a pointer-events-none absolute -left-3 -top-5 h-12 w-16 rounded-full bg-foreground opacity-10" />
-    <div class="cloud cloud-b pointer-events-none absolute -top-3 left-8 h-10 w-14 rounded-full bg-card opacity-40" />
-    <div class="cloud cloud-c pointer-events-none absolute -right-4 top-3 h-14 w-20 rounded-full bg-card opacity-30" />
+    <div class="cloud-a pointer-events-none absolute -left-3 -top-5 h-12 w-16 rounded-full bg-foreground opacity-10 will-change-transform" />
+    <div class="cloud-b pointer-events-none absolute -top-3 left-8 h-10 w-14 rounded-full bg-card opacity-40 will-change-transform" />
+    <div class="cloud-c pointer-events-none absolute -right-4 top-3 h-14 w-20 rounded-full bg-card opacity-30 will-change-transform" />
 
     <div class="relative z-[2]">
       <div class="flex items-start justify-between">
@@ -107,10 +107,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.cloud {
-  will-change: transform;
-}
-
 .cloud-a {
   animation: float-a 8s ease-in-out infinite;
 }

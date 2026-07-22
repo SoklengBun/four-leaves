@@ -359,5 +359,3 @@ onClickOutside(
     </CustomPopup>
   </div>
 </template>
-
-<style scoped></style>

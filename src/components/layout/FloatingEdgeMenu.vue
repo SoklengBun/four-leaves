@@ -185,10 +185,10 @@ const fabStyle = computed(() => {
 });
 
 const halfWheelClass = computed(() => {
-  if (edge.value === 'left') return 'half-right';
-  if (edge.value === 'right') return 'half-left';
-  if (edge.value === 'top') return 'half-down';
-  return 'half-up';
+  if (edge.value === 'left') return '[clip-path:inset(0_0_0_50%)]';
+  if (edge.value === 'right') return '[clip-path:inset(0_50%_0_0)]';
+  if (edge.value === 'top') return '[clip-path:inset(50%_0_0_0)]';
+  return '[clip-path:inset(0_0_50%_0)]';
 });
 
 const wheelBaseAngle = computed(() => {
@@ -454,14 +454,25 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="pointer-events-none fixed inset-0 z-[1000]">
-    <div class="wheel-root fixed" :style="wheelRootStyle">
-      <transition name="wheel-fade">
-        <div v-if="isMenuOpen" class="wheel-half pointer-events-auto" :class="halfWheelClass" @wheel="onWheelInput" @pointerdown="onWheelDragStart">
-          <div class="wheel-ring" />
+    <div class="pointer-events-none fixed" :style="wheelRootStyle">
+      <transition
+        enter-active-class="transition-opacity duration-[320ms] ease-in-out"
+        leave-active-class="transition-opacity duration-[320ms] ease-in-out"
+        enter-from-class="opacity-0"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="isMenuOpen"
+          class="pointer-events-auto absolute left-[calc(-1*var(--wheel-radius-half))] top-[calc(-1*var(--wheel-radius-half))] h-[var(--wheel-diameter)] w-[var(--wheel-diameter)] overflow-hidden rounded-full"
+          :class="halfWheelClass"
+          @wheel="onWheelInput"
+          @pointerdown="onWheelDragStart"
+        >
+          <div class="wheel-ring absolute inset-[var(--wheel-ring-inset)] rounded-full border border-accent" />
           <button
             v-for="(item, index) in menuItems"
             :key="item.path"
-            class="wheel-item"
+            class="wheel-item absolute left-1/2 top-1/2 h-[var(--wheel-item-size)] w-[var(--wheel-item-size)] overflow-hidden rounded-full border border-border-strong bg-card p-0 transition-[transform,opacity] duration-[320ms] ease-[cubic-bezier(0.2,0.9,0.2,1)] [margin-left:var(--wheel-item-offset)] [margin-top:var(--wheel-item-offset)]"
             :class="{ active: index === activeIndex }"
             :style="itemStyle(index)"
             :title="getItemLabel(item)"
@@ -472,8 +483,8 @@ onBeforeUnmount(() => {
             <img
               :src="getItemIcon(item)"
               :alt="getItemLabel(item)"
-              class="wheel-item-icon"
-              :class="{ 'wheel-item-icon--theme': item.action === 'toggle-theme' }"
+              class="pointer-events-none size-full select-none rounded-full [-webkit-user-drag:none]"
+              :class="item.action === 'toggle-theme' ? 'object-contain p-[9px]' : 'object-cover'"
               draggable="false"
             />
           </button>
@@ -481,7 +492,7 @@ onBeforeUnmount(() => {
       </transition>
 
       <button
-        class="floating-fab pointer-events-auto fixed flex items-center justify-center rounded-full border border-primary bg-gradient-to-br from-card to-surface transition"
+        class="floating-fab pointer-events-auto fixed z-20 flex h-[var(--fab-size)] w-[var(--fab-size)] touch-none select-none items-center justify-center rounded-full border-2 border-border-strong text-primary transition [background:var(--gradient-surface)]"
         :class="{ 'fab-open': isStuckOpen }"
         :style="fabStyle"
         @pointerdown="onPointerDown"
@@ -495,20 +506,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.wheel-root {
-  pointer-events: none;
-}
-
 .floating-fab {
-  width: var(--fab-size);
-  height: var(--fab-size);
-  touch-action: none;
-  user-select: none;
-  z-index: 20;
-  border: 2px solid var(--color-border-strong);
-  border-radius: 9999px;
-  background: var(--gradient-surface);
-  color: var(--color-primary);
   box-shadow:
     0 8px 24px color-mix(in srgb, var(--color-primary) 24%, transparent),
     0 0 0 4px color-mix(in srgb, var(--color-card) 70%, transparent) inset;
@@ -521,60 +519,19 @@ onBeforeUnmount(() => {
     0 0 12px color-mix(in srgb, var(--color-accent) 60%, transparent);
 }
 
-.wheel-half {
-  position: absolute;
-  left: calc(-1 * var(--wheel-radius-half));
-  top: calc(-1 * var(--wheel-radius-half));
-  width: var(--wheel-diameter);
-  height: var(--wheel-diameter);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.half-right {
-  clip-path: inset(0 0 0 50%);
-}
-
-.half-left {
-  clip-path: inset(0 50% 0 0);
-}
-
-.half-down {
-  clip-path: inset(50% 0 0 0);
-}
-
-.half-up {
-  clip-path: inset(0 0 50% 0);
-}
-
 .wheel-ring {
-  position: absolute;
-  inset: var(--wheel-ring-inset);
-  border-radius: 9999px;
-  border: 1px solid var(--color-accent);
-  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 18%, transparent) 0%, color-mix(in srgb, var(--color-secondary) 46%, transparent) 100%);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-accent) 18%, transparent) 0%,
+    color-mix(in srgb, var(--color-secondary) 46%, transparent) 100%
+  );
   box-shadow:
     0 0 3px var(--color-accent),
     0 0 12px color-mix(in srgb, var(--color-accent) 55%, transparent);
 }
 
 .wheel-item {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: var(--wheel-item-size);
-  height: var(--wheel-item-size);
-  margin-left: var(--wheel-item-offset);
-  margin-top: var(--wheel-item-offset);
-  border: 1px solid var(--color-border-strong);
-  border-radius: 9999px;
-  background: var(--color-card);
-  padding: 0;
   box-shadow: 0 8px 16px color-mix(in srgb, var(--color-background) 80%, transparent);
-  transition:
-    transform 320ms cubic-bezier(0.2, 0.9, 0.2, 1),
-    opacity 320ms ease;
-  overflow: hidden;
 }
 
 .wheel-item.active {
@@ -582,30 +539,5 @@ onBeforeUnmount(() => {
   box-shadow:
     0 10px 18px color-mix(in srgb, var(--color-background) 85%, transparent),
     0 0 0 2px var(--color-accent-soft);
-}
-
-.wheel-item-icon {
-  width: 100%;
-  height: 100%;
-  border-radius: 9999px;
-  object-fit: cover;
-  -webkit-user-drag: none;
-  user-select: none;
-  pointer-events: none;
-}
-
-.wheel-item-icon--theme {
-  object-fit: contain;
-  padding: 9px;
-}
-
-.wheel-fade-enter-active,
-.wheel-fade-leave-active {
-  transition: opacity 0.32s ease;
-}
-
-.wheel-fade-enter-from,
-.wheel-fade-leave-to {
-  opacity: 0;
 }
 </style>

@@ -136,11 +136,11 @@ onClickOutside(
               </button>
             </template>
             <div
-              class="song-cover-highlight pointer-events-none absolute inset-0 hidden group-hover:!block group-active:!block"
+              class="song-cover-highlight pointer-events-none absolute inset-0 hidden bg-[linear-gradient(150deg,transparent_0%,transparent_10%,#b994ff33_50%,transparent_90%,transparent_100%)] bg-[length:200%_100%] bg-no-repeat group-hover:!block group-active:!block"
               :class="{ '!block': item.id === videoId }"
             ></div>
           </li>
-          <li aria-hidden="true" class="song-cover-divider h-px w-full shrink-0 bg-border last:hidden"></li>
+          <li aria-hidden="true" class="h-px w-full shrink-0 bg-border shadow-[0_0_3px_#31018c74] last:hidden dark:shadow-[0_0_3px_#0f3e71]"></li>
         </template>
       </ul>
     </div>
@@ -186,11 +186,11 @@ onClickOutside(
                 </button>
               </template>
               <div
-                class="song-cover-highlight pointer-events-none absolute inset-0 hidden group-hover:!block group-active:!block"
+                class="song-cover-highlight pointer-events-none absolute inset-0 hidden bg-[linear-gradient(150deg,transparent_0%,transparent_10%,#b994ff33_50%,transparent_90%,transparent_100%)] bg-[length:200%_100%] bg-no-repeat group-hover:!block group-active:!block"
                 :class="{ '!block': item.id === videoId }"
               ></div>
             </li>
-            <li aria-hidden="true" class="song-cover-divider h-px w-full shrink-0 bg-border last:hidden"></li>
+            <li aria-hidden="true" class="h-px w-full shrink-0 bg-border shadow-[0_0_3px_#31018c74] last:hidden dark:shadow-[0_0_3px_#0f3e71]"></li>
           </template>
         </ul>
       </div>
@@ -198,18 +198,7 @@ onClickOutside(
   </div>
 </template>
 <style scoped>
-.song-cover-divider {
-  box-shadow: 0px 0px 3px #31018c74;
-}
-
-.dark .song-cover-divider {
-  box-shadow: 0px 0px 3px #0f3e71;
-}
-
 .song-cover-highlight {
-  background: linear-gradient(150deg, transparent 0%, transparent 10%, #b994ff33 50%, transparent 90%, transparent 100%);
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
   animation: highlight 1s ease-in-out infinite;
 }
 

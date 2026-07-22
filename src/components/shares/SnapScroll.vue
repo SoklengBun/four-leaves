@@ -4,81 +4,22 @@ defineProps<{ fullscreen?: boolean; horizontal?: boolean }>();
 
 <template>
   <div
-    class="scroll-snap-container w-screen"
-    :class="{ fullscreen: fullscreen, horizontal: horizontal }"
+    class="w-screen overflow-auto md:scroll-smooth md:[-webkit-overflow-scrolling:touch] md:[scroll-snap-destination:0_0] [&::-webkit-scrollbar]:w-0 md:[&_.item]:[scroll-snap-align:start] md:[&_.item]:[scroll-snap-stop:always]"
+    :class="[
+      horizontal
+        ? 'md:flex md:flex-row md:flex-nowrap md:overflow-y-hidden md:overflow-x-scroll md:[scroll-snap-points-x:repeat(100%)] md:[scroll-snap-type:x_mandatory] md:[&>.item]:[scroll-snap-align:center]'
+        : 'md:block md:overflow-x-hidden md:overflow-y-scroll md:[scroll-snap-points-y:repeat(100%)] md:[scroll-snap-type:y_mandatory]',
+      fullscreen &&
+        'md:absolute md:inset-0 md:flex md:min-h-full md:min-w-full md:flex-nowrap md:items-stretch md:justify-start md:[&>.item]:min-h-full md:[&>.item]:flex-1',
+      fullscreen && !horizontal && 'md:flex-col',
+      fullscreen && horizontal && 'md:[&>.item]:min-w-full',
+    ]"
   >
     <slot> </slot>
   </div>
 </template>
 
 <style>
-.scroll-snap-container {
-  overflow: auto;
-}
-
-@media (min-width: 768px) {
-  .scroll-snap-container {
-    display: block;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-points-y: repeat(100%);
-    scroll-snap-destination: 0 0;
-    scroll-snap-type: y mandatory;
-    scroll-snap-type: mandatory;
-    scroll-behavior: smooth;
-  }
-  .scroll-snap-container.horizontal {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-y: hidden;
-    overflow-x: scroll;
-    scroll-snap-points-x: repeat(100%);
-    scroll-snap-type: x mandatory;
-  }
-  .scroll-snap-container.fullscreen {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    justify-content: flex-start;
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    min-width: 100%;
-    min-height: 100%;
-  }
-  .scroll-snap-container.fullscreen.horizontal {
-    flex-direction: row;
-  }
-  .item {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
-  .scroll-snap-container.fullscreen > .item {
-    scroll-snap-stop: always;
-    min-height: 100%;
-    flex: 1;
-  }
-  .scroll-snap-container.horizontal > .item {
-    scroll-snap-align: center;
-    scroll-snap-stop: always;
-  }
-  .scroll-snap-container.fullscreen.horizontal > .item {
-    scroll-snap-align: center;
-    scroll-snap-stop: always;
-    min-width: 100%;
-    flex: 1;
-  }
-}
-
-.scroll-snap-container::-webkit-scrollbar {
-  width: 0px;
-}
-
 /* Track */
 ::-webkit-scrollbar-track {
   background: var(--color-surface);
