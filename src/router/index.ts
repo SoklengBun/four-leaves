@@ -10,6 +10,7 @@ import LyricsAddView from '../views/lyrics/AddView.vue';
 import MyLyricsView from '../views/lyrics/MineView.vue';
 import LyricsPlaylistView from '../views/lyrics/PlaylistView.vue';
 import LyricsAllView from '../views/lyrics/AllView.vue';
+import LyricsArtistView from '../views/lyrics/ArtistView.vue';
 
 import NotFound from '../views/PageNotFoundView.vue';
 
@@ -75,6 +76,11 @@ const router = createRouter({
           path: 'playlist/:playlistId',
           name: 'lyrics-playlist',
           component: LyricsPlaylistView,
+        },
+        {
+          path: 'artist/:artistId',
+          name: 'lyrics-artist',
+          component: LyricsArtistView,
         },
         {
           path: '/lyrics/:id',

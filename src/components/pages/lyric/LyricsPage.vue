@@ -4,11 +4,11 @@ import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import LyricsSongShelf from './components/LyricsSongShelf.vue';
+import ArtistsShelf from './components/ArtistsShelf.vue';
 import useAppFetch from '~/services';
-import { useAppSetting } from '~/stores/app-setting';
 import { usePlayer } from '~/stores/player';
 import { usePlaylist } from '~/stores/playlist.js';
-import { getTodayStorageDate, useHomeStorage } from '~/utils/home-storage';
+import { getTodayStorageDate, normalizeHomeResponse, useHomeStorage } from '~/utils/home-storage';
 import { getLyricsArtistsLabel, normalizePlaylistItems } from '~/utils/lyrics';
 import Loading from '~/components/shares/Loading.vue';
 import { useAuth } from '~/stores/auth.js';
@@ -28,25 +28,8 @@ const isSearching = ref(false);
 const searchResults = ref<Lyrics[]>([]);
 const searchError = ref('');
 
-const todaySelection = computed({
-  get: () => homeStorage.value.songs ?? [],
-  set: (value: Lyrics[]) => {
-    homeStorage.value = {
-      ...homeStorage.value,
-      songs: value,
-    };
-  },
-});
-
-const featuredPlaylists = computed({
-  get: () => homeStorage.value.playlists ?? [],
-  set: (value: Playlist[]) => {
-    homeStorage.value = {
-      ...homeStorage.value,
-      playlists: value,
-    };
-  },
-});
+const todaySelection = computed(() => homeStorage.value.songs ?? []);
+const featuredPlaylists = computed(() => homeStorage.value.playlists ?? []);
 
 const filterLocalSongs = (query: string) => {
   const normalizedQuery = query.toLocaleLowerCase();
@@ -89,17 +72,16 @@ const fetchLyrics = async () => {
   isFetching.value = true;
   try {
     const { data } = await useAppFetch('home').get().json();
+    const payload = normalizeHomeResponse(data.value);
+    if (!payload) return;
 
-    if (data.value?.code !== 0) return;
+    const playlists = payload.playlists.map((playlist) => normalizePlaylistItems(playlist));
 
-    const payload = data.value.data ?? {};
-    todaySelection.value = Array.isArray(payload.songs) ? (payload.songs as Lyrics[]) : [];
-
-    featuredPlaylists.value = Array.isArray(payload.playlists)
-      ? payload.playlists.map((playlist: RawPlaylist) => normalizePlaylistItems(playlist))
-      : [];
     homeStorage.value = {
       ...homeStorage.value,
+      songs: payload.songs,
+      playlists,
+      artists: payload.artists,
       date: getTodayStorageDate(),
     };
   } finally {
@@ -258,10 +240,12 @@ const onClear = async () => {
             @select="(song) => onClick(song, playlist)"
           />
         </template>
+
+        <ArtistsShelf :artists="homeStorage.artists ?? []" />
       </template>
 
       <div
-        v-if="!searchText && !todaySelection.length && !isFetching"
+        v-if="!searchText && !todaySelection.length && !featuredPlaylists.length && !homeStorage.artists?.length && !isFetching"
         class="box-cover rounded-[28px] border border-dashed border-border bg-surface px-6 py-10 text-center text-sm text-foreground-muted"
       >
         No playlist data yet. Tap refresh to load the home feed.
