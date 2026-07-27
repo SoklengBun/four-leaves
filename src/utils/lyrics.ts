@@ -22,12 +22,18 @@ export const getLyricsCvLabel = (artist?: LyricsArtist) => {
   return cvAltName ? `CV: ${artist.cv.name} / ${cvAltName}` : `CV: ${artist.cv.name}`;
 };
 
-export const getLyricsArtistName = (artist?: LyricsArtist) => {
+export const getLyricsArtistDisplayName = (artist?: LyricsArtist) => {
   const name = String(artist?.name ?? '').trim();
   if (!name) return '';
 
   const altName = secondaryName(name, artist?.altName);
-  const displayName = altName ? `${name} / ${altName}` : name;
+  return altName ? `${name} / ${altName}` : name;
+};
+
+export const getLyricsArtistName = (artist?: LyricsArtist) => {
+  const displayName = getLyricsArtistDisplayName(artist);
+  if (!displayName) return '';
+
   const cvLabel = getLyricsCvLabel(artist);
 
   return cvLabel ? `${displayName} (${cvLabel})` : displayName;

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
+import { SEARCH_DEBOUNCE_DELAY_MS } from '~/constants/search';
 import useAppFetch from '~/services';
 
 type Artist = { id: number; name: string; normalizedName?: string };
@@ -9,7 +10,7 @@ const props = defineProps<{
   modelValue?: number[];
   knownArtists?: Artist[];
   placeholder?: string;
-  // debounce delay in ms after last keystroke (default: 300)
+  // debounce delay in ms after the last keystroke
   releaseDelayMs?: number;
 }>();
 
@@ -65,7 +66,7 @@ const doSearch = async (q: string) => {
 };
 
 watch(query, (q) => {
-  const delay = typeof props.releaseDelayMs === 'number' ? props.releaseDelayMs : 300;
+  const delay = typeof props.releaseDelayMs === 'number' ? props.releaseDelayMs : SEARCH_DEBOUNCE_DELAY_MS;
   if (timer) window.clearTimeout(timer);
   if (!q || q.trim().length === 0) {
     waiting.value = false;

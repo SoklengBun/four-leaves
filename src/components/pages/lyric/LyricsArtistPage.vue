@@ -2,13 +2,15 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import ArtistFormPopup, { type ArtistSavedPayload } from '~/components/artist/ArtistFormPopup.vue';
+import MarqueeText from '~/components/shares/MarqueeText.vue';
 import LyricsLoadingState from './components/LyricsLoadingState.vue';
 import LyricsSongShelf from './components/LyricsSongShelf.vue';
 import BackButton from '~/components/shares/BackButton.vue';
+import { getArtistById } from '~/services/artist';
 import { getLyricsByArtist } from '~/services/lyrics';
 import { useAuth } from '~/stores/auth';
 import { usePlayer } from '~/stores/player';
-import { getLyricsArtistName } from '~/utils/lyrics';
+import { getLyricsArtistDisplayName, getLyricsCvLabel } from '~/utils/lyrics';
 import { useHomeStorage } from '~/utils/home-storage';
 
 const route = useRoute();
@@ -20,6 +22,8 @@ const homeStorage = useHomeStorage();
 const songs = ref<Lyrics[]>([]);
 const isLoading = ref(false);
 const error = ref('');
+const artistError = ref('');
+const fetchedArtist = ref<LyricsArtist | null>(null);
 const showArtistForm = ref(false);
 const artistFormMode = ref<'create' | 'edit'>('edit');
 
@@ -28,8 +32,10 @@ const artistId = computed(() => {
   return Array.isArray(value) ? value[0] : value?.toString() ?? '';
 });
 
-const artist = computed(() => homeStorage.value.artists?.find((item) => item.id.toString() === artistId.value));
-const artistName = computed(() => (artist.value ? getLyricsArtistName(artist.value) : `Artist #${artistId.value}`));
+const cachedArtist = computed(() => homeStorage.value.artists?.find((item) => item.id.toString() === artistId.value));
+const artist = computed(() => fetchedArtist.value ?? cachedArtist.value);
+const artistName = computed(() => (artist.value ? getLyricsArtistDisplayName(artist.value) : `Artist #${artistId.value}`));
+const artistCv = computed(() => getLyricsCvLabel(artist.value));
 
 const artistPlaylist = computed<Playlist>(() => ({
   id: 0,
@@ -39,19 +45,46 @@ const artistPlaylist = computed<Playlist>(() => ({
   items: songs.value,
 }));
 
+const fetchArtist = async () => {
+  const requestedArtistId = artistId.value;
+  if (!requestedArtistId) return;
+
+  fetchedArtist.value = null;
+  artistError.value = '';
+
+  try {
+    const result = await getArtistById(requestedArtistId);
+    if (artistId.value === requestedArtistId) {
+      fetchedArtist.value = result;
+    }
+  } catch {
+    if (artistId.value === requestedArtistId) {
+      artistError.value = 'Unable to load this artist’s details right now.';
+    }
+  }
+};
+
 const fetchArtistSongs = async () => {
-  if (!artistId.value) return;
+  const requestedArtistId = artistId.value;
+  if (!requestedArtistId) return;
 
   isLoading.value = true;
   error.value = '';
 
   try {
-    songs.value = await getLyricsByArtist(artistId.value);
+    const result = await getLyricsByArtist(requestedArtistId);
+    if (artistId.value === requestedArtistId) {
+      songs.value = result;
+    }
   } catch {
-    songs.value = [];
-    error.value = 'Unable to load this artist’s songs right now.';
+    if (artistId.value === requestedArtistId) {
+      songs.value = [];
+      error.value = 'Unable to load this artist’s songs right now.';
+    }
   } finally {
-    isLoading.value = false;
+    if (artistId.value === requestedArtistId) {
+      isLoading.value = false;
+    }
   }
 };
 
@@ -77,6 +110,7 @@ const onArtistSaved = (saved: ArtistSavedPayload) => {
     cvId: saved.cvId,
     cv: saved.cv ?? null,
   };
+  fetchedArtist.value = updatedArtist;
   const artists = [...(homeStorage.value.artists ?? [])];
   const existingIndex = artists.findIndex((item) => item.id === savedId);
 
@@ -97,11 +131,13 @@ const onArtistSaved = (saved: ArtistSavedPayload) => {
 };
 
 onMounted(() => {
+  void fetchArtist();
   void fetchArtistSongs();
 });
 
 watch(artistId, (value, previousValue) => {
   if (!value || value === previousValue) return;
+  void fetchArtist();
   void fetchArtistSongs();
 });
 </script>
@@ -116,9 +152,12 @@ watch(artistId, (value, previousValue) => {
         <div class="flex size-16 shrink-0 items-center justify-center rounded-[22px] bg-gradient-to-br from-primary-soft to-secondary-soft text-xl font-bold text-primary shadow-sm md:size-20 md:rounded-[26px] md:text-2xl">
           {{ artist?.name.slice(0, 2) || '?' }}
         </div>
-        <div class="min-w-0">
-          <h1 class="truncate text-2xl font-semibold text-foreground md:text-4xl">{{ artistName }}</h1>
-          <p class="mt-1 text-sm text-foreground-muted">Explore lyrics from this artist.</p>
+        <div class="min-w-0 flex-1">
+          <MarqueeText :text="artistName" class="w-full text-2xl font-semibold text-foreground md:text-4xl" :gap="40" :speed="36" />
+          <MarqueeText v-if="artistCv" :text="artistCv" class="mt-1 w-full text-sm font-medium text-primary" :gap="32" :speed="32" />
+          <p :class="['text-sm text-foreground-muted', artistCv ? 'mt-0.5' : 'mt-1']">
+            {{ artistError || 'Explore lyrics from this artist.' }}
+          </p>
         </div>
       </div>
       <div class="mt-5 inline-flex rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground-muted">
