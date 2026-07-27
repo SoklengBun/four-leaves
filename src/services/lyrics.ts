@@ -44,6 +44,14 @@ export const getLyricsList = async (page: number, force = false, all = false) =>
   return list.value[page];
 };
 
+export const getLyricsByArtist = async (artistId: string | number) => {
+  const encodedArtistId = encodeURIComponent(String(artistId));
+  const { data } = await useAppFetch(`lyrics/artist/${encodedArtistId}`).get().json();
+  const items = data.value?.data;
+
+  return (Array.isArray(items) ? items : []) as Lyrics[];
+};
+
 export const resetLyricList = () => {
   const list = useStorage<Record<number, Lyrics[]>>(LYRICS_LIST_KEY, {});
   list.value = {};
