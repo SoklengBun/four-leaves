@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { VueDraggable } from 'vue-draggable-plus';
 import CustomPopup from '~/components/shares/CustomPopup.vue';
@@ -17,6 +17,7 @@ const { current, videoId, showPlaylist } = storeToRefs(player);
 
 const playlist = usePlaylist();
 const originalOrder = ref<{ playlistId: number; itemIds: number[] } | null>(null);
+const playlistScrollContainer = ref<HTMLElement | null>(null);
 
 const playlistItems = computed({
   get: () => playlist.list?.items ?? [],
@@ -27,6 +28,15 @@ const currentPlaylistDescription = computed(() => playlist.list?.description || 
 
 const selectSong = (song: PlaylistItem) => {
   player.selectSong(song, undefined, playlist.list);
+};
+
+const isActiveSong = (song: PlaylistItem) => song.id === current.value?.id || song.videoId === videoId.value;
+
+const scrollToActiveSong = async () => {
+  await nextTick();
+
+  const activeSong = playlistScrollContainer.value?.querySelector<HTMLElement>('[data-active-song="true"]');
+  activeSong?.scrollIntoView({ block: 'center', inline: 'nearest' });
 };
 
 const getPlaylistItemIds = (items: PlaylistItem[]) => {
@@ -81,6 +91,11 @@ const rememberPlaylistOrder = () => {
     : null;
 };
 
+const onPlaylistOpened = () => {
+  rememberPlaylistOrder();
+  void scrollToActiveSong();
+};
+
 const onPlaylistClosed = async () => {
   const previousOrder = originalOrder.value;
   originalOrder.value = null;
@@ -114,12 +129,12 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
     eyebrow="Now playing"
     :title="currentPlaylistTitle"
     :description="currentPlaylistDescription"
-    @open="rememberPlaylistOrder"
+    @open="onPlaylistOpened"
     @closed="onPlaylistClosed"
   >
     <div class="flex h-full w-full flex-col overflow-hidden">
       <p class="mb-3 text-base font-semibold text-foreground md:text-lg">Playlist Queue</p>
-      <div class="flex flex-1 flex-col overflow-auto overscroll-none px-1">
+      <div ref="playlistScrollContainer" class="flex flex-1 flex-col overflow-auto overscroll-none px-1">
         <VueDraggable
           v-model="playlistItems"
           class="flex flex-col"
@@ -136,7 +151,12 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
           :scroll-speed="12"
           :touch-start-threshold="3"
         >
-          <div v-for="(song, index) in playlistItems" :key="song.playlistItemId ?? song.id" class="relative shrink-0">
+          <div
+            v-for="(song, index) in playlistItems"
+            :key="song.playlistItemId ?? song.id"
+            class="relative shrink-0"
+            :data-active-song="isActiveSong(song) || undefined"
+          >
             <div class="group relative flex items-center">
               <button type="button" class="relative flex min-w-0 flex-1 items-center px-1 py-2.5" @click="selectSong(song)">
                 <div class="size-10 shrink-0 overflow-hidden rounded-lg md:size-12">
@@ -156,7 +176,7 @@ const moveSongWithKeyboard = (index: number, event: KeyboardEvent) => {
               </button>
               <div
                 class="playlist-highligh pointer-events-none absolute left-0 top-0 hidden size-full bg-[linear-gradient(150deg,transparent_0%,transparent_10%,#b994ff33_50%,transparent_90%,transparent_100%)] bg-[length:200%_100%] bg-no-repeat group-hover:!block"
-                :class="{ '!block': song.id === current?.id || song.videoId === videoId }"
+                :class="{ '!block': isActiveSong(song) }"
               ></div>
               <button
                 type="button"

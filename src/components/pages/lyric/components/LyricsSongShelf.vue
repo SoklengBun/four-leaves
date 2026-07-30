@@ -25,7 +25,6 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
-const isGridLayout = computed(() => props.layout === 'grid');
 
 const visibleItems = computed(() => {
   if (props.maxItems <= 0) return props.playlist.items;
@@ -78,6 +77,7 @@ const getThumbnailId = (song: PlaylistItem) => {
         v-for="song in visibleItems"
         :key="song.id"
         type="button"
+        data-lyrics-scroll-anchor
         :class="
           layout === 'grid'
             ? 'box-cover group w-full min-w-0 rounded-xl p-2.5 text-left transition-all duration-300 [background:var(--gradient-surface)] [contain-intrinsic-size:220px] [content-visibility:auto] hover:-translate-y-1 active:scale-[0.985] md:rounded-2xl'
