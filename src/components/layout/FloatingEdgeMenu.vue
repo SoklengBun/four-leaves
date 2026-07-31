@@ -30,9 +30,9 @@ const isDark = useAppTheme();
 const menuItems: MenuItem[] = [
   { label: 'Home', path: '/', icon: menuHomeIcon },
   { label: 'Lyrics', path: '/lyrics', icon: menuLyricIcon },
-  { label: 'My Lyrics', path: '/lyrics/all', icon: menuLyricMineIcon },
+  { label: 'All', path: '/lyrics/all', icon: menuLyricMineIcon },
   { label: 'Add Lyrics', path: '/lyrics/add', icon: menuLyricAddIcon },
-  { label: 'About', path: '/about', icon: menuDefaultIcon },
+  // { label: 'About', path: '/about', icon: menuDefaultIcon },
   { label: 'Storage', path: '/storage', icon: menuStorageIcon },
   { label: 'Toggle theme', path: '__toggle-theme__', icon: moonIcon, action: 'toggle-theme' },
 ];
