@@ -7,7 +7,7 @@ type LyricsArtist = Base & {
 
 type LyricsContent = Base & {
   lyricsId?: number;
-  kind: string;
+  kind: LyricsContentKind;
   content: string;
 };
 
@@ -56,4 +56,4 @@ type RawPlaylist = Base & {
   items: RawPlaylistItem[];
 };
 
-type LyricsKeys = 'romaji' | 'pinyin' | 'japanese' | 'english' | 'chinese';
+type LyricsContentKind = import('../constants/lyrics').LyricsContentKind;

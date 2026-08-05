@@ -12,6 +12,10 @@ export const getRadomPosition = (num1: number, num2: number) => {
   return getRandom(num1, num2) * posOrNeg;
 };
 
+export const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export const pxToRem = (px: number, withUnit = true) => {
   // root size 16px
   const rootFontSize = 16;
@@ -21,10 +25,6 @@ export const pxToRem = (px: number, withUnit = true) => {
   if (withUnit) return rem + 'rem';
 
   return rem;
-};
-
-export const sleep = (ms: number) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 export const pxOfCurrentScreenSize = (px: number) => {

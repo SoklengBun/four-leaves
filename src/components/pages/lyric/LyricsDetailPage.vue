@@ -3,6 +3,8 @@ import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
+import { DEFAULT_LYRICS_CONTENT_KIND, LYRICS_CONTENT_KIND_OPTIONS, getLyricsContentKindLabel } from '~/constants/lyrics';
+import type { LyricsContentKind } from '~/constants/lyrics';
 import { usePlayer } from '~/stores/player';
 import PlayerSeekBar from '~/components/music/PlayerSeekBar.vue';
 
@@ -28,20 +30,13 @@ const router = useRouter();
 const player = usePlayer();
 const { videoId, artists, current, isPlaying, mode, shuffle, repeatOne } = storeToRefs(player);
 
-const currentLang = ref<LyricsKeys>('romaji');
+const currentLang = ref<LyricsContentKind>(DEFAULT_LYRICS_CONTENT_KIND);
 const isLoading = ref(false);
 const showMore = ref(false);
 const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 const displayArtist = computed(() => getLyricsArtistsLabel(artists.value));
 const lyricsContent = computed(() => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content?.replace(/е/g, 'e') ?? '');
-const availableLangs = ref<LyricsKeys[]>(['romaji']);
-
-const langKey: { [key: string]: string } = {
-  japanese: '日本語',
-  romaji: 'Romaji',
-  english: 'English',
-};
-const langOrder: LyricsKeys[] = ['japanese', 'romaji', 'english', 'chinese', 'pinyin'];
+const availableLangs = ref<LyricsContentKind[]>([DEFAULT_LYRICS_CONTENT_KIND]);
 
 const fetchLyricsDetail = async (id: string, force = false) => {
   isLoading.value = true;
@@ -50,9 +45,12 @@ const fetchLyricsDetail = async (id: string, force = false) => {
     if (!song) return null;
     current.value = { ...current.value, ...song };
 
-    availableLangs.value = ((current.value.contents?.map((e) => e.kind) ?? ['romaji']) as LyricsKeys[]).sort(
-      (a, b) => langOrder.indexOf(a) - langOrder.indexOf(b),
-    );
+    const contentKinds = new Set(current.value.contents?.map((content) => content.kind) ?? [DEFAULT_LYRICS_CONTENT_KIND]);
+    availableLangs.value = LYRICS_CONTENT_KIND_OPTIONS.filter((option) => contentKinds.has(option.key)).map((option) => option.key);
+
+    if (!availableLangs.value.includes(currentLang.value) && availableLangs.value[0]) {
+      currentLang.value = availableLangs.value[0];
+    }
 
     return song;
   } finally {
@@ -153,7 +151,7 @@ const refreshCurrentLyrics = () => {
           :class="{ 'text-primary': currentLang == lang }"
           :disabled="currentLang == lang"
         >
-          {{ langKey[lang] ?? lang }}
+          {{ getLyricsContentKindLabel(lang) }}
         </button>
       </div>
       <p class="h-fit whitespace-pre-line text-center text-base lowercase md:text-2xl">
