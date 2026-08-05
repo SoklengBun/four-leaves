@@ -2,6 +2,8 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 import ArtistInputMenu from './components/ArtistInputMenu.vue';
+import { LYRICS_CONTENT_KIND_OPTIONS, isLyricsContentKind } from '~/constants/lyrics';
+import type { LyricsContentKind } from '~/constants/lyrics';
 import useAppFetch from '~/services';
 import showToast from '~/utils/toast';
 
@@ -22,7 +24,7 @@ type CoverDraft = {
 };
 
 type ContentDraft = {
-  kind: string;
+  kind: LyricsContentKind | '';
   content: string;
 };
 
@@ -55,12 +57,6 @@ const isLoading = ref(false);
 const error = ref<string | null>(null);
 const originalPayload = ref<LyricsPayload | null>(null);
 
-const contentKinds = ['japanese', 'romaji', 'english', 'translation'];
-const legacyContentKinds: Record<string, string> = {
-  jp: 'japanese',
-  en: 'english',
-};
-
 const lyricId = ref(route.params.id?.toString() || '');
 const isEditMode = computed(() => route.name === 'lyrics-edit' && Boolean(lyricId.value));
 
@@ -82,7 +78,7 @@ const normalizedPayload = computed<LyricsPayload>(() => ({
   covers: cleanCovers.value,
   contents: contents.value
     .map((item) => ({
-      kind: item.kind.trim(),
+      kind: item.kind,
       content: item.content.trim(),
     }))
     .filter((item) => item.kind && item.content),
@@ -261,26 +257,23 @@ const normalizeCoverVideoId = (cover: CoverDraft) => {
 
 const addContent = () => contents.value.push({ kind: '', content: '' });
 const removeContent = (index: number) => contents.value.splice(index, 1);
-const isContentKindUsed = (kind: string, currentIndex: number) =>
+const isContentKindUsed = (kind: LyricsContentKind, currentIndex: number) =>
   contents.value.some((item, index) => index !== currentIndex && item.kind.trim() === kind);
 const normalizeLyricContent = (value: string) => value.replace(/е/g, 'e');
 
 const normalizeContents = (payload: any): ContentDraft[] => {
-  if (Array.isArray(payload?.contents)) {
-    return payload.contents
-      .map((item: any) => ({
-        kind: String(item.kind ?? item.type ?? item.language ?? '').trim(),
-        content: String(item.content ?? item.text ?? item.value ?? '').trim(),
-      }))
-      .filter((item: ContentDraft) => item.kind || item.content);
-  }
+  const source = Array.isArray(payload?.contents) ? payload.contents : [];
 
-  return Object.entries(legacyContentKinds)
-    .map(([sourceKey, kind]) => ({
-      kind,
-      content: String(payload?.[sourceKey] ?? '').trim(),
-    }))
-    .filter((item) => item.content);
+  return source
+    .map((item: any) => {
+      const kind = String(item.kind ?? item.type ?? item.language ?? '').trim();
+
+      return {
+        kind: isLyricsContentKind(kind) ? kind : '',
+        content: String(item.content ?? item.text ?? item.value ?? '').trim(),
+      };
+    })
+    .filter((item: ContentDraft) => item.kind || item.content);
 };
 
 const normalizeCovers = (payload: any): CoverDraft[] => {
@@ -566,8 +559,13 @@ onBeforeRouteLeave(() => confirmLeave());
                   class="h-10 rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary-soft sm:w-48"
                 >
                   <option value="">Kind</option>
-                  <option v-for="kind in contentKinds" :key="kind" :value="kind" :disabled="isContentKindUsed(kind, index)">
-                    {{ kind }}
+                  <option
+                    v-for="option in LYRICS_CONTENT_KIND_OPTIONS"
+                    :key="option.key"
+                    :value="option.key"
+                    :disabled="isContentKindUsed(option.key, index)"
+                  >
+                    {{ option.label }}
                   </option>
                 </select>
                 <button
