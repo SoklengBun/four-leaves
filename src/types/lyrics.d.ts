@@ -14,6 +14,8 @@ type LyricsContent = Base & {
 type LyricsCover = Omit<Base, 'id'> & {
   id: string;
   lyricsId?: number;
+  note?: string;
+  defaultContentKind?: string;
   artists?: LyricsArtist[];
 };
 
@@ -22,6 +24,7 @@ type Lyrics = Base & {
   title: string;
   altTitles: string[];
   artists: LyricsArtist[];
+  defaultContentKind?: string;
   contents?: LyricsContent[];
   covers?: LyricsCover[];
   createdById?: number;
