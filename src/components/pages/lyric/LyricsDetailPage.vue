@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
-import { DEFAULT_LYRICS_CONTENT_KIND, LYRICS_CONTENT_KIND_OPTIONS, getLyricsContentKindLabel } from '~/constants/lyrics';
+import { DEFAULT_LYRICS_CONTENT_KIND, LYRICS_CONTENT_KIND_OPTIONS, getLyricsContentKindLabel, isLyricsContentKind } from '~/constants/lyrics';
 import type { LyricsContentKind } from '~/constants/lyrics';
 import { usePlayer } from '~/stores/player';
 import PlayerSeekBar from '~/components/music/PlayerSeekBar.vue';
@@ -38,19 +38,32 @@ const displayArtist = computed(() => getLyricsArtistsLabel(artists.value));
 const lyricsContent = computed(() => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content?.replace(/е/g, 'e') ?? '');
 const availableLangs = ref<LyricsContentKind[]>([DEFAULT_LYRICS_CONTENT_KIND]);
 
+const syncContentKind = () => {
+  const song = current.value;
+  if (!song) return;
+
+  const contentKinds = new Set(song.contents?.filter((content) => content.content.trim()).map((content) => content.kind) ?? []);
+  availableLangs.value = LYRICS_CONTENT_KIND_OPTIONS.filter((option) => contentKinds.has(option.key)).map((option) => option.key);
+
+  const isSongVersion = !videoId.value || videoId.value === song.videoId;
+  const defaultContentKind = isSongVersion ? song.defaultContentKind : song.covers?.find((cover) => cover.id === videoId.value)?.defaultContentKind;
+
+  if (defaultContentKind && isLyricsContentKind(defaultContentKind) && availableLangs.value.includes(defaultContentKind)) {
+    currentLang.value = defaultContentKind;
+    return;
+  }
+
+  const fallbackContentKind = availableLangs.value.includes(DEFAULT_LYRICS_CONTENT_KIND) ? DEFAULT_LYRICS_CONTENT_KIND : availableLangs.value[0];
+  if (fallbackContentKind) currentLang.value = fallbackContentKind;
+};
+
 const fetchLyricsDetail = async (id: string, force = false) => {
   isLoading.value = true;
   try {
     const song = await getLyricsById(id, force);
     if (!song) return null;
     current.value = { ...current.value, ...song };
-
-    const contentKinds = new Set(current.value.contents?.map((content) => content.kind) ?? [DEFAULT_LYRICS_CONTENT_KIND]);
-    availableLangs.value = LYRICS_CONTENT_KIND_OPTIONS.filter((option) => contentKinds.has(option.key)).map((option) => option.key);
-
-    if (!availableLangs.value.includes(currentLang.value) && availableLangs.value[0]) {
-      currentLang.value = availableLangs.value[0];
-    }
+    syncContentKind();
 
     return song;
   } finally {
@@ -81,6 +94,8 @@ watch(
     }
   },
 );
+
+watch(videoId, syncContentKind);
 
 const togglePlay = () => {
   if (mode.value === 'off') return;
