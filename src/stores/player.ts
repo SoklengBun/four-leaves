@@ -55,6 +55,8 @@ export const usePlayer = defineStore('player', () => {
   const router = useRouter();
 
   let timer: number | null = null;
+  let shuffleListSignature = '';
+  const playedShuffleIndexes = new Set<number>();
 
   const progress = computed(() => {
     if (!duration.value) return 0;
@@ -158,7 +160,7 @@ export const usePlayer = defineStore('player', () => {
     videoId.value = selectedId;
     current.value = song;
 
-    if (coverId || song.defaultCoverId) {
+    if (selectedId !== song.videoId) {
       const cover = song.covers?.find((c) => c.id === selectedId);
       artists.value = cover?.artists ?? [];
     } else {
@@ -218,6 +220,8 @@ export const usePlayer = defineStore('player', () => {
 
   const toggleShuffle = () => {
     shuffle.value = !shuffle.value;
+    shuffleListSignature = '';
+    playedShuffleIndexes.clear();
   };
 
   const toggleRepeatOne = () => {
@@ -250,6 +254,17 @@ export const usePlayer = defineStore('player', () => {
     loopEnabled.value = !loopEnabled.value;
   };
 
+  const getShuffleListSignature = (lyricsList: PlaylistItem[]) => {
+    const playlistId = playlist.list?.id ?? 'none';
+    const itemIds = lyricsList.map((song) => song.playlistItemId ?? `${song.id}:${song.videoId}`).join(',');
+    return `${playlistId}|${itemIds}`;
+  };
+
+  const getRandomSongVersionId = (song: PlaylistItem) => {
+    const versionIds = [...new Set([song.videoId, ...(song.covers ?? []).map((cover) => cover.id)].filter(Boolean))];
+    return versionIds[Math.floor(Math.random() * versionIds.length)] ?? song.videoId;
+  };
+
   const playNext = (fromSongEnd = false) => {
     const lyricsList = playlist.list?.items ?? [];
     if (!lyricsList.length || !current.value) return;
@@ -262,14 +277,33 @@ export const usePlayer = defineStore('player', () => {
       return;
     }
 
-    // Shuffle -> pick random different song when possible
-    if (shuffle.value && lyricsList.length > 1) {
-      let idx = currentIndex;
-      while (idx === currentIndex) {
-        idx = Math.floor(Math.random() * lyricsList.length);
+    // Shuffle -> play every song once before starting a new cycle.
+    if (shuffle.value) {
+      const listSignature = getShuffleListSignature(lyricsList);
+      if (shuffleListSignature !== listSignature) {
+        shuffleListSignature = listSignature;
+        playedShuffleIndexes.clear();
       }
+
+      if (currentIndex >= 0) playedShuffleIndexes.add(currentIndex);
+
+      let unplayedIndexes = lyricsList.map((_, index) => index).filter((index) => !playedShuffleIndexes.has(index));
+
+      if (!unplayedIndexes.length) {
+        playedShuffleIndexes.clear();
+        unplayedIndexes = lyricsList.map((_, index) => index).filter((index) => lyricsList.length === 1 || index !== currentIndex);
+      }
+
+      const idx = unplayedIndexes[Math.floor(Math.random() * unplayedIndexes.length)] ?? currentIndex;
       const nextSong = lyricsList[idx];
-      selectSong(nextSong);
+      const nextVersionId = getRandomSongVersionId(nextSong);
+      playedShuffleIndexes.add(idx);
+      if (nextSong.id === current.value.id && nextVersionId === videoId.value) {
+        seekTo(0);
+        play();
+      } else {
+        selectSong(nextSong, nextVersionId);
+      }
       if (router.currentRoute.value.name === 'lyrics-detail') {
         router.replace({ params: { id: nextSong.videoId } });
       }

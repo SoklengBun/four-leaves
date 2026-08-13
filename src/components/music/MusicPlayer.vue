@@ -5,6 +5,7 @@ import NextImage from '~/assets/images/player/next.png';
 import PrevImage from '~/assets/images/player/previous.png';
 import PauseImage from '~/assets/images/player/pause.png';
 import PlayImage from '~/assets/images/player/play.png';
+import MusicImage from '~/assets/images/player/music.png';
 
 import { usePlayer } from '~/stores/player';
 import PlayerSeekBar from './PlayerSeekBar.vue';
@@ -69,18 +70,29 @@ const togglePlaylist = () => {
             <PlayerSeekBar time-class="text-[10px] text-foreground-muted md:text-xs" class="hidden md:block" />
 
             <div class="flex items-center justify-center">
-              <button class="mx-1 size-6 md:size-8" @click="player.playPrevious()">
+              <button class="mx-1 size-6 transition-transform hover:scale-110 md:size-8" @click="player.playPrevious()">
                 <img :src="PrevImage" />
               </button>
-              <button class="mx-2 size-6 md:mx-7 md:size-9" @click="togglePlay">
+              <button class="mx-2 size-6 transition-transform hover:scale-110 md:mx-7 md:size-9" @click="togglePlay">
                 <img :src="isPlaying ? PauseImage : PlayImage" />
               </button>
-              <button class="mx-1 size-6 md:size-8" @click="player.playNext()">
+              <button class="mx-1 size-6 transition-transform hover:scale-110 md:size-8" @click="player.playNext()">
                 <img :src="NextImage" />
               </button>
             </div>
           </div>
-          <div class="relative z-10 hidden md:flex md:flex-1"></div>
+          <div class="relative z-10 hidden h-full justify-end p-3 md:flex md:flex-1">
+            <button
+              v-if="playlist.list?.items?.length"
+              type="button"
+              class="size-10 p-1 transition-transform hover:scale-110"
+              aria-label="Open current playlist"
+              :aria-expanded="showPlaylist"
+              @click="togglePlaylist"
+            >
+              <img :src="MusicImage" alt="" class="size-full object-contain" />
+            </button>
+          </div>
         </div>
         <div class="h-0 w-full">
           <div
