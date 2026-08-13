@@ -14,6 +14,7 @@ import PauseImage from '~/assets/images/player/pause.png';
 import PlayImage from '~/assets/images/player/play.png';
 import ShuffleImage from '~/assets/images/player/shuffle.png';
 import RepeatImage from '~/assets/images/player/repeat.png';
+import MusicImage from '~/assets/images/player/music.png';
 
 import YoutubeThumbnail from '~/components/music/YoutubeThumbnail.vue';
 import { getLyricsArtistsLabel, getLyricsTitleLabel } from '~/utils/lyrics';
@@ -25,10 +26,12 @@ import { getLyricsById } from '~/services/lyrics.js';
 import LyricsDetailMoreOptions from './components/LyricsDetailMoreOptions.vue';
 import BackButton from '~/components/shares/BackButton.vue';
 import RoundButton from '~/components/shares/RoundButton.vue';
+import { usePlaylist } from '~/stores/playlist';
 
 const router = useRouter();
 const player = usePlayer();
-const { videoId, artists, current, isPlaying, mode, shuffle, repeatOne } = storeToRefs(player);
+const { videoId, artists, current, isPlaying, mode, shuffle, repeatOne, showPlaylist } = storeToRefs(player);
+const playlist = usePlaylist();
 
 const currentLang = ref<LyricsContentKind>(DEFAULT_LYRICS_CONTENT_KIND);
 const isLoading = ref(false);
@@ -107,6 +110,10 @@ const togglePlay = () => {
   }
 };
 
+const togglePlaylist = () => {
+  showPlaylist.value = !showPlaylist.value;
+};
+
 const refreshCurrentLyrics = () => {
   if (!videoId.value) return;
   void fetchLyricsDetail(videoId.value, true);
@@ -134,18 +141,39 @@ const refreshCurrentLyrics = () => {
       <PlayerSeekBar time-class="text-xs text-foreground-muted" />
 
       <div class="flex w-full items-center justify-center">
-        <div class="flex flex-1"></div>
-        <button class="mr-4 size-4 md:mr-8 md:size-6" @click="player.toggleShuffle()" :class="{ 'opacity-50': !shuffle }">
+        <div class="flex flex-1">
+          <button
+            v-if="playlist.list?.items?.length"
+            type="button"
+            class="size-5 rounded-lg transition-transform hover:scale-105 active:scale-95 md:flex md:size-6"
+            aria-label="Open current playlist"
+            :aria-expanded="showPlaylist"
+            @click="togglePlaylist"
+          >
+            <img :src="MusicImage" alt="" class="size-full object-contain" />
+          </button>
+        </div>
+        <button
+          class="mr-4 size-4 transition-transform hover:scale-110 md:mr-8 md:size-6"
+          @click="player.toggleShuffle()"
+          :class="{ 'opacity-50': !shuffle }"
+        >
           <img :src="ShuffleImage" />
         </button>
-        <button class="size-6 md:size-8" @click="player.playPrevious()"><img :src="PrevImage" /></button>
-        <button class="mx-4 size-7 md:mx-10 md:size-10" @click="togglePlay"><img :src="isPlaying ? PauseImage : PlayImage" /></button>
-        <button class="size-6 md:size-8" @click="player.playNext()"><img :src="NextImage" /></button>
-        <button class="ml-4 size-4 md:ml-8 md:size-6" @click="player.toggleRepeatOne()" :class="{ 'opacity-50': !repeatOne }">
+        <button class="size-6 transition-transform hover:scale-110 md:size-8" @click="player.playPrevious()"><img :src="PrevImage" /></button>
+        <button class="mx-4 size-7 transition-transform hover:scale-110 md:mx-10 md:size-10" @click="togglePlay">
+          <img :src="isPlaying ? PauseImage : PlayImage" />
+        </button>
+        <button class="size-6 transition-transform hover:scale-110 md:size-8" @click="player.playNext()"><img :src="NextImage" /></button>
+        <button
+          class="ml-4 size-4 transition-transform hover:scale-110 md:ml-8 md:size-6"
+          @click="player.toggleRepeatOne()"
+          :class="{ 'opacity-50': !repeatOne }"
+        >
           <img :src="RepeatImage" />
         </button>
 
-        <div class="flex flex-1 justify-end">
+        <div class="flex flex-1 items-center justify-end gap-2">
           <LoopSetting />
         </div>
       </div>

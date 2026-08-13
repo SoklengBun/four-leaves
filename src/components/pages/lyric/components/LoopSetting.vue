@@ -159,7 +159,7 @@ onClickOutside(
     <button
       ref="triggerRef"
       type="button"
-      class="ml-4 size-4 rounded-md transition-[opacity,transform] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background md:ml-8 md:size-6"
+      class="ml-4 size-5 rounded-md transition-[opacity,transform] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background md:ml-8 md:size-6"
       :class="{ 'opacity-50': !loopEnabled }"
       aria-label="Open A/B loop settings"
       :aria-expanded="isOpen"

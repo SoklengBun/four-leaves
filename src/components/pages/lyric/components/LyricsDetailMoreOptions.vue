@@ -31,11 +31,19 @@ const addingPlaylistId = ref<number | null>(null);
 const isRemovingFromPlaylist = ref(false);
 
 const isCanRemove = computed(() => {
-  return list.value?.createdById === auth.user?.id;
+  return list.value?.id !== 0 && list.value?.createdById === auth.user?.id;
 });
 
 const onClose = () => {
   show.value = false;
+};
+
+const requireAuth = () => {
+  if (auth.isLoggedIn) return true;
+
+  onClose();
+  router.push({ name: 'login', query: { redirect: router.currentRoute.value.fullPath } });
+  return false;
 };
 
 const togglePlaylistList = () => {
@@ -55,12 +63,14 @@ const edit = () => {
 
 const onCreatePlaylist = () => {
   if (!current.value?.id) return;
+  if (!requireAuth()) return;
   playlist.openCreatePopup([current.value.id]);
   onClose();
 };
 
 const onAddToPlaylist = async (playlistId: number) => {
   if (!current.value?.id) return;
+  if (!requireAuth()) return;
   if (addingPlaylistId.value !== null) return;
   addingPlaylistId.value = playlistId;
 
@@ -74,6 +84,7 @@ const onAddToPlaylist = async (playlistId: number) => {
 
 const onRemoveFromPlaylist = async () => {
   if (!current.value?.playlistItemId) return;
+  if (!requireAuth()) return;
   if (isRemovingFromPlaylist.value) return;
 
   isRemovingFromPlaylist.value = true;
