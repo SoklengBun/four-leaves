@@ -35,7 +35,12 @@ const goToLyrics = () => {
   if (mode.value === 'off') return;
   if (router.currentRoute.value.name === 'lyrics-detail') return;
 
-  router.push({ name: 'lyrics-detail', params: { id: current.value?.videoId } });
+  const playlistId = playlist.list?.id;
+  router.push({
+    name: 'lyrics-detail',
+    params: { id: current.value?.videoId },
+    query: playlistId && playlistId > 0 ? { playlistId: String(playlistId) } : undefined,
+  });
 };
 
 const togglePlaylist = () => {

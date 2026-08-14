@@ -33,7 +33,7 @@ const fetchPlaylist = async (force = false) => {
 const onSelect = (song: PlaylistItem) => {
   if (!list.value) return;
   player.selectSong(song, undefined, list.value);
-  router.push({ name: 'lyrics-detail', params: { id: song.videoId } });
+  router.push({ name: 'lyrics-detail', params: { id: song.videoId }, query: { playlistId: String(list.value.id) } });
 };
 
 onMounted(() => {

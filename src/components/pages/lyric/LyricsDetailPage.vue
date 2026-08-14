@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import MarqueeText from '~/components/shares/MarqueeText.vue';
 import { DEFAULT_LYRICS_CONTENT_KIND, LYRICS_CONTENT_KIND_OPTIONS, getLyricsContentKindLabel, isLyricsContentKind } from '~/constants/lyrics';
 import type { LyricsContentKind } from '~/constants/lyrics';
@@ -22,13 +22,14 @@ import LyricsLoadingState from './components/LyricsLoadingState.vue';
 import LoopSetting from './components/LoopSetting.vue';
 import SongCoverList from './components/SongCoverList.vue';
 import CreatePlaylist from '~/components/music/CreatePlaylist.vue';
-import { getLyricsById } from '~/services/lyrics.js';
+import { getLyricsById, getLyricsList } from '~/services/lyrics.js';
 import LyricsDetailMoreOptions from './components/LyricsDetailMoreOptions.vue';
 import BackButton from '~/components/shares/BackButton.vue';
 import RoundButton from '~/components/shares/RoundButton.vue';
 import { usePlaylist } from '~/stores/playlist';
 
 const router = useRouter();
+const route = useRoute();
 const player = usePlayer();
 const { videoId, artists, current, isPlaying, mode, shuffle, repeatOne, showPlaylist } = storeToRefs(player);
 const playlist = usePlaylist();
@@ -40,6 +41,60 @@ const displayTitle = computed(() => getLyricsTitleLabel(current.value));
 const displayArtist = computed(() => getLyricsArtistsLabel(artists.value));
 const lyricsContent = computed(() => current.value?.contents?.find((e) => e.kind === currentLang.value)?.content?.replace(/е/g, 'e') ?? '');
 const availableLangs = ref<LyricsContentKind[]>([DEFAULT_LYRICS_CONTENT_KIND]);
+const requestedPlaylistId = computed(() => {
+  const value = Array.isArray(route.query.playlistId) ? route.query.playlistId[0] : route.query.playlistId;
+  const id = Number(value);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+});
+
+const useAllLyricsPlaylist = async (song: PlaylistItem) => {
+  let items = await getLyricsList(1, false, true);
+
+  if (!items.length) {
+    try {
+      items = await getLyricsList(1);
+    } catch {
+      items = [];
+    }
+  }
+
+  if (!items.some((item) => item.id === song.id || item.videoId === song.videoId)) {
+    items = [song, ...items];
+  }
+
+  playlist.list = {
+    id: 0,
+    name: 'All Lyrics',
+    description: 'Every song from the lyrics catalog',
+    isPublic: false,
+    items,
+  };
+};
+
+const applyPlaylistContext = async (song: PlaylistItem) => {
+  if (!requestedPlaylistId.value) return song;
+
+  try {
+    const requestedPlaylist =
+      playlist.list?.id === requestedPlaylistId.value ? playlist.list : await playlist.getPlaylist(requestedPlaylistId.value, true);
+    const playlistSong = requestedPlaylist?.items.find((item) => item.id === song.id || item.videoId === song.videoId);
+
+    if (requestedPlaylist && playlistSong) {
+      return {
+        ...playlistSong,
+        ...song,
+        playlistItemId: playlistSong.playlistItemId,
+        note: playlistSong.note,
+        defaultCoverId: playlistSong.defaultCoverId,
+      };
+    }
+  } catch {
+    // A private, missing, or unavailable playlist falls back to all lyrics.
+  }
+
+  await useAllLyricsPlaylist(song);
+  return song;
+};
 
 const syncContentKind = () => {
   const song = current.value;
@@ -65,7 +120,12 @@ const fetchLyricsDetail = async (id: string, force = false) => {
   try {
     const song = await getLyricsById(id, force);
     if (!song) return null;
-    current.value = { ...current.value, ...song };
+    const contextualSong = await applyPlaylistContext(song);
+    const shouldPreparePlayer = !videoId.value || current.value?.id !== contextualSong.id;
+    current.value = { ...current.value, ...contextualSong };
+    if (shouldPreparePlayer) {
+      await player.selectSong(current.value, undefined, undefined, false);
+    }
     syncContentKind();
 
     return song;
@@ -81,22 +141,11 @@ onMounted(() => {
   }
 });
 
-watch(
-  () => router.currentRoute.value.params.id,
-  (id, previousId) => {
-    if (typeof id !== 'string' || !id || id === previousId) return;
-    fetchLyricsDetail(id);
-  },
-);
-
-watch(
-  () => player.isReady,
-  () => {
-    if (!player.videoId && current.value) {
-      player.selectSong(current.value);
-    }
-  },
-);
+watch([() => route.params.id, requestedPlaylistId], ([id, playlistId], [previousId, previousPlaylistId]) => {
+  if (typeof id !== 'string' || !id) return;
+  if (id === previousId && playlistId === previousPlaylistId) return;
+  fetchLyricsDetail(id);
+});
 
 watch(videoId, syncContentKind);
 
@@ -115,8 +164,8 @@ const togglePlaylist = () => {
 };
 
 const refreshCurrentLyrics = () => {
-  if (!videoId.value) return;
-  void fetchLyricsDetail(videoId.value, true);
+  if (!current.value?.videoId) return;
+  void fetchLyricsDetail(current.value.videoId, true);
 };
 </script>
 
@@ -185,7 +234,7 @@ const refreshCurrentLyrics = () => {
       v-else
       class="mx-auto mt-5 w-full flex-1 rounded-xl bg-card pb-5 pt-4 shadow-[inset_-5px_-5px_10px_#b0b0b040,inset_5px_5px_10px_#b0b0b040] dark:shadow-[inset_-5px_-5px_10px_#17275180,inset_5px_5px_10px_#1a294580] md:max-w-[700px] md:rounded-2xl md:pb-10"
     >
-      <div class="mb-3 flex w-full items-center gap-2 px-3 md:px-6">
+      <div class="sticky top-0 mb-3 flex w-full items-center justify-center gap-2 bg-card px-3 md:px-6">
         <button
           v-for="lang in availableLangs"
           :key="lang"

@@ -2,6 +2,7 @@ import { computed, ref, shallowRef, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
 import { usePlaylist } from './playlist';
+import { getLyricsById } from '~/services/lyrics';
 
 let ytApiPromise: Promise<void> | null = null;
 
@@ -55,8 +56,10 @@ export const usePlayer = defineStore('player', () => {
   const router = useRouter();
 
   let timer: number | null = null;
+  let autoplayWhenReady = false;
   let shuffleListSignature = '';
   const playedShuffleIndexes = new Set<number>();
+  const hydratedAllLyricsSongIds = new Set<number>();
 
   const progress = computed(() => {
     if (!duration.value) return 0;
@@ -107,7 +110,6 @@ export const usePlayer = defineStore('player', () => {
     player.value = new window.YT.Player(containerId, {
       height: '0',
       width: '0',
-      videoId: videoId.value,
       playerVars: {
         controls: 0,
         rel: 0,
@@ -117,7 +119,16 @@ export const usePlayer = defineStore('player', () => {
       events: {
         onReady: () => {
           isReady.value = true;
-          duration.value = player.value?.getDuration() ?? 0;
+          if (!player.value || !videoId.value) return;
+
+          duration.value = 0;
+          if (autoplayWhenReady) {
+            autoplayWhenReady = false;
+            player.value.loadVideoById(videoId.value);
+            player.value.playVideo();
+          } else {
+            player.value.cueVideoById(videoId.value);
+          }
         },
         onStateChange: (e: { data: number }) => {
           console.log('YT state change', e.data);
@@ -140,15 +151,42 @@ export const usePlayer = defineStore('player', () => {
     console.log('YT Player initialized', player.value);
   };
 
-  const play = () => player.value?.playVideo();
+  const play = () => {
+    if (!player.value || !isReady.value) {
+      autoplayWhenReady = true;
+      return;
+    }
 
-  const pause = () => player.value?.pauseVideo();
+    autoplayWhenReady = false;
+    player.value.playVideo();
+  };
+
+  const pause = () => {
+    autoplayWhenReady = false;
+    player.value?.pauseVideo();
+  };
 
   const seekTo = (time: number) => {
     player.value?.seekTo(Math.max(0, time), true);
   };
 
-  const selectSong = async (song: PlaylistItem, coverId?: string, selectedPlaylist?: Playlist | null) => {
+  const syncLyricsDetailRoute = (song: PlaylistItem) => {
+    const route = router.currentRoute.value;
+    if (route.name !== 'lyrics-detail') return;
+
+    const query = { ...route.query };
+    const playlistId = playlist.list?.id;
+    if (playlistId && playlistId > 0) {
+      query.playlistId = String(playlistId);
+    } else {
+      delete query.playlistId;
+    }
+
+    if (route.params.id === song.videoId && route.query.playlistId === query.playlistId) return;
+    router.replace({ name: 'lyrics-detail', params: { id: song.videoId }, query });
+  };
+
+  const selectSong = async (song: PlaylistItem, coverId?: string, selectedPlaylist?: Playlist | null, autoplay = true) => {
     const selectedId = coverId || song.defaultCoverId || song.videoId;
 
     if (selectedPlaylist) {
@@ -167,22 +205,21 @@ export const usePlayer = defineStore('player', () => {
       artists.value = song.artists;
     }
 
+    syncLyricsDetailRoute(song);
+    if (mode.value === 'off') mode.value = 'full';
+    clearLoopRange();
+
+    autoplayWhenReady = autoplay;
     if (!videoId.value || !player.value || !isReady.value) return;
 
     pause();
     duration.value = 0;
-    player.value.loadVideoById(videoId.value);
-    play();
-
-    const route = router.currentRoute.value;
-    const isDetail = route.name === 'lyrics-detail';
-    if (isDetail && route.params.id !== song.videoId) {
-      router.replace({ params: { id: song.videoId } });
+    if (autoplay) {
+      player.value.loadVideoById(videoId.value);
+      play();
+    } else {
+      player.value.cueVideoById(videoId.value);
     }
-
-    if (mode.value === 'off') mode.value = 'full';
-
-    clearLoopRange();
   };
 
   const destroy = () => {
@@ -190,6 +227,7 @@ export const usePlayer = defineStore('player', () => {
     mode.value = 'off';
     player.value?.destroy();
     player.value = null;
+    autoplayWhenReady = false;
     isReady.value = false;
     isPlaying.value = false;
     currentTime.value = 0;
@@ -265,7 +303,53 @@ export const usePlayer = defineStore('player', () => {
     return versionIds[Math.floor(Math.random() * versionIds.length)] ?? song.videoId;
   };
 
-  const playNext = (fromSongEnd = false) => {
+  const hydrateAllLyricsSong = async (song: PlaylistItem, index: number) => {
+    if (playlist.list?.id !== 0 || hydratedAllLyricsSongIds.has(song.id)) return song;
+
+    try {
+      const details = await getLyricsById(song.videoId, true);
+      if (!details) return song;
+
+      const covers = [...(song.covers ?? []), ...(details.covers ?? [])].filter(
+        (cover, coverIndex, allCovers) => allCovers.findIndex((item) => item.id === cover.id) === coverIndex,
+      );
+
+      const hydratedSong: PlaylistItem = {
+        ...song,
+        ...details,
+        covers,
+      };
+
+      if (playlist.list?.id === 0 && playlist.list.items[index]?.id === song.id) {
+        playlist.list.items[index] = hydratedSong;
+      }
+
+      hydratedAllLyricsSongIds.add(song.id);
+      return hydratedSong;
+    } catch {
+      return song;
+    }
+  };
+
+  const selectPlaylistSong = async (song: PlaylistItem, index: number) => {
+    if (playlist.list?.id !== 0) {
+      await selectSong(song);
+      return;
+    }
+
+    const hydratedSong = await hydrateAllLyricsSong(song, index);
+    const versionId = getRandomSongVersionId(hydratedSong);
+
+    if (hydratedSong.id === current.value?.id && versionId === videoId.value) {
+      seekTo(0);
+      play();
+      return;
+    }
+
+    await selectSong(hydratedSong, versionId);
+  };
+
+  const playNext = async (fromSongEnd = false) => {
     const lyricsList = playlist.list?.items ?? [];
     if (!lyricsList.length || !current.value) return;
     const currentIndex = lyricsList.findIndex((s) => s.id === current.value?.id);
@@ -295,18 +379,8 @@ export const usePlayer = defineStore('player', () => {
       }
 
       const idx = unplayedIndexes[Math.floor(Math.random() * unplayedIndexes.length)] ?? currentIndex;
-      const nextSong = lyricsList[idx];
-      const nextVersionId = getRandomSongVersionId(nextSong);
       playedShuffleIndexes.add(idx);
-      if (nextSong.id === current.value.id && nextVersionId === videoId.value) {
-        seekTo(0);
-        play();
-      } else {
-        selectSong(nextSong, nextVersionId);
-      }
-      if (router.currentRoute.value.name === 'lyrics-detail') {
-        router.replace({ params: { id: nextSong.videoId } });
-      }
+      await selectPlaylistSong(lyricsList[idx], idx);
       return;
     }
 
@@ -316,14 +390,10 @@ export const usePlayer = defineStore('player', () => {
       nextIndex = 0;
     }
 
-    const nextSong = lyricsList[nextIndex];
-    selectSong(nextSong);
-    if (router.currentRoute.value.name === 'lyrics-detail') {
-      router.replace({ params: { id: nextSong.videoId } });
-    }
+    await selectPlaylistSong(lyricsList[nextIndex], nextIndex);
   };
 
-  const playPrevious = () => {
+  const playPrevious = async () => {
     const lyricsList = playlist.list?.items ?? [];
     if (!lyricsList.length || !current.value) return;
     const currentIndex = lyricsList.findIndex((s) => s.id === current.value?.id);
@@ -334,11 +404,7 @@ export const usePlayer = defineStore('player', () => {
       while (idx === currentIndex) {
         idx = Math.floor(Math.random() * lyricsList.length);
       }
-      const prevSong = lyricsList[idx];
-      selectSong(prevSong);
-      if (router.currentRoute.value.name === 'lyrics-detail') {
-        router.replace({ params: { id: prevSong.videoId } });
-      }
+      await selectPlaylistSong(lyricsList[idx], idx);
       return;
     }
 
@@ -347,11 +413,7 @@ export const usePlayer = defineStore('player', () => {
       prevIndex = lyricsList.length - 1;
     }
 
-    const previousSong = lyricsList[prevIndex];
-    selectSong(previousSong);
-    if (router.currentRoute.value.name === 'lyrics-detail') {
-      router.replace({ params: { id: previousSong.videoId } });
-    }
+    await selectPlaylistSong(lyricsList[prevIndex], prevIndex);
   };
 
   watch(songEnded, (ended) => {

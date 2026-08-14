@@ -23,6 +23,9 @@ const scrollPositions = new Map<string, ScrollPosition>();
 let scrollRestorationFrame: number | null = null;
 
 const initPlaylist = async () => {
+  const requestedPlaylistId = Number(currentRoute.query.playlistId);
+  if (Number.isSafeInteger(requestedPlaylistId) && requestedPlaylistId > 0) return;
+
   const cachedLyrics = await getLyricsList(1, false, true);
   if (cachedLyrics.length <= (playlist.list?.items?.length ?? 0)) return;
 

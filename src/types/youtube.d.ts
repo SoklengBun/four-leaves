@@ -14,6 +14,7 @@ type YTPlayer = {
   playVideo: () => void;
   pauseVideo: () => void;
   seekTo: (seconds: number, allowSeekAhead?: boolean) => void;
+  cueVideoById: (videoId: string) => void;
   loadVideoById: (videoId: string) => void;
   getCurrentTime: () => number;
   getDuration: () => number;

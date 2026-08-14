@@ -186,7 +186,11 @@ watch(searchText, (value, previousValue) => {
 watch(searchDebounce, (value) => void search(value, searchType.value));
 
 const onClick = (lyrics: PlaylistItem, selectedPlaylist: Playlist | null = null) => {
-  router.push({ name: 'lyrics-detail', params: { id: lyrics.videoId } });
+  router.push({
+    name: 'lyrics-detail',
+    params: { id: lyrics.videoId },
+    query: selectedPlaylist?.id && selectedPlaylist.id > 0 ? { playlistId: String(selectedPlaylist.id) } : undefined,
+  });
   player.selectSong(lyrics, undefined, selectedPlaylist);
 };
 
