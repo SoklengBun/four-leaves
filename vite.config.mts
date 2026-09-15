@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import path from 'path';
 import vueJsxPlugin from '@vitejs/plugin-vue-jsx';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -23,7 +22,7 @@ export default defineConfig({
         short_name: 'Anella',
         description: 'Anella',
         display: 'standalone',
-        theme_color: '#fffff',
+        theme_color: '#ffffff',
         icons: [
           {
             src: '192.png',
@@ -47,7 +46,8 @@ export default defineConfig({
         globPatterns: ['**/*.{css,js,html,ico,png,jpg,jpeg,svg,gif,webp}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/img\.youtube\.com\/vi\/.*\/(maxresdefault|mqdefault)\.jpg$/,
+            urlPattern:
+              /^https:\/\/img\.youtube\.com\/vi\/.*\/(maxresdefault|mqdefault)\.jpg$/,
             handler: 'CacheFirst',
             options: {
               cacheName: 'youtube-thumbnails',
@@ -66,19 +66,17 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '~/': `${path.resolve(__dirname, 'src')}/`,
-      '@/': `${path.resolve(__dirname, 'src')}/`,
+      '~/': `${import.meta.dirname}/src/`,
+      '@/': `${import.meta.dirname}/src/`,
       'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
     },
   },
   css: {
     preprocessorOptions: {
       scss: {
-        api: 'modern', // or "modern", "legacy"
         quietDeps: true,
       },
       sass: {
-        api: 'modern', // or "modern", "legacy"
         quietDeps: true,
       },
     },

@@ -1,6 +1,6 @@
 module.exports = {
   plugins: {
-    tailwindcss: {},
+    '@tailwindcss/postcss': {},
     'postcss-pxtorem': {
       rootValue: 16, // 设计稿宽度/10，如设计稿为1920px，则设为192
       propList: ['*'], // 需要转换的属性，*表示所有

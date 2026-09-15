@@ -32,8 +32,8 @@ Anella is a personal Vue 3 web app for discovering lyrics, organizing playlists,
 
 ## Requirements
 
-- Node.js 22.13 or newer
-- pnpm 11.18.0 (the version declared in `package.json`)
+- Node.js 24
+- pnpm 10.34.5 (the version declared in `package.json`)
 - A compatible Anella API server for lyrics, playlists, artists, and authentication
 
 The dashboard can render without the application API, but API-backed features will return network errors until the backend is available.
