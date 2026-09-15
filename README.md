@@ -32,8 +32,8 @@ Anella is a personal Vue 3 web app for discovering lyrics, organizing playlists,
 
 ## Requirements
 
-- Node.js 18 or newer
-- Yarn 1.x
+- Node.js 22.13 or newer
+- pnpm 11.18.0 (the version declared in `package.json`)
 - A compatible Anella API server for lyrics, playlists, artists, and authentication
 
 The dashboard can render without the application API, but API-backed features will return network errors until the backend is available.
@@ -43,7 +43,7 @@ The dashboard can render without the application API, but API-backed features wi
 1. Install dependencies:
 
    ```sh
-   yarn install
+   pnpm install
    ```
 
 2. Create your local environment file:
@@ -62,7 +62,7 @@ The dashboard can render without the application API, but API-backed features wi
 4. Start the development server:
 
    ```sh
-   yarn dev
+   pnpm dev
    ```
 
 Vite serves the app at [http://localhost:5555](http://localhost:5555) and opens it in the default browser.
@@ -82,12 +82,12 @@ Vite exposes variables prefixed with `VITE_` to client-side code. Do not store s
 
 | Command | Description |
 | --- | --- |
-| `yarn dev` | Run the Vite development server on the local network. |
-| `yarn build` | Type-check the project and create a production build. |
-| `yarn preview` | Preview the production build locally. |
-| `yarn type-check` | Run Vue and TypeScript checks without emitting files. |
-| `yarn test:unit` | Run unit tests with Vitest and jsdom. |
-| `yarn lint` | Run ESLint and apply safe automatic fixes. |
+| `pnpm dev` | Run the Vite development server on the local network. |
+| `pnpm build` | Type-check the project and create a production build. |
+| `pnpm preview` | Preview the production build locally. |
+| `pnpm type-check` | Run Vue and TypeScript checks without emitting files. |
+| `pnpm test:unit` | Run unit tests with Vitest and jsdom. |
+| `pnpm lint` | Run ESLint and apply safe automatic fixes. |
 
 ## Main routes
 
@@ -138,7 +138,7 @@ Some browsers do not expose the Battery Status API, so the battery widget may sh
 Create an optimized build with:
 
 ```sh
-yarn build
+pnpm build
 ```
 
 The generated files are written to `dist/`. Because the app uses Vue Router history mode, configure the web server to fall back to `index.html` for unknown routes.
