@@ -1,5 +1,7 @@
 @import './base.css';
 
+@reference '../../styles/tailwind.css';
+
 :root {
   --nav-height: 50px;
   --body-height: 100vh;

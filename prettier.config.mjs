@@ -1,6 +1,6 @@
-module.exports = {
-  plugins: [require('prettier-plugin-tailwindcss')],
-  tailwindConfig: './styles/tailwind.config.js',
+export default {
+  plugins: ['prettier-plugin-tailwindcss'],
+  tailwindStylesheet: './src/styles/tailwind.css',
   printWidth: 80,
   tabWidth: 2,
   useTabs: false,
