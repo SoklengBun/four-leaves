@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Patrick+Hand');
 
-@reference '../../styles/tailwind.css';
-
 :root {
   /* Theme contract: swap these values per theme, keep the variable names. */
   --color-primary: #6258c9;
